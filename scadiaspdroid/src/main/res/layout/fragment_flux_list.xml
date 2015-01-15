@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/margin_small"
+    android:paddingRight="@dimen/margin_small"
+    android:paddingTop="@dimen/margin_small"
+    android:paddingBottom="@dimen/margin_small"
+    tools:context="fr.android.scaron.diaspdroid.vues.fragment.FluxFragment">
+    <!--
+    <RelativeLayout
+        android:id="@+id/fragment_flux_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:clickable="true"
+        android:minHeight="?android:attr/listPreferredItemHeight">
+        <ImageView
+            android:id="@+id/fragment_flux_user_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/margin_medium"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/fragment_flux_user_name_textivew"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_toRightOf="@id/fragment_flux_user_image"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="@android:color/primary_text_dark"
+            tools:text="Sebastien Caron" />
+
+        <TextView
+            android:id="@+id/fragment_flux_user_surname_textview"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_flux_user_name_textivew"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_toRightOf="@id/fragment_flux_user_image"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="@android:color/primary_text_dark"
+            tools:text="Flux" />
+    </RelativeLayout>
+    -->
+
+    <ListView
+        android:id="@+id/fragment_flux_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/margin_small" />
+
+        <!--
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#cccc"
+    android:orientation="vertical"
+    tools:context="fr.android.scaron.diaspdroid.vues.fragment.FluxFragment">
+    </LinearLayout>
+        -->
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="fr.android.scaron.diaspdroid.vues.fragment.FluxFragment">
+
+    <ListView android:id="@android:id/list" android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView android:id="@android:id/empty" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:gravity="center" />
+
+</FrameLayout>
+-->
+
+
+</RelativeLayout>
