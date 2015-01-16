@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.acra.ACRA;
@@ -46,6 +47,12 @@ public class DiaspActivity extends ActionBarActivity
 //                } else
                 if (type.startsWith("image/")) {
                     handleSendImage(intent); // Handle single image being sent
+
+                    setContentView(R.layout.activity_share);
+//                    LinearLayout shareLayout = (LinearLayout)findViewById(R.id.share_layout);
+                    EditText shareText = (EditText)findViewById(R.id.share_text_entry);
+                    Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                    shareText.setText("Partage de la photo : "+imageUri.getEncodedPath());
                 }
 //            } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
 //                if (type.startsWith("image/")) {
@@ -155,7 +162,7 @@ public class DiaspActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         try{
-            if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            if (mNavigationDrawerFragment!=null && !mNavigationDrawerFragment.isDrawerOpen()) {
                 // Only show items in the action bar relevant to this screen
                 // if the drawer is not showing. Otherwise, let the drawer
                 // decide what to show in the action bar.

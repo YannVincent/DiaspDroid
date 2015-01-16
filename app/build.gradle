@@ -7,7 +7,7 @@ android {
 
     tracepotConfig {
         apiGroupKey "1234567890abcdef"
-        enabledFor "release"
+        enabledFor "develop"
     }
 
     defaultConfig {
