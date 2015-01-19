@@ -105,7 +105,7 @@ public class DiaspActivity extends ActionBarActivity
                 case 0 :
                     mTitle = getString(R.string.title_section1);
                     fragmentManager.beginTransaction()
-                            .replace(R.id.container, FluxFragment.newInstance(mTitle.toString(), mTitle.toString()))
+                            .replace(R.id.container, FluxFragment.newInstance(mTitle.toString(), this))
                             .commit();
                     restoreActionBar();
                     break;

@@ -3,6 +3,7 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,12 +59,12 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static FluxFragment newInstance(String param1, String param2) {
+    public static FluxFragment newInstance(String title, String activity) {
         try{
             FluxFragment fragment = new FluxFragment();
             Bundle args = new Bundle();
-            args.putString(ARG_PARAM1, param1);
-            args.putString(ARG_PARAM2, param2);
+            args.putString(ARG_PARAM1, title);
+            args.putString(ARG_PARAM2, activity);
             fragment.setArguments(args);
             return fragment;
         } catch (Throwable thr) {
@@ -96,6 +97,11 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
 //            mAdapter = new FluxContentAdapter(getActivity(), R.layout.fragment_flux_list, FluxContent.ITEMS);
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, FluxContent.POSTS);
+
+            ActionBar actionBar = getActivity().getSupportActionBar();
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            actionBar.setTitle(R.string.app_name);
         } catch (Throwable thr) {
             Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
