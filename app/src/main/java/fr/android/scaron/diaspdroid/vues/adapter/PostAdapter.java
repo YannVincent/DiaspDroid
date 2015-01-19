@@ -52,7 +52,11 @@ public class PostAdapter extends ArrayAdapter<Post>
     public void setPosts(List<Post> posts){
         try{
             //follower.updateTitle(String.valueOf(downloads.size()));
-            this.posts = posts;
+            if (posts==null) {
+                this.posts = new ArrayList<Post>();
+            }else{
+                this.posts = posts;
+            }
             super.notifyDataSetChanged();
         } catch (Throwable thr) {
             Log.e(this.getClass().getName(),"Erreur : "+thr.toString());

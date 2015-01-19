@@ -3,7 +3,7 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +12,23 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
 
 import org.acra.ACRA;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
+import fr.android.scaron.diaspdroid.controler.DataControler;
+import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
 
 /**
@@ -32,8 +44,8 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+//    private static final String ARG_PARAM1 = "param1";
+//    private static final String ARG_PARAM2 = "param2";
 
     /**
      * The fragment argument representing the section number for this
@@ -42,8 +54,8 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mTitle;
+    private ActionBarActivity mActivity;
 
     private OnFragmentInteractionListener mListener;
 
@@ -56,15 +68,16 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private PostAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static FluxFragment newInstance(String title, String activity) {
+    public static FluxFragment newInstance(String title, ActionBarActivity activity, int sectionNumber) {
         try{
             FluxFragment fragment = new FluxFragment();
+            fragment.setmTitle(title);
+            fragment.setmActivity(activity);
             Bundle args = new Bundle();
-            args.putString(ARG_PARAM1, title);
-            args.putString(ARG_PARAM2, activity);
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         } catch (Throwable thr) {
@@ -73,35 +86,41 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             throw thr;
         }
     }
-
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public FluxFragment() {
+        super();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         try{
             super.onCreate(savedInstanceState);
+            FutureCallback<JsonObject> fluxCallback = new FutureCallback<JsonObject>() {
+                @Override
+                public void onCompleted(Exception e, JsonObject result) {
+                    if (e==null) {
+                        Type collectionType = new TypeToken<List<Post>>() {
+                        }.getType();
+                        List<Post> posts = new Gson().fromJson(result, collectionType);
+                        Log.d(FluxFragment.class.getName(), "Stream json : " + result.toString());
+                        mAdapter.setPosts(posts);
+//                    mAdapter.notifyDataSetChanged();
+                        return;
+                    }
+                    //Affichage de l'erreur
+                    Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG);
+                }
+            };
+            DataControler.getStream(this.getmActivity().getApplicationContext(), fluxCallback);
+            mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());//FluxContent.POSTS);
 
-            if (getArguments() != null) {
-                mParam1 = getArguments().getString(ARG_PARAM1);
-                mParam2 = getArguments().getString(ARG_PARAM2);
-            }
-
-//            // TODO: Change Adapter to display your content
-//            mAdapter = new ArrayAdapter<FluxContent.FluxItem>(getActivity(),
-//                    android.R.layout.simple_list_item_1, android.R.id.text1, FluxContent.ITEMS);
-
-//            mAdapter = new FluxContentAdapter(getActivity(), R.layout.fragment_flux_list, FluxContent.ITEMS);
-            mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, FluxContent.POSTS);
-
-            ActionBar actionBar = getActivity().getSupportActionBar();
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            actionBar.setTitle(R.string.app_name);
+//            ActionBar actionBar = mActivity.getSupportActionBar();
+//            actionBar.setDisplayShowTitleEnabled(true);
+//            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//            actionBar.setTitle(getString(R.string.title_section1));
         } catch (Throwable thr) {
             Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
@@ -134,24 +153,10 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     public void onAttach(Activity activity) {
         try{
             super.onAttach(activity);
-            try {
-                mListener = (OnFragmentInteractionListener) activity;
-            } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString()
-                        + " must implement OnFragmentInteractionListener");
-            }
-        } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
-            ACRA.getErrorReporter().handleException(thr);
-            throw thr;
-        }
-
-
-        try{
-            super.onAttach(activity);
             ((DiaspActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
-        }catch(Throwable thr){
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (Throwable thr) {
             Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
@@ -221,4 +226,20 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
         public void onFragmentInteraction(String id);
     }
 
+
+    public String getmTitle() {
+        return mTitle;
+    }
+
+    public void setmTitle(String mTitle) {
+        this.mTitle = mTitle;
+    }
+
+    public ActionBarActivity getmActivity() {
+        return mActivity;
+    }
+
+    public void setmActivity(ActionBarActivity mActivity) {
+        this.mActivity = mActivity;
+    }
 }
