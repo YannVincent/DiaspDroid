@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <property name="LOG_DIR" value="/data/data/fr.android.scaron.diaspdroid/files" />
+    <!--<property name="LOG_DIR" value="/sdcard/Android/data/fr.scaron.diaspdroid/logs" />-->
+    <!--<property name="FIC_DIR" value="/sdcard/Android/data/fr.scaron.diaspdroid/files" />-->
+
+
+  <!-- Create a file appender for DEBUG-level messages -->
+  <appender name="DebugLog" class="ch.qos.logback.core.FileAppender">
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>DEBUG</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>ACCEPT</onMismatch>
+    </filter>
+
+	  <file>${LOG_DIR}/diaspdroid.log</file>
+      <includeCallerData>true</includeCallerData>
+
+    <encoder>
+		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Write DEBUG messages from class B to its own log -->
+  <logger name="fr.android.scaron.diaspdroid" level="DEBUG">
+    <appender-ref ref="DebugLog" />
+  </logger>
+
+  <!-- Write DEBUG (and higher-level) messages to logcat -->
+  <root level="DEBUG">
+    <appender-ref ref="logcat" />
+  </root>
+</configuration>

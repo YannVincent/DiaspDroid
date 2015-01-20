@@ -86,12 +86,15 @@
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3.1" level="project" />
     <orderEntry type="library" exported="" name="androidasync-2.0.4" level="project" />
+    <orderEntry type="library" exported="" name="logback-classic-1.1.2" level="project" />
     <orderEntry type="library" exported="" name="ion-2.0.4" level="project" />
+    <orderEntry type="library" exported="" name="logback-core-1.1.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="acra-4.5.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.10" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
   </component>
 </module>
 

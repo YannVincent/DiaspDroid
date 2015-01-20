@@ -100,7 +100,6 @@ public class DiaspActivity extends ActionBarActivity
         try{
             // update the main content by replacing fragments
             FragmentManager fragmentManager = getSupportFragmentManager();
-            ProfilControler.login(this, "tilucifer", "Pikifou01");
 
             // TODO VALIDER CE BLOC SWITCH
             switch(position){

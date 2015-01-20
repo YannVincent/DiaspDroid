@@ -12,11 +12,17 @@ import com.koushikdutta.ion.Ion;
 import org.acra.ACRA;
 
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Maison on 13/01/2015.
  */
 public class DataControler {
+
+
+
+    public static Logger log = LoggerFactory.getLogger(DataControler.class);
 
     static String POD = "framasphere.org";
     static String POD_URL = "https://"+POD;
@@ -37,6 +43,7 @@ public class DataControler {
                 .asJsonObject()
                 .setCallback(callback);
         }catch(Throwable thr){
+            log.error("Erreur : " + thr.toString());
             Log.e(DataControler.class.getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
@@ -44,15 +51,21 @@ public class DataControler {
     }
 
     public static void getStream(Context context, FutureCallback<JsonObject> callback){
+        log.debug(DataControler.class.getName()+".getStream : Entrée");
+        Log.d(DataControler.class.getName(), ".getStream : Entrée");
         try{
+            Log.d(DataControler.class.getName(), ".getStream : Load url '"+POD_URL + GET_STREAM+"'");
             Future<JsonObject> jsonObjectFuture = Ion.with(context)
             .load(POD_URL + GET_STREAM)
             .asJsonObject()
             .setCallback(callback);
         }catch(Throwable thr){
+            log.error("Erreur : " + thr.toString());
             Log.e(DataControler.class.getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
+        log.debug(DataControler.class.getName()+".getStream : Sortie");
+        Log.d(DataControler.class.getName(), ".getStream : Sortie");
     }
 }

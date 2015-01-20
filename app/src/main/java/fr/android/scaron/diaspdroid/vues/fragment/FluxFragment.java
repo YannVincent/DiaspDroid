@@ -18,8 +18,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.HeadersResponse;
+import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,6 +32,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 import fr.android.scaron.diaspdroid.controler.DataControler;
+import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
 
@@ -42,6 +47,8 @@ import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
  */
 public class FluxFragment extends Fragment implements AbsListView.OnItemClickListener {
 
+    static String POD = "framasphere.org";
+    public static Logger log = LoggerFactory.getLogger(FluxFragment.class);
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //    private static final String ARG_PARAM1 = "param1";
@@ -98,23 +105,66 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     public void onCreate(Bundle savedInstanceState) {
         try{
             super.onCreate(savedInstanceState);
-            FutureCallback<JsonObject> fluxCallback = new FutureCallback<JsonObject>() {
+
+            FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
                 @Override
-                public void onCompleted(Exception e, JsonObject result) {
-                    if (e==null) {
-                        Type collectionType = new TypeToken<List<Post>>() {
-                        }.getType();
-                        List<Post> posts = new Gson().fromJson(result, collectionType);
-                        Log.d(FluxFragment.class.getName(), "Stream json : " + result.toString());
-                        mAdapter.setPosts(posts);
-//                    mAdapter.notifyDataSetChanged();
-                        return;
+                public void onCompleted(Exception e, Response<String> result) {
+                    HeadersResponse resultHeaders = result.getHeaders();
+                    int code = resultHeaders.code();
+                    String message = resultHeaders.message();
+                    if (message!=null && !message.isEmpty()){
+                        message = message.replaceAll("[\r\n]+", "");
+
+                        log.info(FluxFragment.class.getName() + "Réponse du login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
                     }
-                    //Affichage de l'erreur
-                    Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG);
+                    //Callback de la récupération du flux
+                    FutureCallback<JsonObject> fluxCallback = new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject result) {
+
+                            log.info(FluxFragment.class.getName() + "Callback flux, exception ? " + e);
+                            log.info(FluxFragment.class.getName() + "Callback flux, result ? " + result);
+                            if (result!=null) {
+                                String resultJson = result.toString();
+                                log.info(FluxFragment.class.getName() + "Callback flux, json ? " + result.toString());
+                            }
+                            if (e==null) {
+                                Type collectionType = new TypeToken<List<Post>>() {
+                                }.getType();
+                                List<Post> posts = new Gson().fromJson(result, collectionType);
+                                Log.d(FluxFragment.class.getName(), "Stream json : " + result.toString());
+                                mAdapter.setPosts(posts);
+//                    mAdapter.notifyDataSetChanged();
+                                return;
+                            }
+                            //Affichage de l'erreur
+                            Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG);
+                        }
+                    };
+
+                    String reponseLoginOk = "OK"; //"<html><body>You are being<a href=\"https://framasphere.org/stream\">redirected</a>.</body></html>";
+                    if (reponseLoginOk.equals(message)) {
+                        log.info(FluxFragment.class.getName() + "Succès du login sur le pod " + POD);
+                        Log.i(DataControler.class.getName(), "Succès du login sur le pod " + POD);
+                        Toast.makeText(getmActivity(), "Succès du login sur le pod " + POD, Toast.LENGTH_LONG);
+                        DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
+                    } else if (code == 302) {
+                        log.info(FluxFragment.class.getName() + "Succès du login sur le pod " + POD);
+                        Log.i(DataControler.class.getName(), "Succès du login sur le pod " + POD);
+                        Toast.makeText(getmActivity(), "Succès du login sur le pod " + POD, Toast.LENGTH_LONG);
+                        DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
+                    } else {
+                        log.error(FluxFragment.class.getName() + "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult());
+                        Log.e(DataControler.class.getName(), "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult());
+                        Toast.makeText(getmActivity(), "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult(), Toast.LENGTH_LONG);
+                    }
                 }
             };
-            DataControler.getStream(this.getmActivity().getApplicationContext(), fluxCallback);
+
+
+            ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01" ,loginCallback);
+
+
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());//FluxContent.POSTS);
 
 //            ActionBar actionBar = mActivity.getSupportActionBar();
