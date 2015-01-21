@@ -160,7 +160,8 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
                             //Cas de la vidéo
                             int indexSrcBegin = objectHtml.indexOf("src=\"");
-                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin+1);
+                            indexSrcBegin = indexSrcBegin+1+"src=\"".length();
+                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
                             String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
                             log.debug(PostAdapter.class.getName() + "Url de la vidéo récoltée '" + urlSrc + "'");
                             Log.d(this.getClass().getName(),"Url de la vidéo récoltée '" + urlSrc + "'");

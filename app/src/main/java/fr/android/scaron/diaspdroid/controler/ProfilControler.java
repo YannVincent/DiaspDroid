@@ -70,12 +70,12 @@ public class ProfilControler {
         try{
             TOKEN = token;
             theContext = context;
-            Ion ion=Ion.getDefault(context);//.Config.configure().setTag();
-            ion.configure().createSSLContext("TLS");
+//            Ion ion=Ion.getDefault(context);//.Config.configure().setTag();
+//            ion.configure().createSSLContext("TLS");
             Ion.with(context)
                 .load("POST", LOGIN_URL)
-                .followRedirect(true)
-                .setHeader("Content-Type", "application/x-www-form-urlencoded")
+//                .followRedirect(true)
+//                .setHeader("Content-Type", "application/x-www-form-urlencoded")
                 .setBodyParameter("user[username]", username)
                 .setBodyParameter("user[password]", password)
                 .setBodyParameter("user[remember_me]", "1")
@@ -103,8 +103,8 @@ public class ProfilControler {
         Log.d(DataControler.class.getName(), ".post : Entrée (username="+username+" , password="+password+", token="+TOKEN+")");
         try{
             theContext = context;
-            Ion ion=Ion.getDefault(context);//.Config.configure().setTag();
-            ion.configure().createSSLContext("TLS");
+//            Ion ion=Ion.getDefault(context);//.Config.configure().setTag();
+//            ion.configure().createSSLContext("TLS");
             Ion.with(context)
                     .load("POST", LOGIN_URL)
                     .setHeader("Content-Type", "application/x-www-form-urlencoded")

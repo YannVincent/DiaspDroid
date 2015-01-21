@@ -201,7 +201,8 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                         int indexTokenName = reponse.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
                         if (indexTokenName>0) {
                             int indexToken = reponse.indexOf("<meta content=\"", indexTokenName + 1);
-                            int indexEndToken = reponse.indexOf("\" name=\"csrf-token\"", indexToken+1);
+                            indexToken = indexToken+1+"<meta content=\"".length();
+                            int indexEndToken = reponse.indexOf("\" name=\"csrf-token\"", indexToken);
                             String token = reponse.substring(indexToken, indexEndToken);
 
                             log.debug(FluxFragment.class.getName() + "token récolté '" + token + "'");
