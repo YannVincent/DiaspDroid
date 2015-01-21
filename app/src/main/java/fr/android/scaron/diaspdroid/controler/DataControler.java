@@ -61,74 +61,93 @@ public class DataControler {
 
     public static void getStream(Context context, FutureCallback<List<Post>> callback, List<String> cookies){
         log.debug(DataControler.class.getName()+".getStream : Entrée");
-        //DONNEES TESTS
-        cookies.clear();
-        cookies.add("_pk_id.26.270d=5026bb5658ab938b.1421711090.2.1421798634.1421711873.; _pk_ses.26.270d=*; remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368; _diaspora_session=BAh7CUkiD3Nlc3Npb25faWQGOgZFVEkiJTllOWQ4OTQ5MmY0NGI3NmJmMDQ2NjVlNDUzYjBmNDkwBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJFNyaGJkL3JLYkFzOWpZSTlxU1lVT08GOwBUSSIKZmxhc2gGOwBUbzolQWN0aW9uRGlzcGF0Y2g6OkZsYXNoOjpGbGFzaEhhc2gJOgpAdXNlZG86CFNldAY6CkBoYXNoewY6C25vdGljZVQ6DEBjbG9zZWRGOg1AZmxhc2hlc3sGOwpJIihWb3VzIMOqdGVzIMOgIHByw6lzZW50IGNvbm5lY3TDqS1lLgY7AFQ6CUBub3cwSSIQX2NzcmZfdG9rZW4GOwBGSSIxVE9xeWJKeTlycHZYRWoxU0tycUFjeitkSFVaZTQzbHhHVU03dHRPY3BEWT0GOwBG--40fd4850fbafbaaa7b0e93b48ec4e332025a2da0");
         Log.d(DataControler.class.getName(), ".getStream : Entrée");
         try{
-//            log.debug(DataControler.class.getName() + ".getStream : Load url '" + POD_URL + GET_STREAM_TEST + "'");
-//            Log.d(DataControler.class.getName(), ".getStream : Load url '" + POD_URL + GET_STREAM_TEST + "'");
-//            Ion ion = Ion.getDefault(context);
-//            log.debug(DataControler.class.getName()+".getStream : CookieMiddleware clearing");
-//            Log.d(DataControler.class.getName(), ".getStream : CookieMiddleware cleaning");
-//            ion.getCookieMiddleware().clear();
-////            CookieManager manager = new CookieManager(null, null);
-//
-//            log.debug(DataControler.class.getName()+".getStream : Create header");
-//            Log.d(DataControler.class.getName(), ".getStream : Create header");
-//            Headers headersCookies = new Headers();
-//            log.debug(DataControler.class.getName()+".getStream : Add Set-Cookie '"+cookies+"'");
-//            Log.d(DataControler.class.getName(), ".getStream : Add Set-Cookie '" + cookies + "'");
-//            headersCookies.set("Cookie", cookies);
-//            Headers headers = new Headers();
-//            headers.set("Accept", "application/json, text/javascript, */*; q=0.01");
-//            log.debug(DataControler.class.getName()+".getStream : Add header \"x-requested-with\",\"XMLHttpRequest\"");
-//            Log.d(DataControler.class.getName(), ".getStream : Add header \"x-requested-with\",\"XMLHttpRequest\"");
-//            headers.set("x-requested-with", "XMLHttpRequest");
-//            log.debug(DataControler.class.getName() + ".getStream : Add header \"x-requested-with\",\"XMLHttpRequest\"");
-//            Log.d(DataControler.class.getName(), ".getStream : Add header \"x-requested-with\",\"XMLHttpRequest\"");
-//            log.debug(DataControler.class.getName() + ".getStream : Create uri for '" + POD_URL + GET_STREAM_TEST + "'");
-//            Log.d(DataControler.class.getName(), ".getStream : Create uri for '" + POD_URL + GET_STREAM_TEST + "'");
-//            URI uri = URI.create(POD_URL + GET_STREAM_TEST);
-////            manager.put(uri, headers.getMultiMap());
-//
-//            log.debug(DataControler.class.getName()+".getStream : Associate cookies with uri");
-//            Log.d(DataControler.class.getName(), ".getStream : Associate cookies with uri");
-//            ion.getCookieMiddleware().put(uri, headersCookies);
-//            ion.getCookieMiddleware().put(uri, headers);
-//
-//
-//            log.debug(DataControler.class.getName()+".getStream : Build ion call");
-//            Log.d(DataControler.class.getName(), ".getStream : Build ion call");
-//            JsonObject json = new JsonObject();
-//            ion.build(context)
-//                .load(POD_URL + GET_STREAM_TEST)
-//                .setJsonObjectBody(json)
-//                    .as(new TypeToken<List<Post>>() {})
-////                .asString()
-////                .withResponse()
-//                .setCallback(callback);
-////            Future<JsonObject> jsonObjectFuture = Ion.with(context)
-////            .load(POD_URL + GET_STREAM)
-////            .asJsonObject()
-////            .setCallback(callback);
-
             if (cookies!=null) {
                 Ion ion = Ion.getDefault(context);
                 CookieManager manager = ion.getCookieMiddleware().getCookieManager();
                 Headers headers = new Headers();
                 headers.addAll("Cookie", cookies);
-                URI uri = URI.create(POD_URL);
+                URI uri = URI.create(POD_URL + GET_STREAM_TEST);
                 manager.put(uri, headers.getMultiMap());
             }
 
-            Ion.with(context)
-                    .load("GET", POD_URL + GET_STREAM_TEST)
+            if (cookies.size()<1){
+                Log.i(DataControler.class.getName(), ".getStream : No Cookie found from login");
+                log.debug(DataControler.class.getName()+".getStream : No Cookie found from login");
+                Ion.with(context)
+                .load("GET", POD_URL + GET_STREAM)
+                        .followRedirect(false)
 //                    .setHeader("Cookie", cookies)
-                    .setHeader("x-requested-with", "XMLHttpRequest")
-                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                    .as(new TypeToken<List<Post>>() {})
-                    .setCallback(callback);
+                        .setHeader("x-requested-with", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("x-csrf-token", ProfilControler.TOKEN)
+                        .as(new TypeToken<List<Post>>() {
+                        })
+                        .setCallback(callback);
+            }else if (cookies.size()<2) {
+                Log.i(DataControler.class.getName(), ".getStream : 1 Cookie found from login");
+                log.debug(DataControler.class.getName()+".getStream : 1 Cookie found from login");
+                Ion.with(context)
+                        .load("GET", POD_URL + GET_STREAM)
+                        .followRedirect(false)
+//                    .setHeader("Cookie", cookies)
+                        .setHeader("x-requested-with", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("x-csrf-token", ProfilControler.TOKEN)
+                        .setHeader("Cookie", cookies.get(0))
+                        .as(new TypeToken<List<Post>>() {
+                        })
+                        .setCallback(callback);
+            }else if (cookies.size()<3) {
+                Log.i(DataControler.class.getName(), ".getStream : 2 Cookie found from login");
+                log.debug(DataControler.class.getName()+".getStream : 2 Cookie found from login");
+                Ion.with(context)
+                        .load("GET", POD_URL + GET_STREAM)
+                        .followRedirect(false)
+//                    .setHeader("Cookie", cookies)
+                        .setHeader("x-requested-with", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("x-csrf-token", ProfilControler.TOKEN)
+                        .setHeader("Cookie", cookies.get(0))
+                        .setHeader("Cookie", cookies.get(1))
+                        .as(new TypeToken<List<Post>>() {
+                        })
+                        .setCallback(callback);
+            }else if (cookies.size()<4) {
+                Log.i(DataControler.class.getName(), ".getStream : 3 Cookie found from login");
+                log.debug(DataControler.class.getName()+".getStream : 3 Cookie found from login");
+                Ion.with(context)
+                        .load("GET", POD_URL + GET_STREAM)
+                        .followRedirect(false)
+//                    .setHeader("Cookie", cookies)
+                        .setHeader("x-requested-with", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("x-csrf-token", ProfilControler.TOKEN)
+                        .setHeader("Cookie", cookies.get(0))
+                        .setHeader("Cookie", cookies.get(1))
+                        .setHeader("Cookie", cookies.get(2))
+                        .as(new TypeToken<List<Post>>() {
+                        })
+                        .setCallback(callback);
+            }else {
+                Log.i(DataControler.class.getName(), ".getStream : 4+ Cookie found from login");
+                log.debug(DataControler.class.getName()+".getStream : 4+ Cookie found from login");
+                Ion.with(context)
+                        .load("GET", POD_URL + GET_STREAM_TEST)
+                        .followRedirect(false)
+//                    .setHeader("Cookie", cookies)
+                        .setHeader("x-requested-with", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("x-csrf-token", ProfilControler.TOKEN)
+                        .setHeader("Cookie", cookies.get(0))
+                        .setHeader("Cookie", cookies.get(1))
+                        .setHeader("Cookie", cookies.get(2))
+                        .setHeader("Cookie", cookies.get(3))
+                        .as(new TypeToken<List<Post>>() {
+                        })
+                        .setCallback(callback);
+            }
 
 
         }catch(Throwable thr){

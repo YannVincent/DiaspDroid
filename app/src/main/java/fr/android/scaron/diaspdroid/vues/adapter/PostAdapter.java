@@ -9,8 +9,11 @@ import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import org.acra.ACRA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +30,15 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
 /**
  * Created by CARON-08651 on 16/01/2015.
  */
-public class PostAdapter extends ArrayAdapter<Post>
+public class PostAdapter extends ArrayAdapter<Post> {
 
-    {
-        LayoutInflater inflater;
-        Activity follower;
-        private List<Post> posts = new ArrayList<Post>();
+    public static Logger log = LoggerFactory.getLogger(PostAdapter.class);
+    LayoutInflater inflater;
+    Activity follower;
+    private List<Post> posts = new ArrayList<Post>();
 
 
-        public PostAdapter(Activity follower, int ressource, List<Post> posts){
+    public PostAdapter(Activity follower, int ressource, List<Post> posts){
         super(follower, ressource);
         try{
             inflater = LayoutInflater.from(follower.getApplicationContext());
@@ -104,7 +107,8 @@ public class PostAdapter extends ArrayAdapter<Post>
                     postView.flux_list_item_post_datetime = (TextView)convertView.findViewById(R.id.flux_list_item_post_datetime);
                     postView.flux_list_item_post_detail = (TextView)convertView.findViewById(R.id.flux_list_item_post_detail);
                     postView.flux_list_item_post_detail_picture = (ImageView)convertView.findViewById(R.id.flux_list_item_post_detail_picture);
-                    postView.flux_list_item_post_detail_video = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail_video);
+                    postView.flux_list_item_post_detail_video = (VideoView)convertView.findViewById(R.id.flux_list_item_post_detail_video);
+                    postView.flux_list_item_post_detail_video_web = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail_video_web);
                     convertView.setTag(postView);
                 } else {
                     postView = (PostView) convertView.getTag();
@@ -118,7 +122,7 @@ public class PostAdapter extends ArrayAdapter<Post>
                     Image avatar = author.getAvatar();
                     // Remplissage de l'avatar
                     if (avatar!=null){
-                        ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getSmall());
+                        ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getLarge());
                     }
                     // Remplissage du nom
                     postView.flux_list_item_post_user.setText(author.getName());
@@ -134,20 +138,33 @@ public class PostAdapter extends ArrayAdapter<Post>
                 if (imageURL!=null && !imageURL.isEmpty()){
                     ProfilControler.putImage(postView.flux_list_item_post_detail_picture, imageURL);
                 }
-                // Remplissage de l'objet (vidéo ou autre)
+
+                // Remplissage de l'objet web(vidéo ou autre) et de la vue vidéo
                 OEmbedCache object = post.getO_embed_cache();
                 if (object!=null) {
                     Data objectData = object.getData();
                     if (objectData!=null) {
                         String objectHtml = objectData.getHtml();
                         if (objectHtml != null && !objectHtml.isEmpty()) {
-                            String objectHtmlDroid = "<div style=\"width: 100%;\">" + objectHtml + "</div>";
-                            postView.flux_list_item_post_detail_video.getSettings().setUseWideViewPort(true);
-                            postView.flux_list_item_post_detail_video.getSettings().setLoadWithOverviewMode(true);
-                            postView.flux_list_item_post_detail_video.getSettings().setJavaScriptEnabled(true);
+                            String objectHtmlDroid = objectHtml;//"<div style=\"width: 100%;\">" + objectHtml + "</div>";
+
+                            //Cas de l'objet web
+                            postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
+                            postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
+                            postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
                             final String mimeType = "text/html";
                             final String encoding = "utf-8";
-                            postView.flux_list_item_post_detail_video.loadDataWithBaseURL(null, objectHtmlDroid, mimeType, encoding, "");
+                            postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, objectHtmlDroid, mimeType, encoding, "");
+                            //test on masque la video
+                            postView.flux_list_item_post_detail_video_web.setVisibility(View.INVISIBLE);
+
+                            //Cas de la vidéo
+                            int indexSrcBegin = objectHtml.indexOf("src=\"");
+                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin+1);
+                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
+                            log.debug(PostAdapter.class.getName() + "Url de la vidéo récoltée '" + urlSrc + "'");
+                            Log.d(this.getClass().getName(),"Url de la vidéo récoltée '" + urlSrc + "'");
+                            postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
                         }
                     }
                 }

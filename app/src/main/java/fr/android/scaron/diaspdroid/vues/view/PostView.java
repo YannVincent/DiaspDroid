@@ -4,6 +4,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import fr.android.scaron.diaspdroid.model.Post;
 
@@ -21,7 +22,8 @@ public class PostView {
     // Detail du post
     public TextView flux_list_item_post_detail;
     public ImageView flux_list_item_post_detail_picture;
-    public WebView flux_list_item_post_detail_video;
+    public VideoView flux_list_item_post_detail_video;
+    public WebView flux_list_item_post_detail_video_web;
     //Boutons d'action
     public Button flux_list_item_like;
     public Button flux_list_item_publish;
