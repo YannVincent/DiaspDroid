@@ -156,9 +156,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
                     String reponseLoginOk = "OK"; //"<html><body>You are being<a href=\"https://framasphere.org/stream\">redirected</a>.</body></html>";
                     if (reponseLoginOk.equals(message) && result.getHeaders()!=null && result.getHeaders().getHeaders()!=null) {
-                            String cookies = result.getHeaders().getHeaders().get("Set-Cookie");
+                            List<String> cookies = result.getHeaders().getHeaders().getAll("Set-Cookie");
                             log.info(FluxFragment.class.getName() + "Succès du login sur le pod " + POD + "\n" +
-                                    result.getHeaders().getHeaders().toString());
+                                    cookies.toString());
                             Log.i(DataControler.class.getName(), "Succès du login sur le pod " + POD + "\n" +
                                     result.getHeaders().getHeaders().toString());
                             Toast.makeText(getmActivity(), "Succès du login sur le pod " + POD, Toast.LENGTH_LONG);

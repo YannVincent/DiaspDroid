@@ -59,8 +59,11 @@ public class DataControler {
         }
     }
 
-    public static void getStream(Context context, FutureCallback<List<Post>> callback, String cookies){
+    public static void getStream(Context context, FutureCallback<List<Post>> callback, List<String> cookies){
         log.debug(DataControler.class.getName()+".getStream : Entrée");
+        //DONNEES TESTS
+        cookies.clear();
+        cookies.add("_pk_id.26.270d=5026bb5658ab938b.1421711090.2.1421798634.1421711873.; _pk_ses.26.270d=*; remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368; _diaspora_session=BAh7CUkiD3Nlc3Npb25faWQGOgZFVEkiJTllOWQ4OTQ5MmY0NGI3NmJmMDQ2NjVlNDUzYjBmNDkwBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJFNyaGJkL3JLYkFzOWpZSTlxU1lVT08GOwBUSSIKZmxhc2gGOwBUbzolQWN0aW9uRGlzcGF0Y2g6OkZsYXNoOjpGbGFzaEhhc2gJOgpAdXNlZG86CFNldAY6CkBoYXNoewY6C25vdGljZVQ6DEBjbG9zZWRGOg1AZmxhc2hlc3sGOwpJIihWb3VzIMOqdGVzIMOgIHByw6lzZW50IGNvbm5lY3TDqS1lLgY7AFQ6CUBub3cwSSIQX2NzcmZfdG9rZW4GOwBGSSIxVE9xeWJKeTlycHZYRWoxU0tycUFjeitkSFVaZTQzbHhHVU03dHRPY3BEWT0GOwBG--40fd4850fbafbaaa7b0e93b48ec4e332025a2da0");
         Log.d(DataControler.class.getName(), ".getStream : Entrée");
         try{
 //            log.debug(DataControler.class.getName() + ".getStream : Load url '" + POD_URL + GET_STREAM_TEST + "'");
@@ -114,7 +117,7 @@ public class DataControler {
                 Ion ion = Ion.getDefault(context);
                 CookieManager manager = ion.getCookieMiddleware().getCookieManager();
                 Headers headers = new Headers();
-                headers.add("Set-Cookie", cookies);
+                headers.addAll("Cookie", cookies);
                 URI uri = URI.create(POD_URL);
                 manager.put(uri, headers.getMultiMap());
             }

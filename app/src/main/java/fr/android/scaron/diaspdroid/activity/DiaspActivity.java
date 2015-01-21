@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.koushikdutta.ion.Ion;
+
 import org.acra.ACRA;
 
 import fr.android.scaron.diaspdroid.R;
@@ -41,7 +43,7 @@ public class DiaspActivity extends ActionBarActivity
             Intent intent = getIntent();
             String action = intent.getAction();
             String type = intent.getType();
-
+            Ion.getDefault(this).configure().setLogging("diaspdroid.ion", Log.VERBOSE);
             if (Intent.ACTION_SEND.equals(action) && type != null) {
 //                if ("text/plain".equals(type)) {
 //                    handleSendText(intent); // Handle text being sent
