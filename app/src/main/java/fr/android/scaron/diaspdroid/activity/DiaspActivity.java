@@ -17,20 +17,7 @@ import com.koushikdutta.ion.Ion;
 
 import org.acra.ACRA;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.PlaceholderFragment;
 
@@ -52,21 +39,21 @@ public class DiaspActivity extends ActionBarActivity
         try{
             super.onCreate(savedInstanceState);
 
-            //SET SSL
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-            ks.load(this.getResources().openRawResource(R.raw.keystore), "storepass".toCharArray());
-            kmf.init(ks, "storepass".toCharArray());
-
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
-            ts.load(this.getResources().openRawResource(R.raw.keystore), "storepass".toCharArray());
-            tmf.init(ts);
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            //SET SSL TODO DECOMMENTER
+//            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
+//            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+//
+//            ks.load(this.getResources().openRawResource(R.raw.keystore), "storepass".toCharArray());
+//            kmf.init(ks, "storepass".toCharArray());
+//
+//
+//            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//            KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
+//            ts.load(this.getResources().openRawResource(R.raw.keystore), "storepass".toCharArray());
+//            tmf.init(ts);
+//
+//            SSLContext sslContext = SSLContext.getInstance("TLS");
+//            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             //END OF SET SSL
 
             // Get intent, action and MIME type
@@ -108,21 +95,21 @@ public class DiaspActivity extends ActionBarActivity
         }catch(Throwable thr){
             Log.e(this.getClass().getName(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
-            try {
+//            try { TODO DECOMMENTER
                 throw thr;
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (UnrecoverableKeyException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
+//            } catch (NoSuchAlgorithmException e) {
+//                e.printStackTrace();
+//            } catch (KeyStoreException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (CertificateException e) {
+//                e.printStackTrace();
+//            } catch (UnrecoverableKeyException e) {
+//                e.printStackTrace();
+//            } catch (KeyManagementException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 

@@ -15,10 +15,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpResponse;
 import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
+import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,8 +220,68 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             };
 
 
+            final AsyncHttpClient.StringCallback loginCallBackAsync = new AsyncHttpClient.StringCallback() {
+                // Callback is invoked with any exceptions/errors, and the result, if available.
+                @Override
+                public void onCompleted(Exception e, AsyncHttpResponse response, String result) {
+                    if (e != null) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    List<String> cookies = new ArrayList<String>();
+                    if (result!=null && !result.isEmpty()){
+                        result = result.replaceAll("[\r\n]+", "");
+                        log.debug(FluxFragment.class.getName() + "Réponse login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
+                        Log.d(FluxFragment.class.getName(), "Réponse login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
+                    }
+                    if (response.headers()!=null) {
+                        Header[] headers = response.headers().toHeaderArray();
+                        for (Header header : headers) {
+                            log.debug(FluxFragment.class.getName() + "\tHeader : " + header.getName() + " -> " + header.getValue() + " (" + header.getElements() + ")");
+                            if ("set-cookie".equals(header.getName().toLowerCase())) {
+                                cookies.add(header.getValue());
+                            }
+                        }
+                    }
 
-            ProfilControler.getToken(getmActivity(), tokenCallback);
+                    //On a le token donc on demande le login
+                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback, cookies);
+                }
+            };
+
+            final AsyncHttpClient.StringCallback tokenCallBackAsync = new AsyncHttpClient.StringCallback() {
+                // Callback is invoked with any exceptions/errors, and the result, if available.
+                @Override
+                public void onCompleted(Exception e, AsyncHttpResponse response, String result) {
+                    if (e != null) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    if (result!=null && !result.isEmpty()){
+                        result = result.replaceAll("[\r\n]+", "");
+                        log.debug(FluxFragment.class.getName() + "Réponse du get login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
+                        Log.d(FluxFragment.class.getName(), "Réponse du get login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
+                    }
+                    int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
+                    if (indexTokenName>0) {
+                        int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
+                        indexToken = indexToken+1+"<meta content=\"".length();
+                        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken);
+                        String token = result.substring(indexToken, indexEndToken);
+
+                        log.debug(FluxFragment.class.getName() + "token récolté '" + token + "'");
+                        Log.d(this.getClass().getName(),"token récolté '" + token + "'");
+
+                        //On a le token donc on demande le login
+                        ProfilControler.loginAsync("tilucifer", "Pikifou01", token, loginCallBackAsync);
+                    }
+                }
+            };
+
+
+
+            ProfilControler.getTokenAsync(tokenCallBackAsync);
+//            ProfilControler.getToken(getmActivity(), tokenCallback);
 
 
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());

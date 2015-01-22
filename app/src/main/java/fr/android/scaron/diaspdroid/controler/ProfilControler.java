@@ -6,12 +6,23 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpRequest;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 
@@ -127,5 +138,74 @@ public class ProfilControler {
         }
         log.debug(ProfilControler.class.getName()+".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
         Log.d(DataControler.class.getName(), ".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
+    }
+
+
+    public static void getTokenAsync(AsyncHttpClient.StringCallback callback){
+        log.debug(ProfilControler.class.getName()+".getTokenAsync : Entrée");
+        Log.d(DataControler.class.getName(), ".getTokenAsync : Entrée");
+        HttpGet httpRequest = new HttpGet(LOGIN_URL);
+        AsyncHttpRequest asyncRequest = AsyncHttpRequest.create(httpRequest);
+        AsyncHttpClient.getDefaultInstance().executeString(asyncRequest, callback);
+        log.debug(ProfilControler.class.getName()+".getTokenAsync : Sortie");
+        Log.d(DataControler.class.getName(), ".getTokenAsync : Sortie");
+    }
+
+    public static void loginAsync(String username, String password, String token, AsyncHttpClient.StringCallback callback){
+
+        log.debug(ProfilControler.class.getName()+".loginAsync : Entrée (username="+username+" , password="+password+", token="+token+")");
+        Log.d(DataControler.class.getName(), ".loginAsync : Entrée (username="+username+" , password="+password+", token="+token+")");
+        HttpPost httpRequest = new HttpPost(LOGIN_URL);
+
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du header \"user[username]\": " + username);
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du header \"user[username]\": " + username);
+        httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        // Ajout des donnees pour le login
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(6);
+//        HttpParams params = httpRequest.getParams();
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param utf8: " + "&#x2713;");
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param utf8: " + "&#x2713;");
+        nameValuePairs.add(new BasicNameValuePair("utf8", "✓"));
+//        params.setParameter("utf8", "&#x2713;");
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param authenticity_token: " + token);
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param \"authenticity_token\": " + token);
+        nameValuePairs.add(new BasicNameValuePair("authenticity_token", token));
+//        params.setParameter("authenticity_token", token);
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param user[username]");
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param user[username]");
+        nameValuePairs.add(new BasicNameValuePair("user[username]", username));
+//        params.setParameter("user[username]", username);
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param user[password]");
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param user[password]");
+        nameValuePairs.add(new BasicNameValuePair("user[password]", password));
+//        params.setParameter("user[password]", password);
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param user[remember_me]: " + "1");
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param user[remember_me]: " + "1");
+        nameValuePairs.add(new BasicNameValuePair("user[remember_me]", "1"));
+//        params.setParameter("user[remember_me]", "1");
+        log.debug(ProfilControler.class.getName() + ".loginAsync : ajout du param commit: " + "Connexion");
+        Log.d(DataControler.class.getName(), ".loginAsync : ajout du param commit: " + "Connexion");
+        nameValuePairs.add(new BasicNameValuePair("commit", "Connexion"));
+//        params.setParameter("commit", "Connexion");
+        try {
+            httpRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+//        httpRequest.setParams(params);
+        AsyncHttpRequest asyncRequest = AsyncHttpRequest.create(httpRequest);
+        AsyncHttpClient.getDefaultInstance().executeString(asyncRequest, callback);
+        log.debug(ProfilControler.class.getName()+".loginAsync : Sortie (username="+username+" , password="+password+", token="+token+")");
+        Log.d(DataControler.class.getName(), ".loginAsync : Sortie (username=" + username + " , password=" + password + ", token=" + token + ")");
+
+
+
+//        .setBodyParameter("user[username]", username)
+//                .setBodyParameter("user[password]", password)
+//                .setBodyParameter("user[remember_me]", "1")
+//                .setBodyParameter("authenticity_token",token)//"vzXnKbMHg96jEsDO289+fic6Kl2wDGz76dFtUYK98dM=")
+//                .setBodyParameter("utf8","&#x2713;")
+//                .setBodyParameter("commit","Connexion")
     }
 }
