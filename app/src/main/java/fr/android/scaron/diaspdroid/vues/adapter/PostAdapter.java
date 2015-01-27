@@ -122,7 +122,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
                     Image avatar = author.getAvatar();
                     // Remplissage de l'avatar
                     if (avatar!=null){
-                        ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getLarge());
+                        ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getMedium());
                     }
                     // Remplissage du nom
                     postView.flux_list_item_post_user.setText(author.getName());

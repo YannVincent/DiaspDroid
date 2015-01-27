@@ -1,6 +1,9 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -30,7 +33,9 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
+import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DataControler;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
@@ -47,11 +52,8 @@ import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
 public class FluxFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     static String POD = "framasphere.org";
-    public static Logger log = LoggerFactory.getLogger(FluxFragment.class);
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
+
+    public static LogControler LOG = LogControler.getInstance();
 
     /**
      * The fragment argument representing the section number for this
@@ -110,9 +112,15 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 @Override
                 public void onCompleted(Exception e, List<Post> posts) {
 
-                    log.info(FluxFragment.class.getName() + "Callback flux, exception ? " + e);
+                    LOG.d(FluxFragment.class, "Callback flux, exception ? " + e);
                     if (e!=null && e.getCause()!=null) {
-                        log.info(FluxFragment.class.getName() + "Callback flux, cause exception ? " + e.getCause().getMessage());
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
+                        final AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setIcon(R.drawable.ic_launcher);
+                        alertDialog.setTitle("PB Données");
+                        alertDialog.setMessage("La récupétion de votre flux a échouée");
+                        alertDialog.show();
+                        LOG.d(FluxFragment.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
                     }
                     if (posts!=null){
                         mAdapter.setPosts(posts);
@@ -123,8 +131,6 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                         Log.e(FluxFragment.class.getName(), "Callback flux, cause exception ? " + e.getCause().getMessage());
                     }
                     ACRA.getErrorReporter().handleException(e);
-                    //Affichage de l'erreur
-                    Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG);
                 }
             };
 
@@ -132,49 +138,17 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
                 @Override
                 public void onCompleted(Exception e, Response<String> result) {
-                    HeadersResponse resultHeaders = result.getHeaders();
-                    int code = resultHeaders.code();
-                    //code = 401 i,n
-                    String message = resultHeaders.message();
-                    if (message!=null && !message.isEmpty()){
-                        message = message.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Header Réponse du login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Header Réponse du login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
+                    boolean resultOK = ProfilControler.onCompleteLogin(e, result);
+                    if (!resultOK){
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
+                        final AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setIcon(R.drawable.ic_launcher);
+                        alertDialog.setTitle("PB Connexion");
+                        alertDialog.setMessage("La connexion a Diaspora a échouée");
+                        alertDialog.show();
                     }
-                    message = result.getResult();
-                    if (message!=null && !message.isEmpty()){
-                        message = message.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Réponse du login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Réponse du login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                    }
-
-                    String reponseLoginOk = "OK"; //"<html><body>You are being<a href=\"https://framasphere.org/stream\">redirected</a>.</body></html>";
-//                    if (reponseLoginOk.equals(message)) {
-                        List<String> cookies = new ArrayList<String>();
-                        if (result.getHeaders() != null && result.getHeaders().getHeaders() != null) {
-                            cookies = result.getHeaders().getHeaders().getAll("set-cookie");
-                            log.info(FluxFragment.class.getName() + "Succès du login sur le pod " + POD + "\n" +
-                                    cookies.toString());
-                            Log.i(DataControler.class.getName(), "Succès du login sur le pod " + POD + "\n" +
-                                    result.getHeaders().getHeaders().toString());
-                            Toast.makeText(getmActivity(), "Succès du login sur le pod " + POD, Toast.LENGTH_LONG);
-                        }else {
-
-                            log.info(FluxFragment.class.getName() + "Pas de cookie pour le login sur le pod " + POD + "\n" +
-                                    cookies.toString());
-                            Log.i(DataControler.class.getName(), "Pas de cookie pour le login sur le pod " + POD + "\n" +
-                                    result.getHeaders().getHeaders().toString());
-                        }
-                        //BOUCHON on met manuellement le cookie
-                        cookies.clear();
-                        cookies.add("_pk_ref.26.270d=%5B%22%22%2C%22%22%2C1421845797%2C%22https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DaZ7Y-CSFTbY%22%5D; remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368; _pk_id.26.270d=d9a7ba39dd808238.1412778655.23.1421845886.1421843838.; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWZjNjIzY2M2Y2RlMDk0YTMyMzlhZmE2Y2I0ZGMzYzRlBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJFNyaGJkL3JLYkFzOWpZSTlxU1lVT08GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxOTVEUjltNmd2UlRpVFNPWGQvaXVCOWU3TkFCdWwxeStjekRUUXQxb3BIRT0GOwBG--e8931f6b938a2324f7e7ab50db247cbf14027007");
-                        //On est loggué donc on demande le flux
-                        DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback, cookies);
-//                    }else {
-//                        log.error(FluxFragment.class.getName() + "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult());
-//                        Log.e(DataControler.class.getName(), "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult());
-//                        Toast.makeText(getmActivity(), "Echec du login sur le pod " + POD + "(err:" + code + ")\n" + result.getResult(), Toast.LENGTH_LONG);
-//                    }
+                    //On est loggué donc on demande le flux
+                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
                 }
             };
 
@@ -182,107 +156,22 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
                 @Override
                 public void onCompleted(Exception e, Response<String> result) {
-                    HeadersResponse resultHeaders = result.getHeaders();
-                    int code = resultHeaders.code();
-                    String message = resultHeaders.message();
-                    if (message!=null && !message.isEmpty()){
-                        message = message.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Header Réponse du get login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Header Réponse du get login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
+                    boolean resultOK = ProfilControler.onCompleteGetToken(e, result);
+                    if (!resultOK){
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
+                        final AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setIcon(R.drawable.ic_launcher);
+                        alertDialog.setTitle("PB Accès");
+                        alertDialog.setMessage("L'accès a Diaspora est impossible");
+                        alertDialog.show();
                     }
-                    message = result.getResult();
-                    if (message!=null && !message.isEmpty()){
-                        message = message.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Réponse du get login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Réponse du get login sur le pod " + POD + "\n--------------------------\n" + message + "\n--------------------------");
-                    }
-                    if (code == 200) {
-                        //on récupère les lignes
-//                        <meta content="authenticity_token" name="csrf-param" />
-//                        <meta content="tHvh4NDDRCihQtdiHKhxTtDFwH5TFfC4jLQe2MOWnOM=" name="csrf-token" />
-                        String reponse = result.getResult();
-                        int indexTokenName = reponse.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
-                        if (indexTokenName>0) {
-                            int indexToken = reponse.indexOf("<meta content=\"", indexTokenName + 1);
-                            indexToken = indexToken+1+"<meta content=\"".length();
-                            int indexEndToken = reponse.indexOf("\" name=\"csrf-token\"", indexToken);
-                            String token = reponse.substring(indexToken, indexEndToken);
-
-                            log.debug(FluxFragment.class.getName() + "token récolté '" + token + "'");
-                            Log.d(this.getClass().getName(),"token récolté '" + token + "'");
-
-                            //On a le token donc on demande le login
-                            ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01", token, loginCallback);
-                        }
-
-                    }
-                }
-            };
-
-
-            final AsyncHttpClient.StringCallback loginCallBackAsync = new AsyncHttpClient.StringCallback() {
-                // Callback is invoked with any exceptions/errors, and the result, if available.
-                @Override
-                public void onCompleted(Exception e, AsyncHttpResponse response, String result) {
-                    if (e != null) {
-                        e.printStackTrace();
-                        return;
-                    }
-                    List<String> cookies = new ArrayList<String>();
-                    if (result!=null && !result.isEmpty()){
-                        result = result.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Réponse login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Réponse login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
-                    }
-                    if (response.headers()!=null) {
-                        Header[] headers = response.headers().toHeaderArray();
-                        for (Header header : headers) {
-                            log.debug(FluxFragment.class.getName() + "\tHeader : " + header.getName() + " -> " + header.getValue() + " (" + header.getElements() + ")");
-                            if ("set-cookie".equals(header.getName().toLowerCase())) {
-                                cookies.add(header.getValue());
-                            }
-                        }
-                    }
-
                     //On a le token donc on demande le login
-                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback, cookies);
+                    ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01", loginCallback);
                 }
             };
 
-            final AsyncHttpClient.StringCallback tokenCallBackAsync = new AsyncHttpClient.StringCallback() {
-                // Callback is invoked with any exceptions/errors, and the result, if available.
-                @Override
-                public void onCompleted(Exception e, AsyncHttpResponse response, String result) {
-                    if (e != null) {
-                        e.printStackTrace();
-                        return;
-                    }
-                    if (result!=null && !result.isEmpty()){
-                        result = result.replaceAll("[\r\n]+", "");
-                        log.debug(FluxFragment.class.getName() + "Réponse du get login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
-                        Log.d(FluxFragment.class.getName(), "Réponse du get login async sur le pod " + POD + "\n--------------------------\n" + result + "\n--------------------------");
-                    }
-                    int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
-                    if (indexTokenName>0) {
-                        int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
-                        indexToken = indexToken+1+"<meta content=\"".length();
-                        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken);
-                        String token = result.substring(indexToken, indexEndToken);
-
-                        log.debug(FluxFragment.class.getName() + "token récolté '" + token + "'");
-                        Log.d(this.getClass().getName(),"token récolté '" + token + "'");
-
-                        //On a le token donc on demande le login
-                        ProfilControler.loginAsync("tilucifer", "Pikifou01", token, loginCallBackAsync);
-                    }
-                }
-            };
-
-
-
-            ProfilControler.getTokenAsync(tokenCallBackAsync);
-//            ProfilControler.getToken(getmActivity(), tokenCallback);
-
+            CookieControler cookieControler = CookieControler.getInstance(getmActivity());
+            ProfilControler.getToken(getmActivity(), tokenCallback);
 
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
         } catch (Throwable thr) {
