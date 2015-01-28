@@ -1,7 +1,6 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,8 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
  */
 public class PostAdapter extends ArrayAdapter<Post> {
 
-    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(PostAdapter.class));
+    private static Logger LOGGEUR = LoggerFactory.getLogger(PostAdapter.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     LayoutInflater inflater;
     Activity follower;
     private List<Post> posts = new ArrayList<Post>();
@@ -161,7 +161,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
                             //Cas de la vidéo
                             int indexSrcBegin = objectHtml.indexOf("src=\"");
-                            indexSrcBegin = indexSrcBegin+1+"src=\"".length();
+                            indexSrcBegin = indexSrcBegin+"src=\"".length();
                             int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
                             String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
                             LOG.d(this.getClass(),"Url de la vidéo récoltée '" + urlSrc + "'");

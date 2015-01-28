@@ -3,7 +3,6 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,7 @@ public class PlaceholderFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PlaceholderFragment.class);
-    public static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
 
 
     /**

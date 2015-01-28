@@ -4,7 +4,6 @@ package fr.android.scaron.diaspdroid.vues.adapter;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.acra.ACRA;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
@@ -33,7 +33,9 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
     LayoutInflater inflater;
     Activity follower;
     private List<FluxPost> posts = new ArrayList<FluxPost>();
-    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxContentAdapter.class));
+
+    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxContentAdapter.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
 
 
     public FluxContentAdapter(Activity follower,

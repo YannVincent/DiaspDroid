@@ -1,14 +1,20 @@
 package fr.android.scaron.diaspdroid.controler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by Sébastien on 24/01/2015.
  */
 public class DiaporaControler {
 
+    private static Logger LOGGEUR = LoggerFactory.getLogger(DiaporaControler.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     static String POD = "framasphere.org";
     static String POD_URL = "https://"+POD;
     static String LOGIN_URL = POD_URL+"/users/sign_in";
     static String STREAM_URL = POD_URL+"/stream";
+    static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true";
     static String TOKEN_VIDE = "";
     static String TOKEN_TEST = "4REWL0RLsEU5edVgVWuZL16XGAQkVuCYyzGirHvXjOI=";
     static String COOKIE_SESSION_LOGIN_VIDE = "";
@@ -21,5 +27,5 @@ public class DiaporaControler {
     static String TOKEN = TOKEN_VIDE;
     static String COOKIE_SESSION_LOGIN = COOKIE_SESSION_LOGIN_VIDE;
     static String COOKIE_SESSION_STREAM = COOKIE_SESSION_STREAM_VIDE;
-    static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST;
+    static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST_VIDE;
 }

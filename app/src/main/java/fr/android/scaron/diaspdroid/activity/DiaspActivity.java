@@ -19,18 +19,6 @@ import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment;
@@ -40,7 +28,7 @@ public class DiaspActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, FluxFragment.OnFragmentInteractionListener {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiaspActivity.class);
-    public static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
 //    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(DiaspActivity.class));
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.

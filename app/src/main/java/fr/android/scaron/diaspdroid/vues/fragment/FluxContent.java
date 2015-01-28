@@ -1,11 +1,10 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.acra.ACRA;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
@@ -32,7 +31,8 @@ public class FluxContent {
     public static List<FluxPost> ITEMS = new ArrayList<FluxPost>();
     public static List<Post> POSTS = new ArrayList<Post>();
 
-    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxContent.class));
+    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxContent.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     /**
      * A map of sample (dummy) items, by ID.
      */

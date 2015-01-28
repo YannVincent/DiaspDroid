@@ -2,8 +2,6 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -15,16 +13,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
-import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +44,8 @@ import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
  */
 public class FluxFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    static String POD = "framasphere.org";
-
-    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxFragment.class));
-
+    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     /**
      * The fragment argument representing the section number for this
      * fragment.

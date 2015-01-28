@@ -6,6 +6,9 @@ import com.koushikdutta.async.http.Headers;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.cookie.CookieMiddleware;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.URI;
@@ -17,6 +20,8 @@ import java.util.List;
  */
 public class CookieControler {
 
+    private static Logger LOGGEUR = LoggerFactory.getLogger(CookieControler.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
 
     static CookieControler instance;
     CookieManager manager;

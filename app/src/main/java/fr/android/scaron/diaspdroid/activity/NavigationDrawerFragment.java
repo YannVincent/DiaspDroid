@@ -22,7 +22,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -31,6 +35,8 @@ import fr.android.scaron.diaspdroid.R;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+    private static Logger LOGGEUR = LoggerFactory.getLogger(NavigationDrawerFragment.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     /**
      * Remember the position of the selected item.
      */

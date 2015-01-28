@@ -1,7 +1,5 @@
 package fr.android.scaron.diaspdroid.controler;
 
-import android.util.Log;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,22 +34,22 @@ public class LogControler {
 
     public void i(Class classe, String message){
 //        Logger log = LoggerFactory.getLogger(classe);
-        log.info(classe.getName(), message);
+        log.info(message);
 //        Log.i(classe.getName(), message);
     }
     public void d(Class classe, String message){
 //        Logger log = LoggerFactory.getLogger(classe);
-        log.debug(classe.getName(), message);
+        log.debug(message);
 //        Log.d(classe.getName(), message);
     }
     public void v(Class classe, String message){
 //        Logger log = LoggerFactory.getLogger(classe);
-        log.trace(classe.getName(), message);
+        log.trace(message);
 //        Log.v(classe.getName(), message);
     }
     public void e(Class classe, String message){
 //        Logger log = LoggerFactory.getLogger(classe);
-        log.error(classe.getName(), message);
+        log.error(message);
 //        Log.e(classe.getName(), message);
     }
 }

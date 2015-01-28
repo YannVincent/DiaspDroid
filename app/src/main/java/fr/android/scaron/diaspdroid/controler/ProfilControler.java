@@ -1,36 +1,18 @@
 package fr.android.scaron.diaspdroid.controler;
 
-import android.app.Fragment;
 import android.content.Context;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpRequest;
-import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.koushikdutta.async.http.Headers;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.CookieManager;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import fr.android.scaron.diaspdroid.R;
 
@@ -39,8 +21,8 @@ import fr.android.scaron.diaspdroid.R;
  */
 public class ProfilControler extends DiaporaControler{
 
-    public static LogControler LOG = LogControler.getInstance(ProfilControler.class);
-
+    private static Logger LOGGEUR = LoggerFactory.getLogger(ProfilControler.class);
+    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
 
 
     public static void putImage(ImageView imageView, String imagePath){
@@ -57,8 +39,9 @@ public class ProfilControler extends DiaporaControler{
     }
 
     public static void getToken(Context context, FutureCallback<Response<String>> callback){
-        LOG.d(ProfilControler.class, ".get token : Entrée");
+        LOG.d(ProfilControler.class, ".getToken : Entrée");
         try{
+            LOG.d(ProfilControler.class, ".getToken : Construction de la requête d'appel GET à "+LOGIN_URL);
             Ion.with(context)
                     .load("GET", LOGIN_URL)
                     .followRedirect(true)
@@ -67,24 +50,29 @@ public class ProfilControler extends DiaporaControler{
                     .withResponse()
                     .setCallback(callback);
         }catch(Throwable thr){
-            LOG.e(ProfilControler.class, "Erreur : " + thr.toString());
+            LOG.e(ProfilControler.class, ".getToken Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
         }
-        LOG.d(DataControler.class, ".get token : Sortie");
+        LOG.d(DataControler.class, ".getToken : Sortie");
     }
 
     public static boolean onCompleteGetToken(Exception exception, Response<String> response){
+        LOG.d(ProfilControler.class, ".onCompleteGetToken : Entrée");
         String result = response.getResult();
         boolean resultOK = true;
         boolean resultKO = false;
 
         if (exception != null) {
+            LOG.d(ProfilControler.class, ".onCompleteGetToken Erreur : "+exception.getMessage());
             exception.printStackTrace();
+            ACRA.getErrorReporter().handleException(exception);
+            LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
             return resultKO;
         }
 
         if (response==null || response.getHeaders()==null){
-            LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\trecherche impossible de COOKIE_SESSION\t**");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\trecherche impossible de COOKIE_SESSION_LOGIN\t**");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
             return resultKO;
         }
         Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
@@ -106,43 +94,60 @@ public class ProfilControler extends DiaporaControler{
             if (headerName != null && !headerName.isEmpty() &&
                     headerValue != null && !headerValue.isEmpty() &&
                     headerName.toLowerCase().equals("set-cookie")) {
-                if (headerValue.startsWith("remember_user_token=")){
-                    COOKIE_REMEMBER = headerValue.substring("remember_user_token=".length());
-                    LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_REMEMBER set to " + COOKIE_REMEMBER + "\t**");
-                }else if (headerValue.startsWith("_diaspora_session=")) {
+//                if (headerValue.startsWith("remember_user_token=")){
+//                    LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_REMEMBER found in " + headerValue + "\t**");
+//                    COOKIE_REMEMBER = headerValue.substring("remember_user_token=".length());
+//                    LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_REMEMBER set to " + COOKIE_REMEMBER + "\t**");
+//                }else if (headerValue.startsWith("_diaspora_session=")) {
+//                    LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
+//                    cookieSessionFound = true;
+//                    if (COOKIE_SESSION_LOGIN.isEmpty()) {
+//                        COOKIE_SESSION_LOGIN = headerValue.substring("_diaspora_session=".length());
+//                        LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN set to " + COOKIE_SESSION_LOGIN + "\t**");
+//                    }else{
+//                        LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN already set to " + COOKIE_SESSION_LOGIN + "\t**");
+//                    }
+//                }
+                if (headerValue.startsWith("_diaspora_session=")) {
+                    LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN found in " + headerValue + "\t**");
                     cookieSessionFound = true;
                     if (COOKIE_SESSION_LOGIN.isEmpty()) {
                         COOKIE_SESSION_LOGIN = headerValue.substring("_diaspora_session=".length());
                         LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN set to " + COOKIE_SESSION_LOGIN + "\t**");
-                    }else{
+                    } else {
                         LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN already set to " + COOKIE_SESSION_LOGIN + "\t**");
                     }
                 }
             }
         }
         if (!cookieSessionFound){
-            LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION introuvable\t**");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN introuvable\t**");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
             return resultKO;
         }
 
         if (result==null || result.isEmpty()){
             LOG.d(ProfilControler.class, ".parseLoginAsync\t**\tRESPONSE introuvable\t**");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
             return resultKO;
         }
         int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
         if (indexTokenName<=0) {
             LOG.d(ProfilControler.class,".onCompleteGetToken\t**\tIMPOSSIBLE de trouver le token");
+            LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
             return resultKO;
         }
         int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
-        indexToken = indexToken+1+"<meta content=\"".length();
-        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken);
+        LOG.d(ProfilControler.class, ".onCompleteGetToken	**	token found in "+result.substring(indexToken, result.indexOf("/>")));
+        indexToken = indexToken+"<meta content=\"".length();
+        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken+1);
         if (TOKEN.isEmpty()) {
             TOKEN = result.substring(indexToken, indexEndToken);
             LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\ttoken récolté '" + TOKEN + "'");
         }else{
             LOG.d(ProfilControler.class, ".onCompleteGetToken\t**\ttoken déjà récolté '" + TOKEN + "'");
         }
+        LOG.d(ProfilControler.class, ".onCompleteGetToken : Sortie");
         return resultOK;
     }
 
@@ -150,8 +155,10 @@ public class ProfilControler extends DiaporaControler{
         LOG.d(DataControler.class, ".login : Entrée");
 
         try{
+            LOG.d(ProfilControler.class, ".login : On efface les cookies");
             CookieControler cookieControler = CookieControler.getInstance(context);
             cookieControler.clearCookies();
+            LOG.d(ProfilControler.class, ".login : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
             URI uri = URI.create(POD_URL);
             cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
 //            Ion ion=Ion.getDefault(context);//.Config.configure().setTag();
@@ -169,6 +176,7 @@ public class ProfilControler extends DiaporaControler{
 ////            ion.getCookieMiddleware().addCookies(cookies, newHeaders);
 //
 //            ion.build(context)
+            LOG.d(ProfilControler.class, ".login : Construction de la requête d'appel POST à "+LOGIN_URL+ " (authenticity_token="+TOKEN+")");
             Ion.with(context)
                     .load("POST", LOGIN_URL)
                     .followRedirect(true)
@@ -186,7 +194,7 @@ public class ProfilControler extends DiaporaControler{
                     .withResponse()
                     .setCallback(callback);
         }catch(Throwable thr){
-            LOG.e(ProfilControler.class, "Erreur : " + thr.toString());
+            LOG.e(ProfilControler.class, ".login Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
         }
         LOG.d(DataControler.class, ".login : Sortie");
@@ -194,12 +202,16 @@ public class ProfilControler extends DiaporaControler{
 
 
     public static boolean onCompleteLogin(Exception exception, Response<String> response) {
+        LOG.d(DataControler.class, ".onCompleteLogin : Entrée");
         String result = response.getResult();
         boolean resultOK = true;
         boolean resultKO = false;
 
         if (exception != null) {
+            LOG.d(ProfilControler.class, ".onCompleteLogin Erreur : "+exception.getMessage());
             exception.printStackTrace();
+            ACRA.getErrorReporter().handleException(exception);
+            LOG.d(ProfilControler.class, ".onCompleteLogin : Sortie");
             return resultKO;
         }
 
@@ -209,6 +221,7 @@ public class ProfilControler extends DiaporaControler{
         }
         Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
         boolean cookieSessionFound = false;
+        boolean cookieRememberFound = false;
         for(Header header:headers) {
             String headerName = header.getName();
             String headerValue = header.getValue();
@@ -227,9 +240,12 @@ public class ProfilControler extends DiaporaControler{
                     headerValue != null && !headerValue.isEmpty() &&
                     headerName.toLowerCase().equals("set-cookie")) {
                 if (headerValue.startsWith("remember_user_token=")){
+                    LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_REMEMBER found in " + headerValue + "\t**");
+                    cookieRememberFound = true;
                     COOKIE_REMEMBER = headerValue.substring("remember_user_token=".length());
                     LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_REMEMBER set to " + COOKIE_REMEMBER + "\t**");
                 }else if (headerValue.startsWith("_diaspora_session=")) {
+                    LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
                     cookieSessionFound = true;
                     if (headerValue.length()>COOKIE_SESSION_STREAM.length()) {
                         if (COOKIE_SESSION_STREAM.isEmpty()) {
@@ -243,14 +259,22 @@ public class ProfilControler extends DiaporaControler{
             }
         }
         if (!cookieSessionFound){
-            LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_SESSION introuvable\t**");
+            LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
+            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
+            return resultKO;
+        }
+        if (!cookieRememberFound){
+            LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tCOOKIE_REMEMBER introuvable\t**");
+            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
             return resultKO;
         }
 
         if (result==null || result.isEmpty()){
             LOG.d(ProfilControler.class, ".onCompleteLogin\t**\tRESPONSE introuvable\t**");
+            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
             return resultKO;
         }
+        LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
         return resultOK;
     }
 
