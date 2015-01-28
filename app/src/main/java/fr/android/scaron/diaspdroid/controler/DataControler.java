@@ -23,7 +23,7 @@ import fr.android.scaron.diaspdroid.model.Post;
 /**
  * Created by Maison on 13/01/2015.
  */
-public class DataControler extends DiaporaControler{
+public class DataControler extends DiasporaControler {
 
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DataControler.class);

@@ -19,7 +19,7 @@ import fr.android.scaron.diaspdroid.R;
 /**
  * Created by Maison on 11/01/2015.
  */
-public class ProfilControler extends DiaporaControler{
+public class ProfilControler extends DiasporaControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ProfilControler.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
@@ -138,7 +138,7 @@ public class ProfilControler extends DiaporaControler{
             return resultKO;
         }
         int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
-        LOG.d(ProfilControler.class, ".onCompleteGetToken	**	token found in "+result.substring(indexToken, result.indexOf("/>")));
+        LOG.d(ProfilControler.class, ".onCompleteGetToken	**	token found in "+result.substring(indexToken, result.indexOf("/>", indexToken)));
         indexToken = indexToken+"<meta content=\"".length();
         int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken+1);
         if (TOKEN.isEmpty()) {

@@ -28,6 +28,7 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DataControler;
+import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
@@ -125,44 +126,49 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 }
             };
 
-            //Callback d'envoi du formulaire de login
-            final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-                @Override
-                public void onCompleted(Exception e, Response<String> result) {
-                    boolean resultOK = ProfilControler.onCompleteLogin(e, result);
-                    if (!resultOK){
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
-                        final AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.setIcon(R.drawable.ic_launcher);
-                        alertDialog.setTitle("PB Connexion");
-                        alertDialog.setMessage("La connexion a Diaspora a échouée");
-                        alertDialog.show();
-                    }
-                    //On est loggué donc on demande le flux
-                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
-                }
-            };
+//            //Callback d'envoi du formulaire de login
+//            final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//                @Override
+//                public void onCompleted(Exception e, Response<String> result) {
+//                    boolean resultOK = ProfilControler.onCompleteLogin(e, result);
+//                    if (!resultOK){
+//                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
+//                        final AlertDialog alertDialog = alertDialogBuilder.create();
+//                        alertDialog.setIcon(R.drawable.ic_launcher);
+//                        alertDialog.setTitle("PB Connexion");
+//                        alertDialog.setMessage("La connexion a Diaspora a échouée");
+//                        alertDialog.show();
+//                        return;
+//                    }
+//                    //On est loggué donc on demande le flux
+//                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
+//                }
+//            };
 
-            //Callback de récupération du formulaire de login et d'accès au authenticity_token
-            final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
-                @Override
-                public void onCompleted(Exception e, Response<String> result) {
-                    boolean resultOK = ProfilControler.onCompleteGetToken(e, result);
-                    if (!resultOK){
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
-                        final AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.setIcon(R.drawable.ic_launcher);
-                        alertDialog.setTitle("PB Accès");
-                        alertDialog.setMessage("L'accès a Diaspora est impossible");
-                        alertDialog.show();
-                    }
-                    //On a le token donc on demande le login
-                    ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01", loginCallback);
-                }
-            };
+//            //Callback de récupération du formulaire de login et d'accès au authenticity_token
+//            final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+//                @Override
+//                public void onCompleted(Exception e, Response<String> result) {
+//                    boolean resultOK = ProfilControler.onCompleteGetToken(e, result);
+//                    if (!resultOK){
+//                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
+//                        final AlertDialog alertDialog = alertDialogBuilder.create();
+//                        alertDialog.setIcon(R.drawable.ic_launcher);
+//                        alertDialog.setTitle("PB Accès");
+//                        alertDialog.setMessage("L'accès a Diaspora est impossible");
+//                        alertDialog.show();
+//                        return;
+//                    }
+//                    //On a le token donc on demande le login
+//                    ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01", loginCallback);
+//                }
+//            };
 
             CookieControler cookieControler = CookieControler.getInstance(getmActivity());
-            ProfilControler.getToken(getmActivity(), tokenCallback);
+            cookieControler.clearCookies();
+//            ProfilControler.getToken(getmActivity(), tokenCallback);
+
+            DiasporaControler.getStreamFlow(getmActivity(), fluxCallback);
 
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
         } catch (Throwable thr) {

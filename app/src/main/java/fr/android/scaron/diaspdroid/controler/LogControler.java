@@ -1,5 +1,7 @@
 package fr.android.scaron.diaspdroid.controler;
 
+import android.util.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,10 +11,12 @@ import org.slf4j.LoggerFactory;
 public class LogControler {
     private static LogControler Loggeur;
     Logger log;
+    static String className;
 
     public static LogControler getInstance(Class classe) {
         if (Loggeur==null){
             Loggeur= new LogControler(classe);
+            className = classe.getName();
         }
         return Loggeur;
     }
@@ -33,23 +37,36 @@ public class LogControler {
     }
 
     public void i(Class classe, String message){
-//        Logger log = LoggerFactory.getLogger(classe);
         log.info(message);
-//        Log.i(classe.getName(), message);
+        Log.i(classe.getName(), message);
     }
     public void d(Class classe, String message){
-//        Logger log = LoggerFactory.getLogger(classe);
         log.debug(message);
-//        Log.d(classe.getName(), message);
+        Log.d(classe.getName(), message);
     }
     public void v(Class classe, String message){
-//        Logger log = LoggerFactory.getLogger(classe);
         log.trace(message);
-//        Log.v(classe.getName(), message);
+        Log.v(classe.getName(), message);
     }
     public void e(Class classe, String message){
-//        Logger log = LoggerFactory.getLogger(classe);
         log.error(message);
-//        Log.e(classe.getName(), message);
+        Log.e(classe.getName(), message);
+    }
+
+    public void i(String message){
+        log.info(message);
+        Log.i(className, message);
+    }
+    public void d(String message){
+        log.debug(message);
+        Log.d(className,  message);
+    }
+    public void v(String message){
+        log.trace(message);
+        Log.v(className, message);
+    }
+    public void e(String message){
+        log.error(message);
+        Log.e(className, message);
     }
 }
