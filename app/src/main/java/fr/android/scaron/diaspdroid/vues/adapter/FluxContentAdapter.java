@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.acra.ACRA;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.FluxPost;
 
@@ -31,6 +33,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
     LayoutInflater inflater;
     Activity follower;
     private List<FluxPost> posts = new ArrayList<FluxPost>();
+    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxContentAdapter.class));
 
 
     public FluxContentAdapter(Activity follower,
@@ -42,7 +45,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
             this.posts = posts;
             setPosts(posts);
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -54,7 +57,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
             this.posts = posts;
             super.notifyDataSetChanged();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -65,7 +68,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
         try{
             return posts.size();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -81,7 +84,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
         try{
             return posts.get(position).getId().longValue();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -170,7 +173,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
 
             return convertView;
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -178,7 +181,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
 
     private Bitmap getImageBitmap(String url) {
         try{
-            Log.v(this.getClass().getName(),"<-- begin --> getImageBitmap with param url='"+url+"'");
+            LOG.v(this.getClass(),"<-- begin --> getImageBitmap with param url='"+url+"'");
             Bitmap bm = null;
             try {
                 URL aURL = new URL(url);
@@ -190,12 +193,12 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
                 bis.close();
                 is.close();
             } catch (IOException e) {
-                Log.e(this.getClass().getName(), "Erreur lors de la récupération de l'image '"+url+"'", e);
+                LOG.e(this.getClass(), "Erreur lors de la récupération de l'image '"+url+"' (" + e.getMessage()+")");
             }
-            Log.v(this.getClass().getName(),"<-- end --> getImageBitmap with param url='"+url+"'");
+            LOG.v(this.getClass(),"<-- end --> getImageBitmap with param url='"+url+"'");
             return bm;
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

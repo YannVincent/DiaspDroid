@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.acra.ACRA;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.FluxPost;
 import fr.android.scaron.diaspdroid.model.Post;
 
@@ -30,6 +32,7 @@ public class FluxContent {
     public static List<FluxPost> ITEMS = new ArrayList<FluxPost>();
     public static List<Post> POSTS = new ArrayList<Post>();
 
+    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxContent.class));
     /**
      * A map of sample (dummy) items, by ID.
      */
@@ -51,13 +54,13 @@ public class FluxContent {
                 List<Post> posts =new Gson().fromJson(JSON_TEST,collectionType);
                 for(Post post:posts){
                     addPost(post);
-//                    FluxPost fluxPost = new FluxPost(post.getId(), post.getAuthor().getName(), post.getText(), post.getCreated_at());
+//                    FluxPost fluxPost = new FluxPost(post.getId(), post.getAuthor(), post.getText(), post.getCreated_at());
 //                    fluxPost.setAvatarPath(post.getAuthor().getAvatar().getSmall());
 //                    fluxPost.setDetailPicturePath(post.getImage_url());
 //                    addItem(fluxPost);
                 }
             }catch(Throwable thr){
-                Log.e(FluxContent.class.getName(), "Erreur : " + thr.toString());
+                LOG.e(FluxContent.class, "Erreur : " + thr.toString());
                 ACRA.getErrorReporter().handleException(thr);
                 throw thr;
             }
@@ -197,22 +200,22 @@ public class FluxContent {
 //            addItem(fluxPost2);
 //            addItem(new FluxPost(3, "User Test 3", "Test de post 3", "24 dec 2014 12:00"));
 //        } catch (Throwable thr) {
-//            Log.e(FluxContent.class.getName(), "Erreur : " + thr.toString());
+//            LOG.e(FluxContent.class, "Erreur : " + thr.toString());
 //            ACRA.getErrorReporter().handleException(thr);
 //            throw thr;
 //        }
     }
 
-    private static void addItem(FluxPost item) {
-        try{
-            ITEMS.add(item);
-            ITEM_MAP.put(item.getIdStr(), item);
-        } catch (Throwable thr) {
-            Log.e(FluxContent.class.getName(),"Erreur : "+thr.toString());
-            ACRA.getErrorReporter().handleException(thr);
-            throw thr;
-        }
-    }
+//    private static void addItem(FluxPost item) {
+//        try{
+//            ITEMS.add(item);
+//            ITEM_MAP.put(item.getIdStr(), item);
+//        } catch (Throwable thr) {
+//            LOG.e(FluxContent.class,"Erreur : "+thr.toString());
+//            ACRA.getErrorReporter().handleException(thr);
+//            throw thr;
+//        }
+//    }
 
 
 
@@ -221,7 +224,7 @@ public class FluxContent {
             POSTS.add(item);
             POST_MAP.put(String.valueOf(item.getId()), item);
         } catch (Throwable thr) {
-            Log.e(FluxContent.class.getName(),"Erreur : "+thr.toString());
+            LOG.e(FluxContent.class,"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Data;
 import fr.android.scaron.diaspdroid.model.Image;
@@ -32,7 +33,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
  */
 public class PostAdapter extends ArrayAdapter<Post> {
 
-    public static Logger log = LoggerFactory.getLogger(PostAdapter.class);
+    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(PostAdapter.class));
     LayoutInflater inflater;
     Activity follower;
     private List<Post> posts = new ArrayList<Post>();
@@ -46,7 +47,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
             this.posts = posts;
             setPosts(posts);
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(), "Erreur : " + thr.toString());
+            LOG.e(this.getClass(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -62,7 +63,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
             }
             super.notifyDataSetChanged();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -73,7 +74,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         try{
             return posts.size();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -89,7 +90,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         try{
             return posts.get(position).getId().longValue();
         } catch (Throwable thr) {
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -163,15 +164,14 @@ public class PostAdapter extends ArrayAdapter<Post> {
                             indexSrcBegin = indexSrcBegin+1+"src=\"".length();
                             int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
                             String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
-                            log.debug(PostAdapter.class.getName() + "Url de la vidéo récoltée '" + urlSrc + "'");
-                            Log.d(this.getClass().getName(),"Url de la vidéo récoltée '" + urlSrc + "'");
+                            LOG.d(this.getClass(),"Url de la vidéo récoltée '" + urlSrc + "'");
                             postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
                         }
                     }
                 }
                 return convertView;
             } catch (Throwable thr) {
-                Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+                LOG.e(this.getClass(),"Erreur : "+thr.toString());
                 ACRA.getErrorReporter().handleException(thr);
                 throw thr;
             }

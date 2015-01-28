@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.koushikdutta.ion.Ion;
 
 import org.acra.ACRA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -30,12 +32,16 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.PlaceholderFragment;
 
 public class DiaspActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, FluxFragment.OnFragmentInteractionListener {
 
+    private static Logger LOGGEUR = LoggerFactory.getLogger(DiaspActivity.class);
+    public static LogControler LOG = LogControler.getInstance(LOGGEUR);
+//    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(DiaspActivity.class));
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -105,7 +111,7 @@ public class DiaspActivity extends ActionBarActivity
                     (DrawerLayout) findViewById(R.id.drawer_layout));
             }
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(), "Erreur : " + thr.toString());
+            LOG.e(this.getClass(), "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
 //            try { //TODO DECOMMENTER
                 throw thr;
@@ -165,7 +171,7 @@ public class DiaspActivity extends ActionBarActivity
 //                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
 //                    .commit();
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -185,7 +191,7 @@ public class DiaspActivity extends ActionBarActivity
                     break;
             }
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -198,7 +204,7 @@ public class DiaspActivity extends ActionBarActivity
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(mTitle);
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -218,7 +224,7 @@ public class DiaspActivity extends ActionBarActivity
             }
             return super.onCreateOptionsMenu(menu);
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -239,7 +245,7 @@ public class DiaspActivity extends ActionBarActivity
 
             return super.onOptionsItemSelected(item);
         }catch(Throwable thr){
-            Log.e(this.getClass().getName(),"Erreur : "+thr.toString());
+            LOG.e(this.getClass(),"Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

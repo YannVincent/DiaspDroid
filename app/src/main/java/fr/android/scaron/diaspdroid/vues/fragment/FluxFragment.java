@@ -53,7 +53,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
     static String POD = "framasphere.org";
 
-    public static LogControler LOG = LogControler.getInstance();
+    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(FluxFragment.class));
 
     /**
      * The fragment argument representing the section number for this

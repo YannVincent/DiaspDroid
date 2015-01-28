@@ -39,7 +39,7 @@ import fr.android.scaron.diaspdroid.R;
  */
 public class ProfilControler extends DiaporaControler{
 
-    public static LogControler LOG = LogControler.getInstance();
+    public static LogControler LOG = LogControler.getInstance(ProfilControler.class);
 
 
 
@@ -57,7 +57,7 @@ public class ProfilControler extends DiaporaControler{
     }
 
     public static void getToken(Context context, FutureCallback<Response<String>> callback){
-        LOG.d(DataControler.class, ".get token : Entrée");
+        LOG.d(ProfilControler.class, ".get token : Entrée");
         try{
             Ion.with(context)
                     .load("GET", LOGIN_URL)

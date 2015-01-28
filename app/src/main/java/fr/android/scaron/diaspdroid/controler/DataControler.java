@@ -31,7 +31,7 @@ import fr.android.scaron.diaspdroid.model.Post;
 public class DataControler extends DiaporaControler{
 
 
-    public static LogControler LOG = LogControler.getInstance();
+    public static LogControler LOG = LogControler.getInstance(DataControler.class);
 
 
     static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true";
