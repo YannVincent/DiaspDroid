@@ -1,6 +1,8 @@
 package fr.android.scaron.diaspdroid.controler;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -12,24 +14,11 @@ import com.koushikdutta.ion.Ion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.Future;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Created by Sébastien on 29/01/2015.
@@ -91,13 +80,48 @@ public class YoutubeControler {
                     }
 
                     if (url3gpFound && !rtspUrl.isEmpty()) {
-                        videoView.setVideoURI(Uri.parse(rtspUrl));
-                        MediaController mc = new MediaController(context);
-                        videoView.setMediaController(mc);
+//                        videoView.setVideoURI(Uri.parse(rtspUrl));
+//                        MediaController mc = new MediaController(context);
+//                        videoView.setMediaController(mc);
+//                        videoView.requestFocus();
+//                        videoView.start();
+//                        mc.show();
+//                        videoView.setVisibility(View.VISIBLE);
+
+                        // Create a progressbar
+                        final ProgressDialog pDialog = new ProgressDialog(context);
+                        // Set progressbar title
+                        pDialog.setTitle("Android Video Streaming Youtube");
+                        // Set progressbar message
+                        pDialog.setMessage("Buffering...");
+                        pDialog.setIndeterminate(false);
+                        pDialog.setCancelable(false);
+                        // Show progressbar
+                        pDialog.show();
+
+                        try {
+                            // Start the MediaController
+                            MediaController mediacontroller = new MediaController(context);
+                            mediacontroller.setAnchorView(videoView);
+                            // Get the URL from String VideoURL
+                            Uri video = Uri.parse(rtspUrl);
+                            videoView.setMediaController(mediacontroller);
+                            videoView.setVideoURI(video);
+
+                        } catch (Exception exception) {
+                            LOG.e(".getView Error : "+e.getMessage());
+                            exception.printStackTrace();
+                        }
+
                         videoView.requestFocus();
-                        videoView.start();
-                        mc.show();
                         videoView.setVisibility(View.VISIBLE);
+                        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            // Close the progress bar and play the video
+                            public void onPrepared(MediaPlayer mp) {
+                                pDialog.dismiss();
+                                videoView.start();
+                            }
+                        });
                     }
 
                 }

@@ -30,7 +30,9 @@ public class DiasporaControler {
     static String POD = "framasphere.org";
     static String POD_URL = "https://"+POD;
     static String LOGIN_URL = POD_URL+"/users/sign_in";
-    static String STREAM_URL = POD_URL+"/stream";
+    static String STREAM_URL_NORMAL = POD_URL+"/stream";
+    static String STREAM_URL_DELTA = POD_URL+"/stream?max_time=1421018508&_=1421254891463";
+    static String STREAM_URL = STREAM_URL_DELTA;
     static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true";
     static String TOKEN_VIDE = "";
     static String TOKEN_TEST = "4REWL0RLsEU5edVgVWuZL16XGAQkVuCYyzGirHvXjOI=";

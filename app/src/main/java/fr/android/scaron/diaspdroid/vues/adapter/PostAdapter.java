@@ -1,6 +1,8 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +128,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
                 Image avatar = author.getAvatar();
                 // Remplissage de l'avatar
                 if (avatar!=null){
-                    ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getMedium());
+                    ProfilControler.putImage(postView.flux_list_item_post_avatar, avatar.getLarge());
                 }
                 // Remplissage du nom
                 postView.flux_list_item_post_user.setText(author.getName());
@@ -168,21 +170,58 @@ public class PostAdapter extends ArrayAdapter<Post> {
 //                        postView.flux_list_item_post_detail_video.start();
 
                             // Le lien rtsp est déjà en mémoire ?
+                            String rtspVideo = urlSrc;
+                            final VideoView videoView = postView.flux_list_item_post_detail_video;
                             if (!YoutubeControler.rtspMapping.containsKey(urlSrc)){
                                 // Non donc on tente de le trouver
-                                String rtspVideo = YoutubeControler.getUrlVideoRTSP(follower,urlSrc, postView.flux_list_item_post_detail_video);
+                                rtspVideo = YoutubeControler.getUrlVideoRTSP(follower,urlSrc, videoView);
                                 LOG.d("Url de la vidéo rtsp en court de recherche ...");
                             }else{
                                 // Oui donc on affiche directement
-                                String rtspVideo = YoutubeControler.rtspMapping.get(urlSrc);
+                                rtspVideo = YoutubeControler.rtspMapping.get(urlSrc);
                                 LOG.d("Url de la vidéo rtsp déjà en mémoire : '" + rtspVideo + "'");
-                                postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
-                                MediaController mc = new MediaController(follower);
-                                postView.flux_list_item_post_detail_video.setMediaController(mc);
-                                postView.flux_list_item_post_detail_video.requestFocus();
-                                postView.flux_list_item_post_detail_video.start();
-                                mc.show();
-                                postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+//                                postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
+//                                MediaController mc = new MediaController(follower);
+//                                postView.flux_list_item_post_detail_video.setMediaController(mc);
+//                                postView.flux_list_item_post_detail_video.requestFocus();
+//                                postView.flux_list_item_post_detail_video.start();
+//                                mc.show();
+//                                postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+
+                                // Create a progressbar
+                                final ProgressDialog pDialog = new ProgressDialog(follower);
+                                // Set progressbar title
+                                pDialog.setTitle("Android Video Streaming Youtube");
+                                // Set progressbar message
+                                pDialog.setMessage("Buffering...");
+                                pDialog.setIndeterminate(false);
+                                pDialog.setCancelable(false);
+                                // Show progressbar
+                                pDialog.show();
+
+                                try {
+                                    // Start the MediaController
+                                    MediaController mediacontroller = new MediaController(follower);
+                                    mediacontroller.setAnchorView(videoView);
+                                    // Get the URL from String VideoURL
+                                    Uri video = Uri.parse(rtspVideo);
+                                    videoView.setMediaController(mediacontroller);
+                                    videoView.setVideoURI(video);
+
+                                } catch (Exception e) {
+                                    LOG.e(".getView Error : "+e.getMessage());
+                                    e.printStackTrace();
+                                }
+
+                                videoView.requestFocus();
+                                videoView.setVisibility(View.VISIBLE);
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                    // Close the progress bar and play the video
+                                    public void onPrepared(MediaPlayer mp) {
+                                        pDialog.dismiss();
+                                        videoView.start();
+                                    }
+                                });
                             }
 //                            postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
 //                            MediaController mc = new MediaController(follower);
