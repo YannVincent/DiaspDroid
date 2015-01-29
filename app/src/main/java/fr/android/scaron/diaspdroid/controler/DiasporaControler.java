@@ -46,17 +46,24 @@ public class DiasporaControler {
     static String COOKIE_SESSION_STREAM = COOKIE_SESSION_STREAM_VIDE;
     static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST_VIDE;
 
+    static Context contextGlobal;
+
 
 
     public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback){
 
+        contextGlobal = context;
         //Callback d'envoi du formulaire de login
         final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
             @Override
             public void onCompleted(Exception e, Response<String> result) {
                 boolean resultOK = onCompleteLogin(e, result);
                 if (!resultOK){
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    if (contextGlobal==null){
+                        LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
                     final AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.setIcon(R.drawable.ic_launcher);
                     alertDialog.setTitle("PB Connexion");
@@ -65,7 +72,7 @@ public class DiasporaControler {
                     return;
                 }
                 //On est loggué donc on demande le flux
-                getStream(context.getApplicationContext(), fluxCallback);
+                getStream(contextGlobal.getApplicationContext(), fluxCallback);
             }
         };
         //Callback de récupération du formulaire de login et d'accès au authenticity_token
@@ -74,7 +81,11 @@ public class DiasporaControler {
             public void onCompleted(Exception e, Response<String> result) {
                 boolean resultOK = onCompleteGetToken(e, result);
                 if (!resultOK){
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    if (contextGlobal==null){
+                        LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
                     final AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.setIcon(R.drawable.ic_launcher);
                     alertDialog.setTitle("PB Accès");
@@ -83,22 +94,26 @@ public class DiasporaControler {
                     return;
                 }
                 //On a le token donc on demande le login
-                login(context, "tilucifer", "Pikifou01", loginCallback);
+                login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
             }
         };
         //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
         if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
             //Cas ou nous n'avons pas les informations pour se connecter.
             if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
-                getToken(context, tokenCallback);
+                getToken(contextGlobal, tokenCallback);
                 return;
             }
             //Cas ou nous avons les informations pour se connecter
-            login(context, "tilucifer", "Pikifou01", loginCallback);
+            login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
             return;
         }
         //Cas ou nous avons les informations de connexion
-        getStream(context.getApplicationContext(), fluxCallback);
+        getStream(contextGlobal, fluxCallback);
 
     }
 
@@ -117,7 +132,7 @@ public class DiasporaControler {
             LOG.e(".getToken Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
         }
-        LOG.d(DataControler.class, ".getToken : Sortie");
+        LOG.d(".getToken : Sortie");
     }
 
     public static boolean onCompleteGetToken(Exception exception, Response<String> response){
@@ -172,7 +187,7 @@ public class DiasporaControler {
         }
         int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
         if (indexTokenName<=0) {
-            LOG.d(ProfilControler.class,".onCompleteGetToken\t**\tIMPOSSIBLE de trouver le token");
+            LOG.d(".onCompleteGetToken\t**\tIMPOSSIBLE de trouver le token");
             LOG.d(".onCompleteGetToken : Sortie");
             return resultKO;
         }
@@ -191,7 +206,7 @@ public class DiasporaControler {
     }
 
     public static void login(Context context, String username, String password, FutureCallback<Response<String>> callback){
-        LOG.d(DataControler.class, ".login : Entrée");
+        LOG.d(".login : Entrée");
 
         try{
             LOG.d(".login : On efface les cookies");
@@ -216,12 +231,12 @@ public class DiasporaControler {
             LOG.e(".login Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
         }
-        LOG.d(DataControler.class, ".login : Sortie");
+        LOG.d(".login : Sortie");
     }
 
 
     public static boolean onCompleteLogin(Exception exception, Response<String> response) {
-        LOG.d(DataControler.class, ".onCompleteLogin : Entrée");
+        LOG.d(".onCompleteLogin : Entrée");
         String result = response.getResult();
         boolean resultOK = true;
         boolean resultKO = false;
@@ -268,28 +283,28 @@ public class DiasporaControler {
         }
         if (!cookieSessionFound){
             LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
-            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
+            LOG.d(".onCompleteLogin : Sortie");
             return resultKO;
         }
         if (!cookieRememberFound){
             LOG.d(".onCompleteLogin\t**\tCOOKIE_REMEMBER introuvable\t**");
-//            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
+//            LOG.d(".onCompleteLogin : Sortie");
 //            return resultKO;
         }
 
         if (result==null || result.isEmpty()){
             LOG.d(".onCompleteLogin\t**\tRESPONSE introuvable\t**");
-            LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
+            LOG.d(".onCompleteLogin : Sortie");
             return resultKO;
         }
-        LOG.d(DataControler.class, ".onCompleteLogin : Sortie");
+        LOG.d(".onCompleteLogin : Sortie");
         return resultOK;
     }
 
 
 
     public static void post(Context context, String post, String username, String password, FutureCallback<Response<String>> callback){
-        LOG.d(DataControler.class, ".post : Entrée (username="+username+" , password="+password+", token="+TOKEN+")");
+        LOG.d(".post : Entrée (username="+username+" , password="+password+", token="+TOKEN+")");
         try{
             Ion.with(context)
                     .load("POST", LOGIN_URL)

@@ -60,7 +60,7 @@ public class FluxContent {
 //                    addItem(fluxPost);
                 }
             }catch(Throwable thr){
-                LOG.e(FluxContent.class, "Erreur : " + thr.toString());
+                LOG.e("Erreur : " + thr.toString());
                 ACRA.getErrorReporter().handleException(thr);
                 throw thr;
             }
@@ -200,7 +200,7 @@ public class FluxContent {
 //            addItem(fluxPost2);
 //            addItem(new FluxPost(3, "User Test 3", "Test de post 3", "24 dec 2014 12:00"));
 //        } catch (Throwable thr) {
-//            LOG.e(FluxContent.class, "Erreur : " + thr.toString());
+//            LOG.e("Erreur : " + thr.toString());
 //            ACRA.getErrorReporter().handleException(thr);
 //            throw thr;
 //        }

@@ -55,18 +55,18 @@ public class LogControler {
 
     public void i(String message){
         log.info(message);
-        Log.i(className, message);
+        Log.i(className, className+" : "+message);
     }
     public void d(String message){
         log.debug(message);
-        Log.d(className,  message);
+        Log.d(className, className+" : "+message);
     }
     public void v(String message){
         log.trace(message);
-        Log.v(className, message);
+        Log.v(className, className+" : "+message);
     }
     public void e(String message){
         log.error(message);
-        Log.e(className, message);
+        Log.e(className, className+" : "+message);
     }
 }

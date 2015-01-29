@@ -6,7 +6,7 @@
     android:padding="6dip">
         <ImageView android:id="@+id/flux_list_item_post_avatar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50sp"
             android:layout_marginRight="6dip"
             android:contentDescription="Image Avatar de mon amis"
             android:src="@drawable/ic_launcher" />
@@ -37,12 +37,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/flux_list_item_post_detail_picture"
+        android:visibility="gone"
         />
     <WebView  android:id="@+id/flux_list_item_post_detail_video_web"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/flux_list_item_post_detail_video"
             android:minHeight="16sp"
+        android:visibility="gone"
             />
     <TextView android:id="@+id/flux_list_item_post_detail"
     android:layout_width="fill_parent"

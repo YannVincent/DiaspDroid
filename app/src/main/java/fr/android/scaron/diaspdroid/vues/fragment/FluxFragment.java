@@ -81,7 +81,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             fragment.setArguments(args);
             return fragment;
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -118,9 +118,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                         mAdapter.setPosts(posts);
                         return;
                     }
-                    Log.e(FluxFragment.class.getName(), "Callback flux, Erreur : " + e.toString());
+                    LOG.e("Callback flux, Erreur : " + e.toString());
                     if (e.getCause()!=null) {
-                        Log.e(FluxFragment.class.getName(), "Callback flux, cause exception ? " + e.getCause().getMessage());
+                        LOG.e("Callback flux, cause exception ? " + e.getCause().getMessage());
                     }
                     ACRA.getErrorReporter().handleException(e);
                 }
@@ -172,7 +172,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
             mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -193,7 +193,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
 
             return view;
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -207,7 +207,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                     getArguments().getInt(ARG_SECTION_NUMBER));
             mListener = (OnFragmentInteractionListener) activity;
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -220,7 +220,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             super.onDetach();
             mListener = null;
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -236,7 +236,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 mListener.onFragmentInteraction(FluxContent.ITEMS.get(position).getIdStr());
             }
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -255,7 +255,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 ((TextView) emptyView).setText(emptyText);
             }
         } catch (Throwable thr) {
-            Log.e(FluxFragment.class.getName(), "Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

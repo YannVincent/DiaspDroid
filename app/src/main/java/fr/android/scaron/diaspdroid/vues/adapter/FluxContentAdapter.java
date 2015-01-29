@@ -47,7 +47,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
             this.posts = posts;
             setPosts(posts);
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -59,7 +59,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
             this.posts = posts;
             super.notifyDataSetChanged();
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -70,7 +70,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
         try{
             return posts.size();
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -86,7 +86,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
         try{
             return posts.get(position).getId().longValue();
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -175,7 +175,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
 
             return convertView;
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -183,7 +183,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
 
     private Bitmap getImageBitmap(String url) {
         try{
-            LOG.v(this.getClass(),"<-- begin --> getImageBitmap with param url='"+url+"'");
+            LOG.v("<-- begin --> getImageBitmap with param url='"+url+"'");
             Bitmap bm = null;
             try {
                 URL aURL = new URL(url);
@@ -195,12 +195,12 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
                 bis.close();
                 is.close();
             } catch (IOException e) {
-                LOG.e(this.getClass(), "Erreur lors de la récupération de l'image '"+url+"' (" + e.getMessage()+")");
+                LOG.e( "Erreur lors de la récupération de l'image '"+url+"' (" + e.getMessage()+")");
             }
-            LOG.v(this.getClass(),"<-- end --> getImageBitmap with param url='"+url+"'");
+            LOG.v("<-- end --> getImageBitmap with param url='"+url+"'");
             return bm;
         } catch (Throwable thr) {
-            LOG.e(this.getClass(),"Erreur : "+thr.toString());
+            LOG.e("Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
