@@ -2,25 +2,20 @@ package fr.android.scaron.diaspdroid.vues.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.graphics.SurfaceTexture;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.Surface;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
+import android.widget.Toast;
+
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
 
 import org.acra.ACRA;
 import org.slf4j.Logger;
@@ -29,10 +24,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
-import fr.android.scaron.diaspdroid.controler.YoutubeControler;
 import fr.android.scaron.diaspdroid.model.Data;
 import fr.android.scaron.diaspdroid.model.Image;
 import fr.android.scaron.diaspdroid.model.OEmbedCache;
@@ -43,7 +38,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
 /**
  * Created by CARON-08651 on 16/01/2015.
  */
-public class PostAdapter extends ArrayAdapter<Post> implements MediaPlayer.OnErrorListener {
+public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.OnErrorListener { for test textureview
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostAdapter.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
@@ -127,9 +122,10 @@ public class PostAdapter extends ArrayAdapter<Post> implements MediaPlayer.OnErr
 //                postView.flux_list_item_post_detail = (TextView)convertView.findViewById(R.id.flux_list_item_post_detail);
                 postView.flux_list_item_post_detail = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail);
                 postView.flux_list_item_post_detail_picture = (ImageView)convertView.findViewById(R.id.flux_list_item_post_detail_picture);
-                if (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                    postView.flux_list_item_post_detail_video = (TextureView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
-                }
+                postView.flux_list_item_post_detail_video = (YouTubePlayerView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
+//                if (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//                    postView.flux_list_item_post_detail_video = (TextureView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
+//                }
                 postView.flux_list_item_post_detail_video_web = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail_video_web);
                 convertView.setTag(postView);
             } else {
@@ -197,44 +193,117 @@ public class PostAdapter extends ArrayAdapter<Post> implements MediaPlayer.OnErr
                             String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
                             LOG.d("Url de la vidéo récoltée '" + urlSrc + "'");
                             //POUR TEST
-                            urlSrc = "rtsp://r5---sn-cg07luel.c.youtube.com/CiILENy73wIaGQkhqmoFDXKHthMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp";
-                            LOG.d("Url de la vidéo surchargée pour TEST '" + urlSrc + "'");
+//                            urlSrc = "rtsp://r5---sn-cg07luel.c.youtube.com/CiILENy73wIaGQkhqmoFDXKHthMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp";
+//                            LOG.d("Url de la vidéo surchargée pour TEST '" + urlSrc + "'");
 
                             objectData.setVideoUrl(urlSrc);
 
-                            final TextureView textureView = postView.flux_list_item_post_detail_video;
-                            textureView.setVisibility(View.VISIBLE);
-
-                            textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                            //Test avec API Youtube et YoutubePlayeur
+                            int indexOfVideoID = urlSrc.lastIndexOf('/')+1;
+                            if (indexOfVideoID>0 && indexOfVideoID<urlSrc.length()){
+                                urlSrc = urlSrc.substring(indexOfVideoID);
+                            }
+                            final YouTubePlayer.PlaybackEventListener playbackEventListener = new YouTubePlayer.PlaybackEventListener() {
+                                @Override
+                                public void onBuffering(boolean arg0) { }
 
                                 @Override
-                                public void onSurfaceTextureUpdated(SurfaceTexture arg0) {
+                                public void onPaused() { }
 
+                                @Override
+                                public void onPlaying() { }
+
+                                @Override
+                                public void onSeekTo(int arg0) { }
+
+                                @Override
+                                public void onStopped() { }
+                            };
+
+                            final YouTubePlayer.PlayerStateChangeListener playerStateChangeListener = new YouTubePlayer.PlayerStateChangeListener() {
+
+                                @Override
+                                public void onAdStarted() { }
+
+                                @Override
+                                public void onError(YouTubePlayer.ErrorReason arg0) { }
+
+                                @Override
+                                public void onLoaded(String arg0) { }
+
+                                @Override
+                                public void onLoading() { }
+
+                                @Override
+                                public void onVideoEnded() { }
+
+                                @Override
+                                public void onVideoStarted() { }
+                            };
+
+                            final String VIDEO_ID = urlSrc;// "dKLftgvYsVU";
+                            final YouTubePlayerView youtubeView = postView.flux_list_item_post_detail_video;
+                            YouTubePlayer.OnInitializedListener onInitializedListener = new YouTubePlayer.OnInitializedListener (){
+                                @Override
+                                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult result) {
+                                    Toast.makeText(follower, "Failured to Initialize!", Toast.LENGTH_LONG).show();
                                 }
 
                                 @Override
-                                public void onSurfaceTextureSizeChanged(SurfaceTexture arg0, int arg1,
-                                                                        int arg2) {
+                                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
+
+                                    /** add listeners to YouTubePlayer instance **/
+                                    player.setPlayerStateChangeListener(playerStateChangeListener);
+                                    player.setPlaybackEventListener(playbackEventListener);
+
+                                    /** Start buffering **/
+                                    if (!wasRestored) {
+                                        player.cueVideo(VIDEO_ID);
+                                    }
                                 }
-
-                                @Override
-                                public boolean onSurfaceTextureDestroyed(SurfaceTexture arg0) {
-                                    return false;
-                                }
-
-                                @Override
-                                public void onSurfaceTextureAvailable(SurfaceTexture surface, int arg1, int arg2) {
-                                    final MediaPlayer mediaPlayer = new MediaPlayer();
-//                                    mediaPlayer.reset();
-//                                    mediaPlayer.release();
-//                                    holder.vid_play.setTag(mediaPlayer);
-//                                    new SetVideotask().execute(surface, post, mediaPlayer, holder.vid_play);
-                                    new SetVideotask().execute(surface, post, mediaPlayer);
-                                }
-                            });
+                            };
+                            youtubeView.initialize(DeveloperKey.DEVELOPER_KEY, onInitializedListener);
 
 
-                            //Old version avec videoview
+
+
+
+
+
+                            //Test texture view (ne fonctionne pas)
+//                            final TextureView textureView = postView.flux_list_item_post_detail_video;
+//                            textureView.setVisibility(View.VISIBLE);
+//
+//                            textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+//
+//                                @Override
+//                                public void onSurfaceTextureUpdated(SurfaceTexture arg0) {
+//
+//                                }
+//
+//                                @Override
+//                                public void onSurfaceTextureSizeChanged(SurfaceTexture arg0, int arg1,
+//                                                                        int arg2) {
+//                                }
+//
+//                                @Override
+//                                public boolean onSurfaceTextureDestroyed(SurfaceTexture arg0) {
+//                                    return false;
+//                                }
+//
+//                                @Override
+//                                public void onSurfaceTextureAvailable(SurfaceTexture surface, int arg1, int arg2) {
+//                                    final MediaPlayer mediaPlayer = new MediaPlayer();
+////                                    mediaPlayer.reset();
+////                                    mediaPlayer.release();
+////                                    holder.vid_play.setTag(mediaPlayer);
+////                                    new SetVideotask().execute(surface, post, mediaPlayer, holder.vid_play);
+//                                    new SetVideotask().execute(surface, post, mediaPlayer);
+//                                }
+//                            });
+
+
+                            //Old version avec videoview ne fonctionne pas
 ////                        postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
 ////                        postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
 //
@@ -334,38 +403,39 @@ public class PostAdapter extends ArrayAdapter<Post> implements MediaPlayer.OnErr
         }
     }
 
-    class SetVideotask extends AsyncTask<Object, Integer, String> {
-
-        @SuppressLint("NewApi")
-        @Override
-        protected String doInBackground(Object... o) {
-            // TODO Auto-generated method stub
-            final SurfaceTexture s = (SurfaceTexture) o[0];
-            final Post post = (Post) o[1];
-            final MediaPlayer mediaPlayer = (MediaPlayer) o[2];
-
-
-            mediaPlayer.setSurface(new Surface(s));
-            try {
-//                mediaPlayer.reset();
-//                mediaPlayer.release();
-                mediaPlayer.setDataSource(post.getO_embed_cache().getData().getVideoUrl());
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-                //I do this so there is a frame in the video to act as a preview
-                Thread.sleep(100);
-                mediaPlayer.pause();
-                mediaPlayer.setOnErrorListener(PostAdapter.this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-    }
-
-    @Override
-    public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-        return true;
-    }
+    //Pour test textureview
+//    class SetVideotask extends AsyncTask<Object, Integer, String> {
+//
+//        @SuppressLint("NewApi")
+//        @Override
+//        protected String doInBackground(Object... o) {
+//            // TODO Auto-generated method stub
+//            final SurfaceTexture s = (SurfaceTexture) o[0];
+//            final Post post = (Post) o[1];
+//            final MediaPlayer mediaPlayer = (MediaPlayer) o[2];
+//
+//
+//            mediaPlayer.setSurface(new Surface(s));
+//            try {
+////                mediaPlayer.reset();
+////                mediaPlayer.release();
+//                mediaPlayer.setDataSource(post.getO_embed_cache().getData().getVideoUrl());
+//                mediaPlayer.prepare();
+//                mediaPlayer.start();
+//                //I do this so there is a frame in the video to act as a preview
+//                Thread.sleep(100);
+//                mediaPlayer.pause();
+//                mediaPlayer.setOnErrorListener(PostAdapter.this);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            return null;
+//        }
+//    }
+//
+//    @Override
+//    public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+//        return true;
+//    }
 }

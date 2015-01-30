@@ -42,12 +42,19 @@
         <!--android:layout_below="@id/flux_list_item_post_detail_picture"-->
         <!--android:visibility="gone"-->
         <!--/>-->
-    <TextureView android:id="@+id/flux_list_item_post_detail_video"
-        android:layout_width="fill_parent"
+    <!--<TextureView android:id="@+id/flux_list_item_post_detail_video"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/flux_list_item_post_detail_picture"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_marginTop="@dimen/padding_large"/>-->
+
+    <com.google.android.youtube.player.YouTubePlayerView android:id="@+id/flux_list_item_post_detail_video"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/flux_list_item_post_detail_picture"
-        android:visibility="gone"
-        android:layout_marginTop="@dimen/padding_large"/>
+        android:layout_margin="12dip"
+        android:visibility="gone"/>
     <WebView  android:id="@+id/flux_list_item_post_detail_video_web"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

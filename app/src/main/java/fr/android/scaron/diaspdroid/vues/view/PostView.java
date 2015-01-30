@@ -1,11 +1,11 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
-import android.view.TextureView;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
+
+import com.google.android.youtube.player.YouTubePlayerView;
 
 import fr.android.scaron.diaspdroid.model.Post;
 
@@ -24,7 +24,8 @@ public class PostView {
 //    public TextView flux_list_item_post_detail;
     public WebView flux_list_item_post_detail;
     public ImageView flux_list_item_post_detail_picture;
-    public TextureView flux_list_item_post_detail_video;
+//    public TextureView flux_list_item_post_detail_video;
+    public YouTubePlayerView flux_list_item_post_detail_video;
 //    public VideoView flux_list_item_post_detail_video;
     public WebView flux_list_item_post_detail_video_web;
     //Boutons d'action
