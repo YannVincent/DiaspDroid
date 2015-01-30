@@ -33,6 +33,17 @@ public class Data {
 //    "trusted_endpoint_url": "http://www.youtube.com/oembed?scheme=https"
     String trusted_endpoint_url;
 
+    //Ajout de l'adresse de la vidéo pour une lecture en tache asynchrone
+    String videoUrl;
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+
     public String getAuthor_name() {
         return author_name;
     }

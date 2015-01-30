@@ -37,24 +37,23 @@
             android:layout_below="@id/flux_list_item_post_avatar"
         android:paddingTop="6dp" />
     <!--<VideoView android:id="@+id/flux_list_item_post_detail_video"-->
-    <!--android:layout_width="fill_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@id/flux_list_item_post_detail_picture"-->
-    <!--android:visibility="gone"-->
-    <!--/>-->
-    <!--<TextureView android:id="@+id/flux_list_item_post_detail_video"-->
-    <!--android:layout_width="fill_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@id/flux_list_item_post_detail_picture"-->
-    <!--android:visibility="gone" />-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/flux_list_item_post_detail_picture"-->
+        <!--android:visibility="gone"-->
+        <!--/>-->
+    <TextureView android:id="@+id/flux_list_item_post_detail_video"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/flux_list_item_post_detail_picture"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/padding_large"/>
     <WebView  android:id="@+id/flux_list_item_post_detail_video_web"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/flux_list_item_post_detail_picture"
+            android:layout_below="@id/flux_list_item_post_detail_video"
             android:minHeight="16sp"
-        android:visibility="gone"
-            />
-
+        android:visibility="gone"/>
     <WebView  android:id="@+id/flux_list_item_post_detail"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -73,10 +72,10 @@
 
 <!--Si le post comporte un lien cliquable, n’oubliez pas d’utiliser un raccourcisseur d’URL type Bit.ly qui vous permettra en outre de consulter vos statistiques de clics si vous y ouvrez un compte. Prêtez attention aux commentaires, répondez, essayez d’engager la conversation chaque fois que possible. Et bien évidemment, postez (ou programmez vos posts) quand vos fans sont présents sur le réseau, pas quand cela vous arrange vous…"-->
     <!--android:textSize="16sp" />-->
-<!--
-            android:background="#d6d7d7"
-            android:layout_height="40dip"
-            -->
+    <!--
+                android:background="#d6d7d7"
+                android:layout_height="40dip"
+                -->
         <LinearLayout android:id="@+id/flux_list_item_table_bar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

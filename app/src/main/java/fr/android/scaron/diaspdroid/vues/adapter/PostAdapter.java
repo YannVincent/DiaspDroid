@@ -1,12 +1,20 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -35,7 +43,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
 /**
  * Created by CARON-08651 on 16/01/2015.
  */
-public class PostAdapter extends ArrayAdapter<Post> {
+public class PostAdapter extends ArrayAdapter<Post> implements MediaPlayer.OnErrorListener {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostAdapter.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
@@ -101,9 +109,14 @@ public class PostAdapter extends ArrayAdapter<Post> {
         }
     }
 
+    @SuppressLint("NewApi")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         try{
+            int sdk=Build.VERSION.SDK_INT;
+
+            final String mimeType = "text/html";
+            final String encoding = "utf-8";
             PostView postView;
             if(convertView == null) {
                 postView = new PostView();
@@ -111,15 +124,18 @@ public class PostAdapter extends ArrayAdapter<Post> {
                 postView.flux_list_item_post_avatar = (ImageView)convertView.findViewById(R.id.flux_list_item_post_avatar);
                 postView.flux_list_item_post_user = (TextView)convertView.findViewById(R.id.flux_list_item_post_user);
                 postView.flux_list_item_post_datetime = (TextView)convertView.findViewById(R.id.flux_list_item_post_datetime);
-                postView.flux_list_item_post_detail = (TextView)convertView.findViewById(R.id.flux_list_item_post_detail);
+//                postView.flux_list_item_post_detail = (TextView)convertView.findViewById(R.id.flux_list_item_post_detail);
+                postView.flux_list_item_post_detail = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail);
                 postView.flux_list_item_post_detail_picture = (ImageView)convertView.findViewById(R.id.flux_list_item_post_detail_picture);
-                postView.flux_list_item_post_detail_video = (VideoView)convertView.findViewById(R.id.flux_list_item_post_detail_video);
+                if (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                    postView.flux_list_item_post_detail_video = (TextureView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
+                }
                 postView.flux_list_item_post_detail_video_web = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail_video_web);
                 convertView.setTag(postView);
             } else {
                 postView = (PostView) convertView.getTag();
             }
-            Post post = posts.get(position);
+            final Post post = posts.get(position);
             postView.post = post;
             // *** Entete
             // Remplissage de la partie auteur
@@ -138,7 +154,26 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
             // *** Detail
             // Remplissage de la partie texte
-            postView.flux_list_item_post_detail.setText(post.getText());
+//            postView.flux_list_item_post_detail.setText(post.getText());
+            postView.flux_list_item_post_detail.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            postView.flux_list_item_post_detail.getSettings().setUseWideViewPort(true);
+            postView.flux_list_item_post_detail.getSettings().setLoadWithOverviewMode(true);
+            postView.flux_list_item_post_detail.getSettings().setJavaScriptEnabled(true);
+//            String postHTML = "<div style=\"border-bottom-color: rgb(34, 34, 34);border-bottom-style: none;border-bottom-width: 0px;" +
+//                    "border-image-outset: 0px;border-image-repeat: stretch;border-image-slice: 100%;border-image-source: none;border-image-width: 1;" +
+//                    "border-left-color: rgb(34, 34, 34);border-left-style: none;border-left-width: 0px;border-right-color: rgb(34, 34, 34);" +
+//                    "border-right-style: none;border-right-width: 0px;border-top-color: rgb(34, 34, 34);border-top-style: none;" +
+//                    "border-top-width: 0px;color: rgb(34, 34, 34);display: block;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;" +
+//                    "font-size: 13px;font-style: normal;font-weight: normal;height: 266px;line-height: 19.5px;margin-bottom: 0px;margin-left: 0px;" +
+//                    "margin-right: 0px;margin-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;padding-top: 0px;" +
+//                    "vertical-align: baseline;width: 429px;zoom: 1;\">"+post.getText()+"</div>";
+            String postHTML = "<div style=\"display: block;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;" +
+                    "font-size: 34px;font-style: normal;font-weight: normal;" +
+                    "vertical-align: baseline;zoom: 1;\">"+post.getText()+"</div>";
+            postView.flux_list_item_post_detail.loadDataWithBaseURL(null, postHTML, mimeType, encoding, "");
+
+
+
             // Remplissage de l'image
             String imageURL = post.getImage_url();
             if (imageURL!=null && !imageURL.isEmpty()){
@@ -155,99 +190,139 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
                         LOG.d("Object HTML récolté '" + objectHtml + "'");
                         //Cas de la vidéo Youtube
-                        if (objectHtml.contains("youtube")) {
+                        if (objectHtml.contains("youtube") && (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
                             int indexSrcBegin = objectHtml.indexOf("src=\"");
                             indexSrcBegin = indexSrcBegin + "src=\"".length();
                             int indexSrcEnd = objectHtml.indexOf("?feature=oembed", indexSrcBegin);
                             String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
                             LOG.d("Url de la vidéo récoltée '" + urlSrc + "'");
-//                        postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
-//                        postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+                            //POUR TEST
+                            urlSrc = "rtsp://r5---sn-cg07luel.c.youtube.com/CiILENy73wIaGQkhqmoFDXKHthMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp";
+                            LOG.d("Url de la vidéo surchargée pour TEST '" + urlSrc + "'");
 
-//                        postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse("rtsp://v4.cache1.c.youtube.com/CiILENy73wIaGQk4RDShYkdS1BMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp"));
-//                        postView.flux_list_item_post_detail_video.setMediaController(new MediaController(AlertDetail.this));
-//                        postView.flux_list_item_post_detail_video.requestFocus();
-//                        postView.flux_list_item_post_detail_video.start();
+                            objectData.setVideoUrl(urlSrc);
 
-                            // Le lien rtsp est déjà en mémoire ?
-                            String rtspVideo = urlSrc;
-                            final VideoView videoView = postView.flux_list_item_post_detail_video;
-                            if (!YoutubeControler.rtspMapping.containsKey(urlSrc)){
-                                // Non donc on tente de le trouver
-                                rtspVideo = YoutubeControler.getUrlVideoRTSP(follower,urlSrc, videoView);
-                                LOG.d("Url de la vidéo rtsp en court de recherche ...");
-                            }else{
-                                // Oui donc on affiche directement
-                                rtspVideo = YoutubeControler.rtspMapping.get(urlSrc);
-                                LOG.d("Url de la vidéo rtsp déjà en mémoire : '" + rtspVideo + "'");
-//                                postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
-//                                MediaController mc = new MediaController(follower);
-//                                postView.flux_list_item_post_detail_video.setMediaController(mc);
-//                                postView.flux_list_item_post_detail_video.requestFocus();
-//                                postView.flux_list_item_post_detail_video.start();
-//                                mc.show();
-//                                postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+                            final TextureView textureView = postView.flux_list_item_post_detail_video;
+                            textureView.setVisibility(View.VISIBLE);
 
-                                // Create a progressbar
-                                final ProgressDialog pDialog = new ProgressDialog(follower);
-                                // Set progressbar title
-                                pDialog.setTitle("Android Video Streaming Youtube");
-                                // Set progressbar message
-                                pDialog.setMessage("Buffering...");
-                                pDialog.setIndeterminate(false);
-                                pDialog.setCancelable(false);
-                                // Show progressbar
-                                pDialog.show();
+                            textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
 
-                                try {
-                                    // Start the MediaController
-                                    MediaController mediacontroller = new MediaController(follower);
-                                    mediacontroller.setAnchorView(videoView);
-                                    // Get the URL from String VideoURL
-                                    Uri video = Uri.parse(rtspVideo);
-                                    videoView.setMediaController(mediacontroller);
-                                    videoView.setVideoURI(video);
+                                @Override
+                                public void onSurfaceTextureUpdated(SurfaceTexture arg0) {
 
-                                } catch (Exception e) {
-                                    LOG.e(".getView Error : "+e.getMessage());
-                                    e.printStackTrace();
                                 }
 
-                                videoView.requestFocus();
-                                videoView.setVisibility(View.VISIBLE);
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                    // Close the progress bar and play the video
-                                    public void onPrepared(MediaPlayer mp) {
-                                        pDialog.dismiss();
-                                        videoView.start();
-                                    }
-                                });
-                            }
-//                            postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
-//                            MediaController mc = new MediaController(follower);
-//                            postView.flux_list_item_post_detail_video.setMediaController(mc);
-//                            postView.flux_list_item_post_detail_video.requestFocus();
-//                            postView.flux_list_item_post_detail_video.start();
-//                            mc.show();
-//                            postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
-                        }else{
-                            //Cas de l'objet web
-                            int indexSrcBegin = objectHtml.indexOf("src=\"");
-                            indexSrcBegin = indexSrcBegin + "src=\"".length();
-                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
-                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
-                            LOG.d("Url de l'objet récoltée '" + urlSrc + "'");
+                                @Override
+                                public void onSurfaceTextureSizeChanged(SurfaceTexture arg0, int arg1,
+                                                                        int arg2) {
+                                }
+
+                                @Override
+                                public boolean onSurfaceTextureDestroyed(SurfaceTexture arg0) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onSurfaceTextureAvailable(SurfaceTexture surface, int arg1, int arg2) {
+                                    final MediaPlayer mediaPlayer = new MediaPlayer();
+//                                    mediaPlayer.reset();
+//                                    mediaPlayer.release();
+//                                    holder.vid_play.setTag(mediaPlayer);
+//                                    new SetVideotask().execute(surface, post, mediaPlayer, holder.vid_play);
+                                    new SetVideotask().execute(surface, post, mediaPlayer);
+                                }
+                            });
+
+
+                            //Old version avec videoview
+////                        postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
+////                        postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+//
+////                        postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse("rtsp://v4.cache1.c.youtube.com/CiILENy73wIaGQk4RDShYkdS1BMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp"));
+////                        postView.flux_list_item_post_detail_video.setMediaController(new MediaController(AlertDetail.this));
+////                        postView.flux_list_item_post_detail_video.requestFocus();
+////                        postView.flux_list_item_post_detail_video.start();
+//
+//                            // Le lien rtsp est déjà en mémoire ?
+//                            String rtspVideo = urlSrc;
+//                            final VideoView videoView = postView.flux_list_item_post_detail_video;
+//                            if (!YoutubeControler.rtspMapping.containsKey(urlSrc)){
+//                                // Non donc on tente de le trouver
+//                                rtspVideo = YoutubeControler.getUrlVideoRTSP(follower,urlSrc, videoView);
+//                                LOG.d("Url de la vidéo rtsp en court de recherche ...");
+//                            }else{
+//                                // Oui donc on affiche directement
+//                                rtspVideo = YoutubeControler.rtspMapping.get(urlSrc);
+//                                LOG.d("Url de la vidéo rtsp déjà en mémoire : '" + rtspVideo + "'");
+////                                postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
+////                                MediaController mc = new MediaController(follower);
+////                                postView.flux_list_item_post_detail_video.setMediaController(mc);
+////                                postView.flux_list_item_post_detail_video.requestFocus();
+////                                postView.flux_list_item_post_detail_video.start();
+////                                mc.show();
+////                                postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+//
+//                                // Create a progressbar
+//                                final ProgressDialog pDialog = new ProgressDialog(follower);
+//                                // Set progressbar title
+//                                pDialog.setTitle("Android Video Streaming Youtube");
+//                                // Set progressbar message
+//                                pDialog.setMessage("Buffering...");
+//                                pDialog.setIndeterminate(false);
+//                                pDialog.setCancelable(false);
+//                                // Show progressbar
+//                                pDialog.show();
+//
+//                                try {
+//                                    // Start the MediaController
+//                                    MediaController mediacontroller = new MediaController(follower);
+//                                    mediacontroller.setAnchorView(videoView);
+//                                    // Get the URL from String VideoURL
+//                                    Uri video = Uri.parse(rtspVideo);
+//                                    videoView.setMediaController(mediacontroller);
+//                                    videoView.setVideoURI(video);
+//
+//                                } catch (Exception e) {
+//                                    LOG.e(".getView Error : "+e.getMessage());
+//                                    e.printStackTrace();
+//                                }
+//
+//                                videoView.requestFocus();
+//                                videoView.setVisibility(View.VISIBLE);
+//                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                                    // Close the progress bar and play the video
+//                                    public void onPrepared(MediaPlayer mp) {
+//                                        pDialog.dismiss();
+//                                        videoView.start();
+//                                    }
+//                                });
+//                            }
+////                            postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
+////                            MediaController mc = new MediaController(follower);
+////                            postView.flux_list_item_post_detail_video.setMediaController(mc);
+////                            postView.flux_list_item_post_detail_video.requestFocus();
+////                            postView.flux_list_item_post_detail_video.start();
+////                            mc.show();
+////                            postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
+                        }
+
+//                        }else{
+//                            //Cas de l'objet web
+//                            int indexSrcBegin = objectHtml.indexOf("src=\"");
+//                            indexSrcBegin = indexSrcBegin + "src=\"".length();
+//                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
+//                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
+//                            post.getO_embed_cache().getData().setVideoUrl(urlSrc);
+//                            LOG.d("Url de l'objet récoltée '" + urlSrc + "'");
                             String objectHtmlDroid = objectHtml;//"<iframe scrolling=\"no\" frameborder=\"no\" src=\""+urlSrc+"\">";//objectHtml;//"<div style=\"width: 100%;\">" + objectHtml + "</div>";
                             postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
                             postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
                             postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
                             postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);//TEST
-                            final String mimeType = "text/html";
-                            final String encoding = "utf-8";
                             postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, objectHtmlDroid, mimeType, encoding, "");
                             //test on masque la video
                             postView.flux_list_item_post_detail_video_web.setVisibility(View.VISIBLE);
-                        }
+//                        }
                     }
                 }
             }
@@ -257,5 +332,40 @@ public class PostAdapter extends ArrayAdapter<Post> {
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
+    }
+
+    class SetVideotask extends AsyncTask<Object, Integer, String> {
+
+        @SuppressLint("NewApi")
+        @Override
+        protected String doInBackground(Object... o) {
+            // TODO Auto-generated method stub
+            final SurfaceTexture s = (SurfaceTexture) o[0];
+            final Post post = (Post) o[1];
+            final MediaPlayer mediaPlayer = (MediaPlayer) o[2];
+
+
+            mediaPlayer.setSurface(new Surface(s));
+            try {
+//                mediaPlayer.reset();
+//                mediaPlayer.release();
+                mediaPlayer.setDataSource(post.getO_embed_cache().getData().getVideoUrl());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                //I do this so there is a frame in the video to act as a preview
+                Thread.sleep(100);
+                mediaPlayer.pause();
+                mediaPlayer.setOnErrorListener(PostAdapter.this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    @Override
+    public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+        return true;
     }
 }
