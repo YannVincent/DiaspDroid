@@ -2,6 +2,7 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.widget.ProgressBar;
 
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
  * Created by Sébastien on 24/01/2015.
@@ -40,8 +42,10 @@ public class DiasporaControler {
     static String COOKIE_SESSION_LOGIN_TEST="BAh7B0kiD3Nlc3Npb25faWQGOgZFVEkiJWFkOGU5MjQ0NjRmOTM1MWQ1NTQ3NDZlZDc4MmUwYzA5BjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMTRSRVdMMFJMc0VVNWVkVmdWV3VaTDE2WEdBUWtWdUNZeXpHaXJIdlhqT0k9BjsARg%3D%3D--0f5956ca762a3f995f5d1dfa8c51db8d384f5e63";
     static String COOKIE_SESSION_STREAM_VIDE = "";
     static String COOKIE_SESSION_STREAM_TEST="BAh7CUkiD3Nlc3Npb25faWQGOgZFVEkiJWQzYTc1MDM4MGZkMGVkZDgxOTAzYjBiZWNmNjY3OGUwBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJFNyaGJkL3JLYkFzOWpZSTlxU1lVT08GOwBUSSIKZmxhc2gGOwBUbzolQWN0aW9uRGlzcGF0Y2g6OkZsYXNoOjpGbGFzaEhhc2gJOgpAdXNlZG86CFNldAY6CkBoYXNoewY6C25vdGljZVQ6DEBjbG9zZWRGOg1AZmxhc2hlc3sGOwpJIihWb3VzIMOqdGVzIMOgIHByw6lzZW50IGNvbm5lY3TDqS1lLgY7AFQ6CUBub3cwSSIQX2NzcmZfdG9rZW4GOwBGSSIxNE5oeVJKdWdqVll2ZDVwaXhRQ1NCZmZlbkl6bzRMZE1SZUx0UEVVVDJFdz0GOwBG--b1db6d257b315bfff3076ee8112f9a75a45d85ef";
+//    static String COOKIE_SESSION_STREAM_TEST="BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTM5NjFlZWY5OTI3ODUwYWQ0YzcwNmM5NDEyMzI5ODg0BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJFNyaGJkL3JLYkFzOWpZSTlxU1lVT08GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxNzF6Ujd4VUoxT2djTXRBcXFQczBWWis5Szk0QUU0SWFlakx6d0drZmJKdz0GOwBG--4457c24f363ef1afcc886b9ca04466e58871fc53";
     static String COOKIE_REMEMBER_TEST_VIDE = "";
     static String COOKIE_REMEMBER_TEST = "BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368; path=/; expires=Sun, 08-Feb-2015 21:52:35 GMT; HttpOnly; secure";
+//    static String COOKIE_REMEMBER_TEST = "BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368";
 
     static String TOKEN = TOKEN_VIDE;
     static String COOKIE_SESSION_LOGIN = COOKIE_SESSION_LOGIN_VIDE;
@@ -51,8 +55,7 @@ public class DiasporaControler {
     static Context contextGlobal;
 
 
-
-    public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback){
+    public static void partagerImage(final Context context, final String localPath, final String nameFile, final String message, final ProgressBar uploadProgressBar, final FutureCallback<Response<UploadResult>> fluxCallback){
 
         contextGlobal = context;
         //Callback d'envoi du formulaire de login
@@ -62,7 +65,7 @@ public class DiasporaControler {
                 boolean resultOK = onCompleteLogin(e, result);
                 if (!resultOK){
                     if (contextGlobal==null){
-                        LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
+                        LOG.e(".partagerImage : Le contexte est vide et empêche un traitement");
                         return;
                     }
                     final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
@@ -74,7 +77,7 @@ public class DiasporaControler {
                     return;
                 }
                 //On est loggué donc on demande le flux
-                getStream(contextGlobal.getApplicationContext(), fluxCallback);
+                DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
             }
         };
         //Callback de récupération du formulaire de login et d'accès au authenticity_token
@@ -84,7 +87,7 @@ public class DiasporaControler {
                 boolean resultOK = onCompleteGetToken(e, result);
                 if (!resultOK){
                     if (contextGlobal==null){
-                        LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
+                        LOG.e(".partagerImage : Le contexte est vide et empêche un traitement");
                         return;
                     }
                     final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
@@ -111,7 +114,74 @@ public class DiasporaControler {
             return;
         }
         if (contextGlobal==null){
-            LOG.e(".getStreamFlow : Le contexte est vide est empêche un traitement");
+            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+            return;
+        }
+        //Cas ou nous avons les informations de connexion
+        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
+
+    }
+
+    public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback){
+
+        contextGlobal = context;
+        //Callback d'envoi du formulaire de login
+        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                boolean resultOK = onCompleteLogin(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Connexion");
+                    alertDialog.setMessage("La connexion a Diaspora a échouée");
+                    alertDialog.show();
+                    return;
+                }
+                //On est loggué donc on demande le flux
+                getStream(contextGlobal, fluxCallback);
+            }
+        };
+        //Callback de récupération du formulaire de login et d'accès au authenticity_token
+        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                boolean resultOK = onCompleteGetToken(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Accès");
+                    alertDialog.setMessage("L'accès a Diaspora est impossible");
+                    alertDialog.show();
+                    return;
+                }
+                //On a le token donc on demande le login
+                login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+            }
+        };
+        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
+            //Cas ou nous n'avons pas les informations pour se connecter.
+            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
+                getToken(contextGlobal, tokenCallback);
+                return;
+            }
+            //Cas ou nous avons les informations pour se connecter
+            login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
             return;
         }
         //Cas ou nous avons les informations de connexion
@@ -220,7 +290,7 @@ public class DiasporaControler {
             LOG.d(".login : Construction de la requête d'appel POST à "+LOGIN_URL+ " (authenticity_token="+TOKEN+")");
             Ion.with(context)
                     .load("POST", LOGIN_URL)
-                    .followRedirect(true)
+                    .followRedirect(false)
                     .noCache()
                     .setBodyParameter("user[username]", username)
                     .setBodyParameter("user[password]", password)
@@ -339,9 +409,10 @@ public class DiasporaControler {
                 cookieControler.clearCookies();
                 URI uri = URI.create(POD_URL);
                 if (!COOKIE_REMEMBER.isEmpty()) {
-                    LOG.d(".getStream : On ajoute le cookie remember_user_token=" + COOKIE_SESSION_LOGIN);
+                    LOG.d(".getStream : On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
                     cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
-                }else {
+                }
+                if (!COOKIE_SESSION_STREAM.isEmpty()) {
                     LOG.d(".getStream : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_STREAM);
                     cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_STREAM);
                 }

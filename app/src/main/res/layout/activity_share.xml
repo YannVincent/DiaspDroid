@@ -16,11 +16,42 @@
         android:layout_height="wrap_content"
         android:hint="Ecrivez ici..." />
 
-    <Button
-        android:id="@+id/share_text_button"
+        <Button
+            android:id="@+id/share_text_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Partager"
+            android:layout_gravity="center_horizontal" />
+    <!--<ProgressBar-->
+        <!--android:id="@+id/progress_horizontal"-->
+        <!--android:indeterminateOnly="false"-->
+        <!--android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"-->
+        <!--android:progressDrawable="@drawable/progress_horizontal"-->
+        <!--android:minHeight="24dip"-->
+        <!--android:maxHeight="24dip"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:visibility="gone"/>-->
+    <ImageView android:id="@+id/share_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Partager"
-        android:layout_gravity="center_horizontal" />
+        android:layout_marginRight="6dip"
+        android:contentDescription="Image que je partage"
+        android:src="@drawable/ic_launcher" />
+    <ProgressBar
+        android:id="@+id/progress_horizontal"
+        android:indeterminateOnly="false"
+        android:indeterminateDrawable="@android:drawable/progress_horizontal"
+        android:progressDrawable="@drawable/progress_horizontal"
+        android:minHeight="24dip"
+        android:maxHeight="24dip"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+    <EditText
+        android:id="@+id/share_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Le résultat de traitement ici..." />
 
 </LinearLayout>
