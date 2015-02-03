@@ -11,7 +11,7 @@ import fr.android.scaron.diaspdroid.R;
 /**
  * Created by Sébastien on 30/01/2015.
  */
-public class YoutubeActivity extends YouTubeFailureRecoveryActivity {
+public class YoutubeActivity extends  YouTubeFailureRecoveryActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
