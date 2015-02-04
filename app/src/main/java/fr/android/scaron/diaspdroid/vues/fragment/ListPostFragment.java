@@ -28,6 +28,7 @@ public class ListPostFragment extends ListFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         LOG.d(".onCreate entree with savedInstanceState : "+savedInstanceState);
         List<Post> list = new ArrayList<Post>();
 
@@ -106,7 +107,7 @@ public class ListPostFragment extends ListFragment {
         LOG.d("setListContent sortie");
     }
     public interface OnItemSelectedListener {
-        public void onPostItemSelected(String link);
+        public void onPostItemSelected(Post post);
     }
 
     @Override
@@ -152,7 +153,7 @@ public class ListPostFragment extends ListFragment {
     public void updateDetail(Post item) {
         LOG.d(".updateDetail entree");
         LOG.d(".updateDetail listener.onPostItemSelected("+item.getTitle()+")");
-        listener.onPostItemSelected(item.getTitle());
+        listener.onPostItemSelected(item);
         LOG.d(".updateDetail sortie");
     }
 }

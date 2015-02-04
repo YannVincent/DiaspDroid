@@ -25,6 +25,7 @@ public class LogControler {
     public static LogControler getInstance(Logger log) {
         if (Loggeur==null){
             Loggeur= new LogControler(log);
+            className = log.getClass().getName();
         }
         return Loggeur;
     }

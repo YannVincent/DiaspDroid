@@ -8,12 +8,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+
 import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.fragment.DetailPostFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.ListPostFragment;
 
@@ -21,7 +24,7 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
     private static Logger LOGGEUR = LoggerFactory.getLogger(ListPostActivity.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     private boolean mHasOnePane;
-    private String mLastSelectedLink;
+    private Post mLastSelectedPost;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,9 +35,9 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
             setContentView(R.layout.activity_listpost);
 
             LOG.d(".onCreate determinate mHasOnePane");
-            mHasOnePane = findViewById(R.id.container) != null;
+            mHasOnePane = findViewById(R.id.listPostContainer) != null;
 
-            LOG.d(".onCreate mHasOnePane is true ? "+mHasOnePane+" (R.id.container present ?)");
+            LOG.d(".onCreate mHasOnePane is true ? "+mHasOnePane+" (R.id.listPostContainer present ?)");
 
             if (mHasOnePane) {
                 LOG.d(".onCreate mHasOnePane is true, get FragmentManager");
@@ -47,7 +50,7 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
                     LOG.d(".onCreate create FragmentTransaction");
                     FragmentTransaction trx = fm.beginTransaction();
                     LOG.d(".onCreate add in FragmentTransaction fragment list");
-                    trx.add(R.id.container, new ListPostFragment(), "list");
+                    trx.add(R.id.listPostContainer, new ListPostFragment(), "list");
                     LOG.d(".onCreate commit FragmentTransaction");
                     trx.commit();
                 }
@@ -60,11 +63,14 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
             LOG.d(".onCreate savedInstanceState is null ? : "+(savedInstanceState == null));
             if (savedInstanceState != null) {
                 LOG.d(".onCreate savedInstanceState!=null");
-                LOG.d(".onCreate get mLastSelectedLink");
-                mLastSelectedLink = getIntent().hasExtra("selectedLink") ? savedInstanceState.getString("selectedLink") : null;
-                LOG.d(".onCreate onPostItemSelected("+mLastSelectedLink+")");
-    //            mLastSelectedLink = savedInstanceState.getString("selectedLink", null);
-                onPostItemSelected(mLastSelectedLink);
+                LOG.d(".onCreate get mLastSelectedPost");
+                String jsonMyObject;
+                jsonMyObject = savedInstanceState.getString("post");
+                mLastSelectedPost = new Gson().fromJson(jsonMyObject, Post.class);
+//                mLastSelectedPost = getIntent().hasExtra("selectedLink") ? savedInstanceState.getString("selectedLink") : null;
+                LOG.d(".onCreate onPostItemSelected("+ mLastSelectedPost +")");
+    //            mLastSelectedPost = savedInstanceState.getString("selectedLink", null);
+                onPostItemSelected(mLastSelectedPost);
             }
             LOG.d(".onCreate sortie");
         }catch(Throwable thr) {
@@ -79,10 +85,10 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
         try {
             LOG.d(".onSaveInstanceState entree");
             super.onSaveInstanceState(outState);
-            LOG.d(".onSaveInstanceState mLastSelectedLink is null ? : " + (mLastSelectedLink == null));
-            if (mLastSelectedLink != null) {
-                LOG.d(".onSaveInstanceState mLastSelectedLink not null so put string selectedLink in outState : " + mLastSelectedLink);
-                outState.putString("selectedLink", mLastSelectedLink);
+            LOG.d(".onSaveInstanceState mLastSelectedPost is null ? : " + (mLastSelectedPost == null));
+            if (mLastSelectedPost != null) {
+                LOG.d(".onSaveInstanceState mLastSelectedPost not null so put string selectedLink in outState : " + mLastSelectedPost);
+                outState.putString("post", new Gson().toJson(mLastSelectedPost));
             }
             LOG.d(".onSaveInstanceState sortie");
         }catch(Throwable thr) {
@@ -152,11 +158,11 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
     }
 
     @Override
-    public void onPostItemSelected(String link) {
+    public void onPostItemSelected(Post post) {
         try {
-            LOG.d(".onPostItemSelected entree with link : " + link);
-            LOG.d(".onPostItemSelected set link to mLastSelectedLink");
-            mLastSelectedLink = link;
+            LOG.d(".onPostItemSelected entree with post : " + post);
+            LOG.d(".onPostItemSelected set link to mLastSelectedPost");
+            mLastSelectedPost = post;
 
             LOG.d(".onPostItemSelected mHasOnePane ? " + mHasOnePane);
             if (mHasOnePane) {
@@ -176,14 +182,14 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
                     LOG.d(".onPostItemSelected mHasOnePane true, add link to DetailPostFragment");
                     // configure link
                     Bundle bundle = new Bundle();
-                    bundle.putString("link", link);
+                    bundle.putString("post", new Gson().toJson(post));
                     detailFragment.setArguments(bundle);
 
                     // add fragment
                     LOG.d(".onPostItemSelected mHasOnePane true, create FragmentTransaction to replace fragment detail");
                     FragmentTransaction trx = fm.beginTransaction();
                     LOG.d(".onPostItemSelected mHasOnePane true, replace fragment detail");
-                    trx.replace(R.id.container, detailFragment, "detail");
+                    trx.replace(R.id.listPostContainer, detailFragment, "detail");
                     LOG.d(".onPostItemSelected mHasOnePane true, addToBackStack null on transaction");
                     trx.addToBackStack(null);
                     LOG.d(".onPostItemSelected mHasOnePane true, commit transaction");
@@ -192,7 +198,7 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
                 } else {
 
                     LOG.d(".onPostItemSelected mHasOnePane true, update link to DetailPostFragment");
-                    detailFragment.getArguments().putString("link", link);
+                    detailFragment.getArguments().putString("post", new Gson().toJson(post));
                 }
 
             } else {
@@ -200,7 +206,7 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
                 LOG.d(".onPostItemSelected mHasOnePane false, find by id DetailPostFragment");
                 DetailPostFragment fragment = (DetailPostFragment) getSupportFragmentManager().findFragmentById(R.id.detailFragment);
                 LOG.d(".onPostItemSelected mHasOnePane false, setText link to DetailPostFragment");
-                fragment.setText(link);
+                fragment.setPost(post);
             }
             LOG.d(".onPostItemSelected sortie");
         }catch(Throwable thr) {
