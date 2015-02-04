@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 public class LogControler {
     private static LogControler Loggeur;
     Logger log;
-    static String className;
+    String className;
 
     public static LogControler getInstance(Class classe) {
         if (Loggeur==null){
             Loggeur= new LogControler(classe);
-            className = classe.getName();
         }
         return Loggeur;
     }
@@ -25,16 +24,17 @@ public class LogControler {
     public static LogControler getInstance(Logger log) {
         if (Loggeur==null){
             Loggeur= new LogControler(log);
-            className = log.getClass().getName();
         }
         return Loggeur;
     }
 
     private LogControler(Class classe) {
         log = LoggerFactory.getLogger(classe);
+        className = log.getClass().getName();
     }
     private LogControler(Logger loggeur) {
         log = loggeur;
+        className = log.getClass().getName();
     }
 
     public void i(Class classe, String message){

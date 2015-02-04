@@ -28,9 +28,9 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        LOG.d(".onCreate entree with savedInstanceState : "+savedInstanceState);
+        super.onCreate(savedInstanceState);
         try{
-            LOG.d(".onCreate entree with savedInstanceState : "+savedInstanceState);
-            super.onCreate(savedInstanceState);
             LOG.d(".onCreate setContentView R.layout.activity_listpost");
             setContentView(R.layout.activity_listpost);
 
