@@ -1,16 +1,20 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -21,15 +25,13 @@ import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.Data;
-import fr.android.scaron.diaspdroid.model.OEmbedCache;
 import fr.android.scaron.diaspdroid.model.Post;
-
-//import com.google.android.youtube.player.YouTubePlayerFragment;
-//import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 /**
  * Created by CARON-08651 on 03/02/2015.
@@ -46,19 +48,11 @@ public class DetailPostFragment extends Fragment {
     private YouTubePlayer.OnInitializedListener youtubeListener;
     FragmentActivity listener;
     private Post post;
+    private FragmentManager supportFragmentManager;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.listener = (FragmentActivity) activity;
-    }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            String jsonMyObject;
-            jsonMyObject = savedInstanceState.getString("post");
-            post = new Gson().fromJson(jsonMyObject, Post.class);
-        }
     }
 
     @Override
@@ -71,38 +65,13 @@ public class DetailPostFragment extends Fragment {
                 container.removeAllViews();
                 LOG.d(".onCreateView create view with layout  R.layout.fragment_detailpostyoutube");
                 rootview = inflater.inflate(R.layout.fragment_detailpostyoutube, container, false);
-                LOG.d(".onCreateView sortie with view : " + rootview);
-                LOG.d(".onCreateView find web view with id  R.id.detailPostTextYoutube");
-                webview = (WebView) rootview.findViewById(R.id.detailPostTextYoutube);
-                LOG.d(".onCreateView webview found ? " + (webview != null));
-                LOG.d(".onCreateView getting supportFragmentManager");
-                FragmentManager supportFragmentManager =  getActivity().getSupportFragmentManager();
-                LOG.d(".onCreateView find youtube fragment with id  R.id.detailPostVideoYoutube");
-                youTubePlayerFragment =
-                        (YoutubePlayerFragment) supportFragmentManager.findFragmentById(R.id.detailPostVideoYoutube);
-                LOG.d(".onCreateView youTubePlayerFragment found ? " + (youTubePlayerFragment != null));
-                if (youTubePlayerFragment==null){
-                    LOG.d(".onCreate fragment 'detailPostVideoYoutube' to create");
-                    youTubePlayerFragment = new YoutubePlayerFragment();
-                    LOG.d(".onCreateView create FragmentTransaction");
-                    FragmentTransaction sfmTx = supportFragmentManager.beginTransaction();
-                    LOG.d(".onCreateView add add(R.id.detailPostVideoYoutube, youTubePlayerFragment) in FragmentTransaction");
-                    sfmTx.add(R.id.detailPostVideoYoutube, youTubePlayerFragment);
-                    LOG.d(".onCreateView commit FragmentTransaction");
-                    sfmTx.commit();
-                }
             }
-//            LOG.d(".onCreateView sortie with view : " + container.getRootView());
-//            return container.getRootView();
         }catch(Throwable thr) {
             LOG.e(".onCreateView sortie en Erreur ("+thr.toString()+")");
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
         return rootview;
-//        webview = new WebView(getActivity());
-//        LOG.d(".onCreateView sortie with webview : "+webview);
-//        return webview;
     }
 
     @Override
@@ -115,18 +84,10 @@ public class DetailPostFragment extends Fragment {
             Bundle bundle = getArguments();
             LOG.d(".onActivityCreated bundle is null ? : " + (bundle == null));
             if (bundle != null) {
-
-//                LOG.d(".onCreateView create view with layout  R.layout.fragment_detailpostyoutube");
-//                getActivity().setContentView(R.layout.fragment_detailpostyoutube);
                 String jsonMyObject;
                 jsonMyObject = bundle.getString("post");
-                final Post post = new Gson().fromJson(jsonMyObject, Post.class);
-                LOG.d(".onActivityCreated setText with text : " + bundle.getString("link"));
-                setPost(post);
+                post = new Gson().fromJson(jsonMyObject, Post.class);
 
-//BLOC COPY oncreateview
-                LOG.d(".onActivityCreated getting supportFragmentManager");
-                FragmentManager supportFragmentManager =  getActivity().getSupportFragmentManager();
                 LOG.d(".onActivityCreated find web view with id  R.id.detailPostTextYoutube");
                 webview = (WebView) getActivity().findViewById(R.id.detailPostTextYoutube);
                 LOG.d(".onActivityCreated webview found ? " + (webview != null));
@@ -134,85 +95,15 @@ public class DetailPostFragment extends Fragment {
                     LOG.d(".onActivityCreated webview 'detailPostTextYoutube' to create");
                     webview = new WebView(getActivity());
                 }
-                LOG.d(".onActivityCreated find youtube fragment with id  R.id.detailPostVideoYoutube");
-                youTubePlayerFragment =
-                        (YoutubePlayerFragment) supportFragmentManager.findFragmentById(R.id.detailPostVideoYoutube);
-                LOG.d(".onActivityCreated youTubePlayerFragment found ? " + (youTubePlayerFragment != null));
-                if (youTubePlayerFragment==null){
-                    LOG.d(".onActivityCreated fragment 'detailPostVideoYoutube' to create");
-                    youTubePlayerFragment = new YoutubePlayerFragment();
-                    LOG.d(".onActivityCreated create FragmentTransaction");
-                    FragmentTransaction sfmTx = supportFragmentManager.beginTransaction();
-                    LOG.d(".onActivityCreated add add(R.id.detailPostVideoYoutube, youTubePlayerFragment) in FragmentTransaction");
-                    sfmTx.add(R.id.detailPostVideoYoutube, youTubePlayerFragment);
-                    LOG.d(".onActivityCreated commit FragmentTransaction");
-                    sfmTx.commit();
-                }
 
-//BLOC COPY oncreateview FIN
+                LOG.d(".onActivityCreated getting supportFragmentManager");
+                supportFragmentManager =  getActivity().getSupportFragmentManager();
 
+                LOG.d(".onActivityCreated setPost with post : " + post);
+                setPost(post);
 
-                LOG.d(".onActivityCreated find web view with id  R.id.detailPostTextYoutube");
-//                webview = (WebView) getActivity().findViewById(R.id.detailPostTextYoutube);
-                LOG.d(".onActivityCreated webview found ? " + (webview != null));
-//                LOG.d(".onActivityCreated find youtube fragment with id  R.id.detailPostVideoYoutube");
-//                youTubePlayerFragment =
-//                        (YoutubePlayerFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.detailPostVideoYoutube);
-                LOG.d(".onActivityCreated youTubePlayerFragment found ? " + (youTubePlayerFragment != null));
-//        youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
-                LOG.d(".onActivityCreated create youtubeListener");
-                youtubeListener = new YouTubePlayer.OnInitializedListener() {
-                    @Override
-                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player,
-                                                        boolean wasRestored) {
-
-                        if (!wasRestored) {
-                            // Remplissage de l'objet web(vidéo ou autre) et de la vue vidéo
-                            OEmbedCache object = post.getO_embed_cache();
-                            if (object != null) {
-                                Data objectData = object.getData();
-                                if (objectData != null) {
-                                    String objectHtml = objectData.getHtml();
-                                    if (objectHtml != null && !objectHtml.isEmpty()) {
-
-                                        LOG.d(".onInitializationSuccess Object HTML récolté '" + objectHtml + "'");
-                                        //Cas de la vidéo Youtube
-                                        if (objectHtml.contains("youtube")) {
-                                            int indexSrcBegin = objectHtml.indexOf("src=\"");
-                                            indexSrcBegin = indexSrcBegin + "src=\"".length();
-                                            int indexSrcEnd = objectHtml.indexOf("?feature=oembed", indexSrcBegin);
-                                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
-                                            indexSrcBegin = urlSrc.lastIndexOf("/") + 1;
-                                            urlSrc = urlSrc.substring(indexSrcBegin);
-                                            LOG.d(".onInitializationSuccess ID de la vidéo récoltée '" + urlSrc + "'");
-                                            player.cueVideo(urlSrc);
-                                        }
-                                    }
-                                }
-                            }
-//                        player.cueVideo("nCgQDjiotG0");
-                        }
-                    }
-
-                    @Override
-                    public void onInitializationFailure(YouTubePlayer.Provider provider,
-                                                        YouTubeInitializationResult errorReason) {
-                        if (errorReason.isUserRecoverableError()) {
-                            errorReason.getErrorDialog(getActivity(), RECOVERY_DIALOG_REQUEST).show();
-                        } else {
-                            String errorMessage = String.format(getString(R.string.error_player), errorReason.toString());
-                            Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
-                        }
-                    }
-                };
-                if (youTubePlayerFragment != null) {
-                    LOG.d(".onActivityCreated initialize youTubePlayerFragment");
-                    youTubePlayerFragment.initialize(DeveloperKey.DEVELOPER_KEY, youtubeListener);
-                } else {
-                    LOG.d(".onActivityCreated initialize youTubePlayerFragment failed");
-                }
             }
-            LOG.d(".onActivityCreated entree with savedInstanceState : " + savedInstanceState);
+            LOG.d(".onActivityCreated sortie");
         }catch(Throwable thr) {
             LOG.e(".onActivityCreated sortie en Erreur ("+thr.toString()+")");
             ACRA.getErrorReporter().handleException(thr);
@@ -220,14 +111,83 @@ public class DetailPostFragment extends Fragment {
         }
     }
 
+    public String getVideoType() {
+        if (post.getO_embed_cache() != null && post.getO_embed_cache().getData() != null
+                && post.getO_embed_cache().getData().getHtml() != null){
+            if (post.getO_embed_cache().getData().getHtml().contains("youtube") ) {
+                return "youtube";
+            }
+            return "web";
+        }
+        return "none";
+    }
+
+    public Map<String, String> getVideo() {
+        Map mapVideo = new HashMap<String, String>();
+        String videoType = getVideoType();
+        if ("youtube".equals(videoType)) {
+            String objectHtml = post.getO_embed_cache().getData().getHtml();
+            int indexSrcBegin = objectHtml.indexOf("src=\"");
+            indexSrcBegin = indexSrcBegin + "src=\"".length();
+            int indexSrcEnd = objectHtml.indexOf("?feature=oembed", indexSrcBegin);
+            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
+            indexSrcBegin = urlSrc.lastIndexOf("/") + 1;
+            urlSrc = urlSrc.substring(indexSrcBegin);
+            mapVideo.put("youtube",urlSrc);
+        }else if ("web".equals(videoType)) {
+            mapVideo.put("web",post.getO_embed_cache().getData().getHtml());
+        }
+        return mapVideo;
+    }
+
+    public void setYoutubeVideo(final String urlSrc){
+        LOG.d(".setYoutubeVideo entree avec l'id : "+urlSrc);
+        try {
+            LOG.d(".onActivityCreated find youtube fragment with id  R.id.detailPostVideoYoutube");
+            youTubePlayerFragment =
+                    (YoutubePlayerFragment) supportFragmentManager.findFragmentById(R.id.detailPostVideoYoutube);
+            FragmentTransaction sfmTx = supportFragmentManager.beginTransaction();
+                LOG.d(".setYoutubeVideo fragment 'detailPostVideoYoutube' to create");
+                youTubePlayerFragment = new YoutubePlayerFragment();
+                LOG.d(".setYoutubeVideo create FragmentTransaction");
+                LOG.d(".setYoutubeVideo add add(R.id.detailPostVideoYoutube, youTubePlayerFragment) in FragmentTransaction");
+                sfmTx.replace(R.id.detailPostVideoYoutube, youTubePlayerFragment);
+                sfmTx.commit();
+
+            LOG.d(".setYoutubeVideo create youtubeListener");
+            youtubeListener = new YouTubePlayer.OnInitializedListener() {
+                @Override
+                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player,
+                                                    boolean wasRestored) {
+//                    if (!wasRestored) {
+                        LOG.d(".onInitializationSuccess ID de la vidéo récoltée '" + urlSrc + "'");
+                        player.cueVideo(urlSrc);
+//                    }
+                }
+                @Override
+                public void onInitializationFailure(YouTubePlayer.Provider provider,
+                                                    YouTubeInitializationResult errorReason) {
+                    if (errorReason.isUserRecoverableError()) {
+                        errorReason.getErrorDialog(getActivity(), RECOVERY_DIALOG_REQUEST).show();
+                    } else {
+                        String errorMessage = String.format(getString(R.string.error_player), errorReason.toString());
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            LOG.d(".setYoutubeVideo initialize api youTubePlayerFragment");
+            youTubePlayerFragment.initialize(DeveloperKey.DEVELOPER_KEY, youtubeListener);
+            LOG.d(".setYoutubeVideo initialized api youTubePlayerFragment");
+        }catch(Throwable thr) {
+            LOG.e(".setYoutubeVideo sortie en Erreur ("+thr.toString()+")");
+            ACRA.getErrorReporter().handleException(thr);
+            throw thr;
+        }
+        LOG.d(".setYoutubeVideo sortie");
+    }
     public void setPost(Post post) {
         LOG.d(".setPost entree with post : "+post);
         try {
-            if (webview != null) {
-//            LOG.d(".setText setInitialScale");
-//            webview.setInitialScale(50);
-//            LOG.d(".setText loadUrl with : "+item);
-//            webview.loadUrl(item);
                 LOG.d(".setPost getSettings set params");
                 webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
                 webview.getSettings().setUseWideViewPort(true);
@@ -236,7 +196,7 @@ public class DetailPostFragment extends Fragment {
                 // Remplissage de l'objet web
                 StringBuilder sbHtml = new StringBuilder();
                 //Ajout du style
-                sbHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"stylePost.css\" />");
+                sbHtml.append("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"stylePost.css\" /></head><body>");
 
                 //AJOUT D'UN POST TEST dans la webview
                 sbHtml.append("<div class=\"stream_element loaded\" data-template=\"stream-element\"><div class=\"media\">\n" +
@@ -493,37 +453,56 @@ public class DetailPostFragment extends Fragment {
                         "    \n" +
                         "\n" +
                         "  </div>\n" +
-                        "</div></div>");
+                        "</div></div></body></html>");
 
 
-                // Ajout du titre
-                sbHtml.append("<h1>" + post.getTitle() + "</h1>");
-                // Ajout du text
-                sbHtml.append("<div>" + post.getText() + "</div>");
-                // Remplissage de l'objet web avec l'objet
-                OEmbedCache object = post.getO_embed_cache();
-                if (object != null) {
-                    Data objectData = object.getData();
-                    if (objectData != null) {
-                        String objectHtml = objectData.getHtml();
-                        if (objectHtml != null && !objectHtml.isEmpty()) {
-
-                            LOG.d(".setPost Object HTML récolté '" + objectHtml + "'");
-                            sbHtml.append(objectHtml);
-                        }
-                    }
+                Map<String, String> videoData = getVideo();
+            if (!videoData.isEmpty()){
+                if (videoData.containsKey("web")) {
+                    LOG.d(".setPost set web video");
+                    sbHtml.append(videoData.get("web"));
+                    LOG.d(".setPost remove youtube video (desactivated)");
+                    removeYoutubeVideo();
+                }else if (videoData.containsKey("youtube")){
+                    LOG.d(".setPost set youtube video");
+                    setYoutubeVideo(videoData.get("youtube"));
                 }
-                webview.loadDataWithBaseURL("file:///android_asset/", sbHtml.toString(), mimeType, encoding, "");
-//            webview.loadDataWithBaseURL(null, sbHtml.toString(), mimeType, encoding, "");
-                LOG.d(".setPost sortie en succès");
-                return;
+            }else{
+                LOG.d(".setPost remove youtube video (desactivated)");
+                removeYoutubeVideo();
             }
+            webview.loadDataWithBaseURL("file:///android_asset/", sbHtml.toString(), mimeType, encoding, "");
+            LOG.d(".setPost sortie en succès");
         }catch(Throwable thr) {
             LOG.e(".setPost sortie en Erreur ("+thr.toString()+")");
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
-        LOG.d(".setPost not possible webview not found");
-        LOG.d(".setPost sortie en erreur");
+    }
+
+    private void removeYoutubeVideo(){
+        if (supportFragmentManager.findFragmentById(R.id.detailPostVideoYoutube)!=null)
+        LOG.d("Class of findFragmentById(R.id.detailPostVideoYoutube) : "+supportFragmentManager.findFragmentById(R.id.detailPostVideoYoutube).getClass().getName());
+        Fragment frag = getActivity().getSupportFragmentManager().findFragmentById(R.id.detailPostVideoYoutube);
+        if (frag!=null && frag.getView()!=null){
+            frag.getView().setVisibility(View.GONE);
+        }
+        if (webview!=null){
+            LOG.d(".removeYoutubeVideo resize webview with setLayoutParams");
+//            webview.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+    }
+
+    private int getScale(){
+        Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width = display.getWidth();
+        Double val = new Double(width)/new Double(415);
+        val = val * 100d;
+        return val.intValue();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 }

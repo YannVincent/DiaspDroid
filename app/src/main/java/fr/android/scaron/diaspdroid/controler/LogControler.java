@@ -30,11 +30,11 @@ public class LogControler {
 
     private LogControler(Class classe) {
         log = LoggerFactory.getLogger(classe);
-        className = log.getClass().getName();
+        className = log.getName().substring(log.getName().lastIndexOf('.'));
     }
     private LogControler(Logger loggeur) {
         log = loggeur;
-        className = log.getClass().getName();
+        className = log.getName().substring(log.getName().lastIndexOf('.'));
     }
 
     public void i(Class classe, String message){

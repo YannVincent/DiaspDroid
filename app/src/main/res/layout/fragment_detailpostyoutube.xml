@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical">
 
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="fill_parent">-->
         <WebView android:id="@+id/detailPostTextYoutube"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
-
-
-    <fragment
+    <!--</ScrollView>-->
+    <FrameLayout
         android:id="@+id/detailPostVideoYoutube"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        class="fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment"
-        />
+        android:layout_weight="1"/>
+    <!--<fragment-->
+        <!--android:name="com.google.android.youtube.player.YouTubePlayerFragment"-->
+        <!--android:id="@+id/detailPostVideoYoutube"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--class="fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment"-->
+        <!--/>-->
     <!--class="com.google.android.youtube.player.YouTubePlayerSupportFragment"-->
 </LinearLayout>
