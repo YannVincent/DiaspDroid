@@ -85,6 +85,10 @@ import java.util.Date;
 }
  */
 public class Post {
+    public boolean asYoutubeVideo;
+    public String idYoutubeVideo;
+    public boolean asWebSiteUrl;
+    public String webSiteUrl;
     //"id": 302726,
     Integer id;
     //"guid": "56cacec07bc40132ce282a0000053625",
@@ -205,8 +209,56 @@ public class Post {
 //    ]
     ArrayList<Photo> photos;
 
-//    "root": null,
-    String root;
+//    "root": {
+//            "id": 277359,
+//            "guid": "21c0d44074ae0132ce062a0000053625",
+//            "text": "Pourquoi refuser la L\u00e9gion d'honneur, par l'odieux connard :\r\n\r\n![Pourquoi refuser la L\u00e9gion d'honneur, par l'odieux connard](https://odieuxconnard.files.wordpress.com/2015/01/honneurlegion.jpg)",
+//            "public": true,
+//            "created_at": "2015-01-02T13:06:47Z",
+//            "interacted_at": "2015-01-04T09:43:59Z",
+//            "provider_display_name": null,
+//            "post_type": "StatusMessage",
+//            "image_url": null,
+//            "object_url": null,
+//            "favorite": false,
+//            "nsfw": false,
+//            "author": {
+//        "id": 5,
+//                "guid": "b13eb6b0beac0131e7e32a0000053625",
+//                "name": "Framasky",
+//                "diaspora_id": "framasky@framasphere.org",
+//                "avatar": {
+//            "small": "https://framasphere.org/uploads/images/thumb_small_cff201fed872f01be231.png",
+//                    "medium": "https://framasphere.org/uploads/images/thumb_medium_cff201fed872f01be231.png",
+//                    "large": "https://framasphere.org/uploads/images/thumb_large_cff201fed872f01be231.png"
+//        }
+//    },
+//            "o_embed_cache": null,
+//            "open_graph_cache": null,
+//            "mentioned_people": [
+//
+//            ],
+//            "photos": [
+//
+//            ],
+//            "root": null,
+//            "title": "Pourquoi refuser ...",
+//            "address": null,
+//            "poll": null,
+//            "already_participated_in_poll": null,
+//            "interactions": {
+//        "likes": [
+//
+//        ],
+//        "reshares": [
+//
+//        ],
+//        "comments_count": 4,
+//                "likes_count": 22,
+//                "reshares_count": 13
+//    }
+//}
+    Post root;
 //    "title": "St\u00e9phane 22decemb...",
     String title;
 //    "address": null,
@@ -425,11 +477,11 @@ public class Post {
         this.photos = photos;
     }
 
-    public String getRoot() {
+    public Post getRoot() {
         return root;
     }
 
-    public void setRoot(String root) {
+    public void setRoot(Post root) {
         this.root = root;
     }
 

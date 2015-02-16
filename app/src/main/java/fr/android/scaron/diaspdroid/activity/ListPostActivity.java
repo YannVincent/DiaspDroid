@@ -162,52 +162,52 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
         try {
             LOG.d(".onPostItemSelected entree with post : " + post);
             LOG.d(".onPostItemSelected set link to mLastSelectedPost");
-            mLastSelectedPost = post;
-
-            LOG.d(".onPostItemSelected mHasOnePane ? " + mHasOnePane);
-            if (mHasOnePane) {
-
-                LOG.d(".onPostItemSelected mHasOnePane true, get FragmentManager");
-                FragmentManager fm = getSupportFragmentManager();
-                LOG.d(".onPostItemSelected mHasOnePane true, find by tag DetailPostFragment");
-                DetailPostFragment detailFragment = (DetailPostFragment) fm.findFragmentByTag("detail");
-
-                LOG.d(".onPostItemSelected mHasOnePane true, DetailPostFragment found ? " + (detailFragment == null));
-                if (detailFragment == null) {
-                    LOG.d(".onPostItemSelected mHasOnePane true, initialize fragment DetailPostFragment");
-                    // create and initialize fragment
-                    detailFragment = new DetailPostFragment();
-
-
-                    LOG.d(".onPostItemSelected mHasOnePane true, add link to DetailPostFragment");
-                    // configure link
-                    Bundle bundle = new Bundle();
-                    bundle.putString("post", new Gson().toJson(post));
-                    detailFragment.setArguments(bundle);
-
-                    // add fragment
-                    LOG.d(".onPostItemSelected mHasOnePane true, create FragmentTransaction to replace fragment detail");
-                    FragmentTransaction trx = fm.beginTransaction();
-                    LOG.d(".onPostItemSelected mHasOnePane true, replace fragment detail");
-                    trx.replace(R.id.listPostContainer, detailFragment, "detail");
-                    LOG.d(".onPostItemSelected mHasOnePane true, addToBackStack null on transaction");
-                    trx.addToBackStack(null);
-                    LOG.d(".onPostItemSelected mHasOnePane true, commit transaction");
-                    trx.commit();
-
-                } else {
-
-                    LOG.d(".onPostItemSelected mHasOnePane true, update link to DetailPostFragment");
-                    detailFragment.getArguments().putString("post", new Gson().toJson(post));
-                }
-
-            } else {
-
-                LOG.d(".onPostItemSelected mHasOnePane false, find by id DetailPostFragment");
-                DetailPostFragment fragment = (DetailPostFragment) getSupportFragmentManager().findFragmentById(R.id.detailFragment);
-                LOG.d(".onPostItemSelected mHasOnePane false, setText link to DetailPostFragment");
-                fragment.setPost(post);
-            }
+//            mLastSelectedPost = post;
+//
+//            LOG.d(".onPostItemSelected mHasOnePane ? " + mHasOnePane);
+//            if (mHasOnePane) {
+//
+//                LOG.d(".onPostItemSelected mHasOnePane true, get FragmentManager");
+//                FragmentManager fm = getSupportFragmentManager();
+//                LOG.d(".onPostItemSelected mHasOnePane true, find by tag DetailPostFragment");
+//                DetailPostFragment detailFragment = (DetailPostFragment) fm.findFragmentByTag("detail");
+//
+//                LOG.d(".onPostItemSelected mHasOnePane true, DetailPostFragment found ? " + (detailFragment == null));
+//                if (detailFragment == null) {
+//                    LOG.d(".onPostItemSelected mHasOnePane true, initialize fragment DetailPostFragment");
+//                    // create and initialize fragment
+//                    detailFragment = new DetailPostFragment();
+//
+//
+//                    LOG.d(".onPostItemSelected mHasOnePane true, add link to DetailPostFragment");
+//                    // configure link
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("post", new Gson().toJson(post));
+//                    detailFragment.setArguments(bundle);
+//
+//                    // add fragment
+//                    LOG.d(".onPostItemSelected mHasOnePane true, create FragmentTransaction to replace fragment detail");
+//                    FragmentTransaction trx = fm.beginTransaction();
+//                    LOG.d(".onPostItemSelected mHasOnePane true, replace fragment detail");
+//                    trx.replace(R.id.listPostContainer, detailFragment, "detail");
+//                    LOG.d(".onPostItemSelected mHasOnePane true, addToBackStack null on transaction");
+//                    trx.addToBackStack(null);
+//                    LOG.d(".onPostItemSelected mHasOnePane true, commit transaction");
+//                    trx.commit();
+//
+//                } else {
+//
+//                    LOG.d(".onPostItemSelected mHasOnePane true, update link to DetailPostFragment");
+//                    detailFragment.getArguments().putString("post", new Gson().toJson(post));
+//                }
+//
+//            } else {
+//
+//                LOG.d(".onPostItemSelected mHasOnePane false, find by id DetailPostFragment");
+//                DetailPostFragment fragment = (DetailPostFragment) getSupportFragmentManager().findFragmentById(R.id.detailFragment);
+//                LOG.d(".onPostItemSelected mHasOnePane false, setText link to DetailPostFragment");
+//                fragment.setPost(post);
+//            }
             LOG.d(".onPostItemSelected sortie");
         }catch(Throwable thr) {
             LOG.e(".onPostItemSelected sortie en Erreur ("+thr.toString()+")");

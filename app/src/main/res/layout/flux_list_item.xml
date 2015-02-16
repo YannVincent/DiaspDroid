@@ -60,6 +60,11 @@
             android:minHeight="16sp"
         android:visibility="gone"
             />
+    <FrameLayout
+        android:id="@+id/detailPostObjectData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
 
     <WebView  android:id="@+id/flux_list_item_post_detail"
         android:layout_width="fill_parent"

@@ -1,8 +1,9 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Build;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,44 +16,46 @@ import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerView;
 
 import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
-import fr.android.scaron.diaspdroid.model.Data;
 import fr.android.scaron.diaspdroid.model.Image;
-import fr.android.scaron.diaspdroid.model.OEmbedCache;
 import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
 import fr.android.scaron.diaspdroid.vues.view.PostView;
 
 /**
- * Created by CARON-08651 on 16/01/2015.
+ * Created by Sébastien on 16/01/2015.
  */
 public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.OnErrorListener { for test textureview
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostAdapter.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+//    private final FragmentManager supportFragmentManager;
     LayoutInflater inflater;
-    Activity follower;
+    FragmentActivity follower;
     private List<Post> posts = new ArrayList<Post>();
 
 
-    public PostAdapter(Activity follower, int ressource, List<Post> posts){
-        super(follower, ressource);
+    public PostAdapter(FragmentActivity follower, int ressource, List<Post> posts){
+        super(follower, ressource, posts);
         try{
             inflater = LayoutInflater.from(follower.getApplicationContext());
             this.follower = follower;
             this.posts = posts;
+//            supportFragmentManager =  follower.getSupportFragmentManager();
             setPosts(posts);
         } catch (Throwable thr) {
             LOG.e("Erreur : " + thr.toString());
@@ -63,7 +66,6 @@ public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.
 
     public void setPosts(List<Post> posts){
         try{
-            //follower.updateTitle(String.valueOf(downloads.size()));
             if (posts==null) {
                 this.posts = new ArrayList<Post>();
             }else{
@@ -104,10 +106,14 @@ public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.
         }
     }
 
-    @SuppressLint("NewApi")
+//    @SuppressLint("NewApi")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         try{
+            final int RECOVERY_DIALOG_REQUEST = 1;
+
+            YoutubePlayerFragment youTubePlayerFragment;
+            YouTubePlayer.OnInitializedListener youtubeListener;
             int sdk=Build.VERSION.SDK_INT;
 
             final String mimeType = "text/html";
@@ -119,18 +125,17 @@ public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.
                 postView.flux_list_item_post_avatar = (ImageView)convertView.findViewById(R.id.flux_list_item_post_avatar);
                 postView.flux_list_item_post_user = (TextView)convertView.findViewById(R.id.flux_list_item_post_user);
                 postView.flux_list_item_post_datetime = (TextView)convertView.findViewById(R.id.flux_list_item_post_datetime);
-//                postView.flux_list_item_post_detail = (TextView)convertView.findViewById(R.id.flux_list_item_post_detail);
                 postView.flux_list_item_post_detail = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail);
                 postView.flux_list_item_post_detail_picture = (ImageView)convertView.findViewById(R.id.flux_list_item_post_detail_picture);
-//                postView.flux_list_item_post_detail_video = (YouTubePlayerView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
-//                if (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//                    postView.flux_list_item_post_detail_video = (TextureView) convertView.findViewById(R.id.flux_list_item_post_detail_video);
-//                }
+
+
+
                 postView.flux_list_item_post_detail_video_web = (WebView)convertView.findViewById(R.id.flux_list_item_post_detail_video_web);
                 convertView.setTag(postView);
             } else {
                 postView = (PostView) convertView.getTag();
             }
+
             final Post post = posts.get(position);
             postView.post = post;
             // *** Entete
@@ -155,14 +160,7 @@ public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.
             postView.flux_list_item_post_detail.getSettings().setUseWideViewPort(true);
             postView.flux_list_item_post_detail.getSettings().setLoadWithOverviewMode(true);
             postView.flux_list_item_post_detail.getSettings().setJavaScriptEnabled(true);
-//            String postHTML = "<div style=\"border-bottom-color: rgb(34, 34, 34);border-bottom-style: none;border-bottom-width: 0px;" +
-//                    "border-image-outset: 0px;border-image-repeat: stretch;border-image-slice: 100%;border-image-source: none;border-image-width: 1;" +
-//                    "border-left-color: rgb(34, 34, 34);border-left-style: none;border-left-width: 0px;border-right-color: rgb(34, 34, 34);" +
-//                    "border-right-style: none;border-right-width: 0px;border-top-color: rgb(34, 34, 34);border-top-style: none;" +
-//                    "border-top-width: 0px;color: rgb(34, 34, 34);display: block;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;" +
-//                    "font-size: 13px;font-style: normal;font-weight: normal;height: 266px;line-height: 19.5px;margin-bottom: 0px;margin-left: 0px;" +
-//                    "margin-right: 0px;margin-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;padding-top: 0px;" +
-//                    "vertical-align: baseline;width: 429px;zoom: 1;\">"+post.getText()+"</div>";
+
             String postHTML = "<div style=\"display: block;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;" +
                     "font-size: 34px;font-style: normal;font-weight: normal;" +
                     "vertical-align: baseline;zoom: 1;\">"+post.getText()+"</div>";
@@ -177,265 +175,122 @@ public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.
             }
 
             // Remplissage de l'objet web(vidéo ou autre) et de la vue vidéo
-            OEmbedCache object = post.getO_embed_cache();
-            if (object!=null) {
-                Data objectData = object.getData();
-                if (objectData!=null) {
-                    String objectHtml = objectData.getHtml();
-                    if (objectHtml != null && !objectHtml.isEmpty()) {
+            final Map<String, String> videoData = getVideo(post);
 
-                        LOG.d("Object HTML récolté '" + objectHtml + "'");
-                        //Cas de la vidéo Youtube
-//                        if (objectHtml.contains("youtube") && (sdk>= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
-//                            int indexSrcBegin = objectHtml.indexOf("src=\"");
-//                            indexSrcBegin = indexSrcBegin + "src=\"".length();
-//                            int indexSrcEnd = objectHtml.indexOf("?feature=oembed", indexSrcBegin);
-//                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
-//                            LOG.d("Url de la vidéo récoltée '" + urlSrc + "'");
-//                            //POUR TEST
-////                            urlSrc = "rtsp://r5---sn-cg07luel.c.youtube.com/CiILENy73wIaGQkhqmoFDXKHthMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp";
-////                            LOG.d("Url de la vidéo surchargée pour TEST '" + urlSrc + "'");
-//
-//                            objectData.setVideoUrl(urlSrc);
-//
-//                            //Test avec API Youtube et YoutubePlayeur
-//                            int indexOfVideoID = urlSrc.lastIndexOf('/')+1;
-//                            if (indexOfVideoID>0 && indexOfVideoID<urlSrc.length()){
-//                                urlSrc = urlSrc.substring(indexOfVideoID);
-//                            }
-//                            final YouTubePlayer.PlaybackEventListener playbackEventListener = new YouTubePlayer.PlaybackEventListener() {
-//                                @Override
-//                                public void onBuffering(boolean arg0) { }
-//
-//                                @Override
-//                                public void onPaused() { }
-//
-//                                @Override
-//                                public void onPlaying() { }
-//
-//                                @Override
-//                                public void onSeekTo(int arg0) { }
-//
-//                                @Override
-//                                public void onStopped() { }
-//                            };
-//
-//                            final YouTubePlayer.PlayerStateChangeListener playerStateChangeListener = new YouTubePlayer.PlayerStateChangeListener() {
-//
-//                                @Override
-//                                public void onAdStarted() { }
-//
-//                                @Override
-//                                public void onError(YouTubePlayer.ErrorReason arg0) { }
-//
-//                                @Override
-//                                public void onLoaded(String arg0) { }
-//
-//                                @Override
-//                                public void onLoading() { }
-//
-//                                @Override
-//                                public void onVideoEnded() { }
-//
-//                                @Override
-//                                public void onVideoStarted() { }
-//                            };
-//
-//                            final String VIDEO_ID = urlSrc;// "dKLftgvYsVU";
-//                            final YouTubePlayerView youtubeView = postView.flux_list_item_post_detail_video;
-//                            YouTubePlayer.OnInitializedListener onInitializedListener = new YouTubePlayer.OnInitializedListener (){
-//                                @Override
-//                                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult result) {
-//                                    Toast.makeText(follower, "Failured to Initialize!", Toast.LENGTH_LONG).show();
-//                                }
-//
-//                                @Override
-//                                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
-//
-//                                    /** add listeners to YouTubePlayer instance **/
-//                                    player.setPlayerStateChangeListener(playerStateChangeListener);
-//                                    player.setPlaybackEventListener(playbackEventListener);
-//
-//                                    /** Start buffering **/
-//                                    if (!wasRestored) {
-//                                        player.cueVideo(VIDEO_ID);
-//                                    }
-//                                }
-//                            };
-//                            youtubeView.initialize(DeveloperKey.DEVELOPER_KEY, onInitializedListener);
-//
-//
-//
-//
-//
-//
-//
-//                            //Test texture view (ne fonctionne pas)
-////                            final TextureView textureView = postView.flux_list_item_post_detail_video;
-////                            textureView.setVisibility(View.VISIBLE);
-////
-////                            textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-////
-////                                @Override
-////                                public void onSurfaceTextureUpdated(SurfaceTexture arg0) {
-////
-////                                }
-////
-////                                @Override
-////                                public void onSurfaceTextureSizeChanged(SurfaceTexture arg0, int arg1,
-////                                                                        int arg2) {
-////                                }
-////
-////                                @Override
-////                                public boolean onSurfaceTextureDestroyed(SurfaceTexture arg0) {
-////                                    return false;
-////                                }
-////
-////                                @Override
-////                                public void onSurfaceTextureAvailable(SurfaceTexture surface, int arg1, int arg2) {
-////                                    final MediaPlayer mediaPlayer = new MediaPlayer();
-//////                                    mediaPlayer.reset();
-//////                                    mediaPlayer.release();
-//////                                    holder.vid_play.setTag(mediaPlayer);
-//////                                    new SetVideotask().execute(surface, post, mediaPlayer, holder.vid_play);
-////                                    new SetVideotask().execute(surface, post, mediaPlayer);
-////                                }
-////                            });
-//
-//
-//                            //Old version avec videoview ne fonctionne pas
-//////                        postView.flux_list_item_post_detail_video.setVideoPath(urlSrc);
-//////                        postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
-////
-//////                        postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse("rtsp://v4.cache1.c.youtube.com/CiILENy73wIaGQk4RDShYkdS1BMYDSANFEgGUgZ2aWRlb3MM/0/0/0/video.3gp"));
-//////                        postView.flux_list_item_post_detail_video.setMediaController(new MediaController(AlertDetail.this));
-//////                        postView.flux_list_item_post_detail_video.requestFocus();
-//////                        postView.flux_list_item_post_detail_video.start();
-////
-////                            // Le lien rtsp est déjà en mémoire ?
-////                            String rtspVideo = urlSrc;
-////                            final VideoView videoView = postView.flux_list_item_post_detail_video;
-////                            if (!YoutubeControler.rtspMapping.containsKey(urlSrc)){
-////                                // Non donc on tente de le trouver
-////                                rtspVideo = YoutubeControler.getUrlVideoRTSP(follower,urlSrc, videoView);
-////                                LOG.d("Url de la vidéo rtsp en court de recherche ...");
-////                            }else{
-////                                // Oui donc on affiche directement
-////                                rtspVideo = YoutubeControler.rtspMapping.get(urlSrc);
-////                                LOG.d("Url de la vidéo rtsp déjà en mémoire : '" + rtspVideo + "'");
-//////                                postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
-//////                                MediaController mc = new MediaController(follower);
-//////                                postView.flux_list_item_post_detail_video.setMediaController(mc);
-//////                                postView.flux_list_item_post_detail_video.requestFocus();
-//////                                postView.flux_list_item_post_detail_video.start();
-//////                                mc.show();
-//////                                postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
-////
-////                                // Create a progressbar
-////                                final ProgressDialog pDialog = new ProgressDialog(follower);
-////                                // Set progressbar title
-////                                pDialog.setTitle("Android Video Streaming Youtube");
-////                                // Set progressbar message
-////                                pDialog.setMessage("Buffering...");
-////                                pDialog.setIndeterminate(false);
-////                                pDialog.setCancelable(false);
-////                                // Show progressbar
-////                                pDialog.show();
-////
-////                                try {
-////                                    // Start the MediaController
-////                                    MediaController mediacontroller = new MediaController(follower);
-////                                    mediacontroller.setAnchorView(videoView);
-////                                    // Get the URL from String VideoURL
-////                                    Uri video = Uri.parse(rtspVideo);
-////                                    videoView.setMediaController(mediacontroller);
-////                                    videoView.setVideoURI(video);
-////
-////                                } catch (Exception e) {
-////                                    LOG.e(".getView Error : "+e.getMessage());
-////                                    e.printStackTrace();
-////                                }
-////
-////                                videoView.requestFocus();
-////                                videoView.setVisibility(View.VISIBLE);
-////                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-////                                    // Close the progress bar and play the video
-////                                    public void onPrepared(MediaPlayer mp) {
-////                                        pDialog.dismiss();
-////                                        videoView.start();
-////                                    }
-////                                });
-////                            }
-//////                            postView.flux_list_item_post_detail_video.setVideoURI(Uri.parse(rtspVideo));
-//////                            MediaController mc = new MediaController(follower);
-//////                            postView.flux_list_item_post_detail_video.setMediaController(mc);
-//////                            postView.flux_list_item_post_detail_video.requestFocus();
-//////                            postView.flux_list_item_post_detail_video.start();
-//////                            mc.show();
-//////                            postView.flux_list_item_post_detail_video.setVisibility(View.VISIBLE);
-//                        }
-
-//                        }else{
-//                            //Cas de l'objet web
-//                            int indexSrcBegin = objectHtml.indexOf("src=\"");
-//                            indexSrcBegin = indexSrcBegin + "src=\"".length();
-//                            int indexSrcEnd = objectHtml.indexOf("\"", indexSrcBegin);
-//                            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
-//                            post.getO_embed_cache().getData().setVideoUrl(urlSrc);
-//                            LOG.d("Url de l'objet récoltée '" + urlSrc + "'");
-                            String objectHtmlDroid = objectHtml;//"<iframe scrolling=\"no\" frameborder=\"no\" src=\""+urlSrc+"\">";//objectHtml;//"<div style=\"width: 100%;\">" + objectHtml + "</div>";
-                            postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
-                            postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
-                            postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
-                            postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);//TEST
-                            postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, objectHtmlDroid, mimeType, encoding, "");
-                            //test on masque la video
-                            postView.flux_list_item_post_detail_video_web.setVisibility(View.VISIBLE);
-//                        }
+            if (!videoData.isEmpty()){
+                if (videoData.containsKey("youtube")){
+                    LOG.d(".getView set youtube video");
+                    FragmentManager supportFragmentManager=null;
+                    if (postView!=null && postView.getActivity()!=null && postView.getActivity().getSupportFragmentManager()!=null) {
+                        supportFragmentManager = postView.getActivity().getSupportFragmentManager();
                     }
+
+                    if (supportFragmentManager==null && follower!=null && follower.getSupportFragmentManager()!=null) {
+                        supportFragmentManager = follower.getSupportFragmentManager();
+                    }
+                    youTubePlayerFragment =
+                            (YoutubePlayerFragment) supportFragmentManager.findFragmentById(R.id.detailPostObjectData);
+                    if (supportFragmentManager==null || youTubePlayerFragment==null){
+                        if (supportFragmentManager==null) {
+                            LOG.e(".getView impossible to get supportFragmentManager to add Youtube video ID = " + videoData.get("youtube"));
+                        }
+                        if (youTubePlayerFragment==null) {
+                            LOG.e(".getView impossible to get youTubePlayerFragment to add Youtube video ID = " + videoData.get("youtube"));
+                        }
+
+                        postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
+                        postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, "<html><head><meta name=\"viewport\" content=\"width=device-width; user-scalable=no; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; target-densityDpi=device-dpi;\"/></head><body><iframe class=\"youtube-player\" type=\"text/html\" width=\"370\" height=\"220\" src=\"http://www.youtube.com/embed/"+videoData.get("youtube")+"\" frameborder=\"0\"></body></html>", mimeType, encoding, "");
+                        postView.flux_list_item_post_detail_video_web.setVisibility(View.VISIBLE);
+                        postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
+                        postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
+//                        if (videoData.containsKey("web")) {
+//                            LOG.d(".getView set web video");
+//                            postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
+//                            postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
+//                            postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
+//                            postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, "<html><head><meta name=\"viewport\" content=\"width=device-width; user-scalable=no; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; target-densityDpi=device-dpi;\"/></head><body>"+videoData.get("web")+"</body></html>", mimeType, encoding, "");
+//                            postView.flux_list_item_post_detail_video_web.setVisibility(View.VISIBLE);
+//                            postView.flux_list_item_post_detail_video_web.zoomBy(Float.parseFloat("0.8"));
+//                        }
+                    }else {
+
+                        LOG.d(".getView : youTubePlayerFragment found ? " + (youTubePlayerFragment != null));
+                        FragmentTransaction sfmTx = supportFragmentManager.beginTransaction();
+                        LOG.d(".getView fragment 'detailPostVideoYoutube' to create");
+                        youTubePlayerFragment = new YoutubePlayerFragment();
+                        LOG.d(".getView create FragmentTransaction");
+                        LOG.d(".getView add add(R.id.detailPostVideoYoutube, youTubePlayerFragment) in FragmentTransaction");
+                        sfmTx.replace(R.id.detailPostObjectData, youTubePlayerFragment);
+                        sfmTx.commit();
+
+                        LOG.d(".getView create youtubeListener");
+                        youtubeListener = new YouTubePlayer.OnInitializedListener() {
+                            @Override
+                            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player,
+                                                                boolean wasRestored) {
+                                LOG.d(".getView.onInitializationSuccess ID de la vidéo récoltée '" + videoData.get("youtube") + "'");
+                                player.cueVideo(videoData.get("youtube"));
+                            }
+
+                            @Override
+                            public void onInitializationFailure(YouTubePlayer.Provider provider,
+                                                                YouTubeInitializationResult errorReason) {
+                                if (errorReason.isUserRecoverableError()) {
+                                    errorReason.getErrorDialog(follower, RECOVERY_DIALOG_REQUEST).show();
+                                } else {
+                                    String errorMessage = String.format(follower.getString(R.string.error_player), errorReason.toString());
+                                    Toast.makeText(follower, errorMessage, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        };
+                        LOG.d(".getView initialize api youTubePlayerFragment");
+                        youTubePlayerFragment.initialize(DeveloperKey.DEVELOPER_KEY, youtubeListener);
+                    }
+                }else if (videoData.containsKey("web")) {
+                    LOG.d(".getView set web video");
+                    postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);
+                    postView.flux_list_item_post_detail_video_web.getSettings().setLoadWithOverviewMode(true);
+                    postView.flux_list_item_post_detail_video_web.getSettings().setJavaScriptEnabled(true);
+                    postView.flux_list_item_post_detail_video_web.getSettings().setUseWideViewPort(true);//TEST
+                    postView.flux_list_item_post_detail_video_web.loadDataWithBaseURL(null, videoData.get("web"), mimeType, encoding, "");
+                    postView.flux_list_item_post_detail_video_web.setVisibility(View.VISIBLE);
                 }
             }
             return convertView;
         } catch (Throwable thr) {
-            LOG.e("Erreur : "+thr.toString());
+            LOG.e("getView Erreur : "+thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
     }
 
-    //Pour test textureview
-//    class SetVideotask extends AsyncTask<Object, Integer, String> {
-//
-//        @SuppressLint("NewApi")
-//        @Override
-//        protected String doInBackground(Object... o) {
-//            // TODO Auto-generated method stub
-//            final SurfaceTexture s = (SurfaceTexture) o[0];
-//            final Post post = (Post) o[1];
-//            final MediaPlayer mediaPlayer = (MediaPlayer) o[2];
-//
-//
-//            mediaPlayer.setSurface(new Surface(s));
-//            try {
-////                mediaPlayer.reset();
-////                mediaPlayer.release();
-//                mediaPlayer.setDataSource(post.getO_embed_cache().getData().getVideoUrl());
-//                mediaPlayer.prepare();
-//                mediaPlayer.start();
-//                //I do this so there is a frame in the video to act as a preview
-//                Thread.sleep(100);
-//                mediaPlayer.pause();
-//                mediaPlayer.setOnErrorListener(PostAdapter.this);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            return null;
-//        }
-//    }
-//
-//    @Override
-//    public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-//        return true;
-//    }
+    public String getVideoType(Post post) {
+        if (post.getO_embed_cache() != null && post.getO_embed_cache().getData() != null
+                && post.getO_embed_cache().getData().getHtml() != null){
+            if (post.getO_embed_cache().getData().getHtml().contains("youtube") ) {
+                return "youtube";
+            }
+            return "web";
+        }
+        return "none";
+    }
+
+    public Map<String, String> getVideo(Post post) {
+        Map mapVideo = new HashMap<String, String>();
+        String videoType = getVideoType(post);
+        if ("youtube".equals(videoType)) {
+            String objectHtml = post.getO_embed_cache().getData().getHtml();
+            int indexSrcBegin = objectHtml.indexOf("src=\"");
+            indexSrcBegin = indexSrcBegin + "src=\"".length();
+            int indexSrcEnd = objectHtml.indexOf("?feature=oembed", indexSrcBegin);
+            String urlSrc = objectHtml.substring(indexSrcBegin, indexSrcEnd);
+            indexSrcBegin = urlSrc.lastIndexOf("/") + 1;
+            urlSrc = urlSrc.substring(indexSrcBegin);
+            mapVideo.put("youtube",urlSrc);
+            mapVideo.put("web",post.getO_embed_cache().getData().getHtml());
+        }else if ("web".equals(videoType)) {
+            mapVideo.put("web",post.getO_embed_cache().getData().getHtml());
+        }
+        return mapVideo;
+    }
 }

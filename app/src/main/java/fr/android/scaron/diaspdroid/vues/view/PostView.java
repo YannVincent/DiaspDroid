@@ -1,5 +1,6 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
+import android.support.v4.app.Fragment;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -10,9 +11,9 @@ import com.google.android.youtube.player.YouTubePlayerView;
 import fr.android.scaron.diaspdroid.model.Post;
 
 /**
- * Created by CARON-08651 on 16/01/2015.
+ * Created by Sébastien on 16/01/2015.
  */
-public class PostView {
+public class PostView extends Fragment {
 
     public Post post;
 

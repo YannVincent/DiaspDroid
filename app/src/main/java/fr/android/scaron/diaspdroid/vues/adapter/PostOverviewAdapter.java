@@ -16,7 +16,7 @@ import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.Post;
 
 /**
- * Created by CARON-08651 on 03/02/2015.
+ * Created by Sébastien on 03/02/2015.
  */
 public class PostOverviewAdapter  extends ArrayAdapter<Post> {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostOverviewAdapter.class);

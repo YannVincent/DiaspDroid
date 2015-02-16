@@ -2,8 +2,11 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,13 +29,17 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
+import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
 import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DataControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.adapter.DetailPostFragmentAdapter;
+import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
 import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
+import fr.android.scaron.diaspdroid.vues.view.DetailPostView;
 
 /**
  * A fragment representing a list of Items.
@@ -68,7 +75,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private PostAdapter mAdapter;
+//    private PostAdapter mAdapter;
+//    private DetailPostFragmentAdapter mAdapter;
+    private DetailPostViewAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     public static FluxFragment newInstance(String title, ActionBarActivity activity, int sectionNumber) {
@@ -105,6 +114,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 public void onCompleted(Exception e, List<Post> posts) {
 
                     LOG.d(FluxFragment.class, "Callback flux, exception ? " + e);
+                    if (e!=null){
+                        e.printStackTrace();
+                    }
                     if (e!=null && e.getCause()!=null) {
                         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
                         final AlertDialog alertDialog = alertDialogBuilder.create();
@@ -113,6 +125,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                         alertDialog.setMessage("La récupétion de votre flux a échouée");
                         alertDialog.show();
                         LOG.d(FluxFragment.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
+                        //On retente un login complet
+                        DiasporaControler.getStreamFlow(getmActivity(), this, true);
+
                     }
                     if (posts!=null){
                         mAdapter.setPosts(posts);
@@ -126,51 +141,14 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 }
             };
 
-//            //Callback d'envoi du formulaire de login
-//            final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-//                @Override
-//                public void onCompleted(Exception e, Response<String> result) {
-//                    boolean resultOK = ProfilControler.onCompleteLogin(e, result);
-//                    if (!resultOK){
-//                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
-//                        final AlertDialog alertDialog = alertDialogBuilder.create();
-//                        alertDialog.setIcon(R.drawable.ic_launcher);
-//                        alertDialog.setTitle("PB Connexion");
-//                        alertDialog.setMessage("La connexion a Diaspora a échouée");
-//                        alertDialog.show();
-//                        return;
-//                    }
-//                    //On est loggué donc on demande le flux
-//                    DataControler.getStream(getmActivity().getApplicationContext(), fluxCallback);
-//                }
-//            };
-
-//            //Callback de récupération du formulaire de login et d'accès au authenticity_token
-//            final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
-//                @Override
-//                public void onCompleted(Exception e, Response<String> result) {
-//                    boolean resultOK = ProfilControler.onCompleteGetToken(e, result);
-//                    if (!resultOK){
-//                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getmActivity());
-//                        final AlertDialog alertDialog = alertDialogBuilder.create();
-//                        alertDialog.setIcon(R.drawable.ic_launcher);
-//                        alertDialog.setTitle("PB Accès");
-//                        alertDialog.setMessage("L'accès a Diaspora est impossible");
-//                        alertDialog.show();
-//                        return;
-//                    }
-//                    //On a le token donc on demande le login
-//                    ProfilControler.login(getmActivity(), "tilucifer", "Pikifou01", loginCallback);
-//                }
-//            };
-
             CookieControler cookieControler = CookieControler.getInstance(getmActivity());
             cookieControler.clearCookies();
-//            ProfilControler.getToken(getmActivity(), tokenCallback);
 
-            DiasporaControler.getStreamFlow(getmActivity(), fluxCallback);
+            DiasporaControler.getStreamFlow(getmActivity(), fluxCallback, false);
 
-            mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
+//            mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
+//            mAdapter = new DetailPostFragmentAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
+            mAdapter = new DetailPostViewAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
         } catch (Throwable thr) {
             LOG.e("Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
@@ -191,6 +169,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             // Set OnItemClickListener so we can be notified on item clicks
             mListView.setOnItemClickListener(this);
 
+
             return view;
         } catch (Throwable thr) {
             LOG.e("Erreur : " + thr.toString());
@@ -203,6 +182,10 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     public void onAttach(Activity activity) {
         try{
             super.onAttach(activity);
+//            DrawerLayout mDrawerLayout;
+//            mDrawerLayout = (DrawerLayout) mActivity.findViewById(R.id.drawer_layout);
+//            mDrawerLayout.closeDrawers();
+
             ((DiaspActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
             mListener = (OnFragmentInteractionListener) activity;
@@ -230,13 +213,30 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         try{
-            if (null != mListener) {
-                // Notify the active callbacks interface (the activity, if the
-                // fragment is attached to one) that an item has been selected.
-                mListener.onFragmentInteraction(FluxContent.ITEMS.get(position).getIdStr());
-            }
+
+            LOG.d(".onItemClick with view : " + view+" | position : "+position + " | id : "+id);
+//            Post post = mAdapter.getItem(position);
+//            if (post.asYoutubeVideo && post.idYoutubeVideo!=null && !post.idYoutubeVideo.isEmpty()){
+//                // Launching YoutubeActivity Screen
+//                Intent i = new Intent(getActivity(), YoutubeActivity.class);
+//                i.putExtra("idYoutubeVideo", post.idYoutubeVideo);
+//                startActivity(i);
+//            }else if (post.asWebSiteUrl && post.webSiteUrl!=null && !post.webSiteUrl.isEmpty()){
+//                // Launching Browser Screen
+//                Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
+//                myWebLink.setData(Uri.parse(post.webSiteUrl));
+//                startActivity(myWebLink);
+//            }
+//
+//            if (null != mListener) {
+//                if (FluxContent.ITEMS!=null && FluxContent.ITEMS.size()>0 && FluxContent.ITEMS.size()>position) {
+//                    // Notify the active callbacks interface (the activity, if the
+//                    // fragment is attached to one) that an item has been selected.
+//                    mListener.onFragmentInteraction(FluxContent.ITEMS.get(position).getIdStr());
+//                }
+//            }
         } catch (Throwable thr) {
-            LOG.e("Erreur : " + thr.toString());
+            LOG.e(".onItemClick Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

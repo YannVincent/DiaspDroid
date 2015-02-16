@@ -24,6 +24,10 @@
     <appender-ref ref="DiaspDroid" />
   </logger>
 
+    <logger name="com.google.gson" level="TRACE" additivity="true">
+        <appender-ref ref="DiaspDroid" />
+    </logger>
+
   <!-- Write DEBUG (and higher-level) messages to logcat -->
   <root level="DEBUG">
     <appender-ref ref="DiaspDroid" />

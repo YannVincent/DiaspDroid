@@ -122,8 +122,12 @@ public class DiasporaControler {
 
     }
 
-    public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback){
+    public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback, boolean forceRelogin){
 
+        boolean bForceLogin = forceRelogin;
+        if (forceRelogin){
+            return;
+        }
         contextGlobal = context;
         //Callback d'envoi du formulaire de login
         final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
@@ -166,18 +170,19 @@ public class DiasporaControler {
                     return;
                 }
                 //On a le token donc on demande le login
-                login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
             }
         };
         //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
+        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty())){
             //Cas ou nous n'avons pas les informations pour se connecter.
-            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
+            if (bForceLogin || (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty())) {
                 getToken(contextGlobal, tokenCallback);
+                bForceLogin = false;//on ne tente qu'une fois.
                 return;
             }
             //Cas ou nous avons les informations pour se connecter
-            login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
             return;
         }
         if (contextGlobal==null){

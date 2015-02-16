@@ -16,7 +16,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 /**
- * Created by CARON-08651 on 26/01/2015.
+ * Created by Sébastien on 26/01/2015.
  */
 public class CookieControler {
 

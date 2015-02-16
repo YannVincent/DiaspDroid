@@ -6,6 +6,7 @@
     android:paddingRight="@dimen/margin_small"
     android:paddingTop="@dimen/margin_small"
     android:paddingBottom="@dimen/margin_small"
+    android:background="#e9eaed"
     tools:context="fr.android.scaron.diaspdroid.vues.fragment.FluxFragment">
     <!--
     <RelativeLayout
