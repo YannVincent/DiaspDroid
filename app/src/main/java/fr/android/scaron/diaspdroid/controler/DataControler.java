@@ -3,9 +3,7 @@ package fr.android.scaron.diaspdroid.controler;
 import android.content.Context;
 import android.widget.ProgressBar;
 
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.ProgressCallback;
@@ -18,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
-import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
@@ -209,16 +205,17 @@ x-ua-compatible:IE=Edge,chrome=1
                 cookieControler.clearCookies();
                 URI uri = URI.create(POD_URL);
 
-                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
-                    String session = COOKIE_SESSION_STREAM.substring(0,COOKIE_SESSION_STREAM.indexOf(";"));
-                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + session);
-                    if (isTest) {
-                        //TEST ADD COOKIE EN DUR POUR TEST
-                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
-                    }else {
-                        cookieControler.storeCookie(uri, "_diaspora_session", session);
-                    }
-                }else if (!COOKIE_REMEMBER.isEmpty()||isTest) {
+//                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
+//                    String session = COOKIE_SESSION_STREAM.substring(0,COOKIE_SESSION_STREAM.indexOf(";"));
+//                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + session);
+//                    if (isTest) {
+//                        //TEST ADD COOKIE EN DUR POUR TEST
+//                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
+//                    }else {
+//                        cookieControler.storeCookie(uri, "_diaspora_session", session);
+//                    }
+//                }else
+                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
                     String remember = COOKIE_REMEMBER.substring(0,COOKIE_REMEMBER.indexOf(";"));
                     LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);
                     if (isTest) {
@@ -294,9 +291,12 @@ x-requested-with:XMLHttpRequest
                     */
 
                     .noCache()
-                    .setHeader("x-requested-with", "XMLHttpRequest")
-                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                    .setHeader("x-csrf-token", token)
+//                    .setHeader("x-requested-with", "XMLHttpRequest")
+                    .setHeader("User-Agent", USER_AGENT)
+                    .setHeader("content-type", "application/octet-stream")
+                    .setHeader("Accept", "application/json")
+                    .setHeader("Cache-Control", "no-cache")
+//                    .setHeader("x-csrf-token", token)
 //                    .noCache()
 //                    .followRedirect(false)
 //                    .setHeader("x-requested-with", "XMLHttpRequest")

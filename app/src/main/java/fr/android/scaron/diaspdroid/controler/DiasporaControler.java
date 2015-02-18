@@ -36,7 +36,8 @@ public class DiasporaControler {
     static String STREAM_URL_DELTA = POD_URL+"/stream?max_time=1421018508&_=1421254891463";
     static String STREAM_URL = STREAM_URL_NORMAL;
 //    static String POST_IMAGE = POD_URL + "/photos?photo%5Baspect_ids%5D=all";//"/photos?photo%5Bpending%5D=true";
-    static String POST_IMAGE = POD_URL + "/photos?photo[pending]=true";
+//    static String POST_IMAGE = POD_URL + "/photos?photo[pending]=true";
+    static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true&set_profile_image=&";
     static String TOKEN_VIDE = "";
     static String TOKEN_TEST = "4REWL0RLsEU5edVgVWuZL16XGAQkVuCYyzGirHvXjOI=";
     static String COOKIE_SESSION_LOGIN_VIDE = "";
@@ -52,6 +53,8 @@ public class DiasporaControler {
     static String COOKIE_SESSION_LOGIN = COOKIE_SESSION_LOGIN_VIDE;
     static String COOKIE_SESSION_STREAM = COOKIE_SESSION_STREAM_VIDE;
     static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST_VIDE;
+
+    static String USER_AGENT = "DiaspDroid";
 
     static Context contextGlobal;
 
@@ -396,10 +399,13 @@ public class DiasporaControler {
             Ion.with(context)
                     .load("POST", LOGIN_URL)
                     .followRedirect(followRedirect)
+                    .addHeader("Accept","*/*")
                     .noCache()
+                    .setBodyParameter("utf-8", "✓")
                     .setBodyParameter("user[username]", username)
                     .setBodyParameter("user[password]", password)
                     .setBodyParameter("user[remember_me]", "1")
+                    .setBodyParameter("commit", "Sign+in")
                     .setBodyParameter("authenticity_token", TOKEN)
                     .asString()
                     .withResponse()
