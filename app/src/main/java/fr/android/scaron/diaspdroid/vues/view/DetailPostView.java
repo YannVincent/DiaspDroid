@@ -78,8 +78,12 @@ public class DetailPostView extends Fragment {
                 webvideo.getSettings().setJavaScriptEnabled(true);
                 webvideo.loadDataWithBaseURL(null, "<html><head><meta name=\"viewport\" content=\"width=device-width; user-scalable=no; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; target-densityDpi=device-dpi;\"/></head><body>" + htmlSrc + "</body></html>", mimeType, encoding, "");
                 webvideo.setVisibility(View.VISIBLE);
+                webvideo.setInitialScale(1);
+                webvideo.getSettings().setJavaScriptEnabled(true);
                 webvideo.getSettings().setLoadWithOverviewMode(true);
                 webvideo.getSettings().setUseWideViewPort(true);
+                webvideo.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+                webvideo.setScrollbarFadingEnabled(false);
             }
         }catch(Throwable thr) {
             LOG.e(".setWebVideo sortie en Erreur ("+thr.toString()+")");

@@ -7,10 +7,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.google.gson.Gson;
 
 import org.acra.ACRA;
+import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,10 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
     private boolean mHasOnePane;
     private Post mLastSelectedPost;
+//
+//    @ViewById
+//    FrameLayout listPostContainer;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +41,7 @@ public class ListPostActivity extends ActionBarActivity implements ListPostFragm
             setContentView(R.layout.activity_listpost);
 
             LOG.d(".onCreate determinate mHasOnePane");
-            mHasOnePane = findViewById(R.id.listPostContainer) != null;
+            mHasOnePane = findViewById(R.id.listPostContainer) != null; //listPostContainer!=null;
 
             LOG.d(".onCreate mHasOnePane is true ? "+mHasOnePane+" (R.id.listPostContainer present ?)");
 

@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'tracepot'
+apply plugin: 'android-apt'
+def AAVersion = '3.2'
 
 android {
     compileSdkVersion 21
@@ -31,6 +33,8 @@ dependencies {
 //    compile fileTree(dir: 'libs', include: ['*.properties'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
     compile 'ch.acra:acra:4.5.0'
     compile 'com.koushikdutta.ion:ion:2.+'
     compile 'com.koushikdutta.async:androidasync:2.+'
@@ -48,4 +52,19 @@ dependencies {
 //    common 'log4j:log4j:1.2.14'
 
     androidTestCompile 'junit:junit:4.10'
+}
+
+apt {
+    arguments {
+        androidManifestFile variant.outputs[0].processResources.manifestFile
+        // if you have multiple outputs (when using splits), you may want to have other index than 0
+
+        // If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
+        // resourcePackageName android.defaultConfig.packageName
+        resourcePackageName 'fr.android.scaron.diaspdroid'
+
+        // You can set optional annotation processing options here, like these commented options:
+        // logLevel 'INFO'
+        // logFile '/var/log/aa.log'
+    }
 }

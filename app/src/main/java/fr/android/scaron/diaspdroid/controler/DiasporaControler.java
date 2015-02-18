@@ -35,7 +35,8 @@ public class DiasporaControler {
     static String STREAM_URL_NORMAL = POD_URL+"/stream";
     static String STREAM_URL_DELTA = POD_URL+"/stream?max_time=1421018508&_=1421254891463";
     static String STREAM_URL = STREAM_URL_NORMAL;
-    static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true";
+//    static String POST_IMAGE = POD_URL + "/photos?photo%5Baspect_ids%5D=all";//"/photos?photo%5Bpending%5D=true";
+    static String POST_IMAGE = POD_URL + "/photos?photo[pending]=true";
     static String TOKEN_VIDE = "";
     static String TOKEN_TEST = "4REWL0RLsEU5edVgVWuZL16XGAQkVuCYyzGirHvXjOI=";
     static String COOKIE_SESSION_LOGIN_VIDE = "";
@@ -54,6 +55,73 @@ public class DiasporaControler {
 
     static Context contextGlobal;
 
+
+    public static void partagerImage(final Context context, final String localPath, final String nameFile, final ProgressBar uploadProgressBar, final FutureCallback<Response<String>> fluxCallback){
+
+        contextGlobal = context;
+        //Callback d'envoi du formulaire de login
+        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                boolean resultOK = onCompleteLogin(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(".partagerImage : Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Connexion");
+                    alertDialog.setMessage("La connexion a Diaspora a échouée");
+                    alertDialog.show();
+                    return;
+                }
+                //On est loggué donc on demande le flux
+                DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, uploadProgressBar, fluxCallback);
+            }
+        };
+        //Callback de récupération du formulaire de login et d'accès au authenticity_token
+        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                boolean resultOK = onCompleteGetToken(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(".partagerImage : Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Accès");
+                    alertDialog.setMessage("L'accès a Diaspora est impossible");
+                    alertDialog.show();
+                    return;
+                }
+                //On a le token donc on demande le login
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback, false);
+            }
+        };
+        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
+            //Cas ou nous n'avons pas les informations pour se connecter.
+            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
+                getToken(contextGlobal, tokenCallback);
+                return;
+            }
+            //Cas ou nous avons les informations pour se connecter
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+            return;
+        }
+        //Cas ou nous avons les informations de connexion
+        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, uploadProgressBar, fluxCallback);
+
+    }
 
     public static void partagerImage(final Context context, final String localPath, final String nameFile, final String message, final ProgressBar uploadProgressBar, final FutureCallback<Response<UploadResult>> fluxCallback){
 
@@ -99,7 +167,7 @@ public class DiasporaControler {
                     return;
                 }
                 //On a le token donc on demande le login
-                login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback, false);
             }
         };
         //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
@@ -110,7 +178,7 @@ public class DiasporaControler {
                 return;
             }
             //Cas ou nous avons les informations pour se connecter
-            login(contextGlobal, "tilucifer", "Pikifou01", loginCallback);
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
             return;
         }
         if (contextGlobal==null){
@@ -283,6 +351,38 @@ public class DiasporaControler {
     }
 
     public static void login(Context context, String username, String password, FutureCallback<Response<String>> callback){
+        login(context, username, password, callback, false);
+//        LOG.d(".login : Entrée");
+//
+//        try{
+//            LOG.d(".login : On efface les cookies");
+//            CookieControler cookieControler = CookieControler.getInstance(context);
+//            cookieControler.clearCookies();
+//            LOG.d(".login : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+//            URI uri = URI.create(POD_URL);
+//            cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+//            LOG.d(".login : Construction de la requête d'appel POST à "+LOGIN_URL+ " (authenticity_token="+TOKEN+")");
+//            Ion.with(context)
+//                    .load("POST", LOGIN_URL)
+//                    .followRedirect(false)
+//                    .noCache()
+//                    .setBodyParameter("user[username]", username)
+//                    .setBodyParameter("user[password]", password)
+//                    .setBodyParameter("user[remember_me]", "1")
+//                    .setBodyParameter("authenticity_token", TOKEN)
+//                    .asString()
+//                    .withResponse()
+//                    .setCallback(callback);
+//        }catch(Throwable thr){
+//            LOG.e(".login Erreur : " + thr.toString());
+//            ACRA.getErrorReporter().handleException(thr);
+//        }
+//        LOG.d(".login : Sortie");
+    }
+
+
+
+    public static void login(Context context, String username, String password, FutureCallback<Response<String>> callback, boolean followRedirect){
         LOG.d(".login : Entrée");
 
         try{
@@ -295,7 +395,7 @@ public class DiasporaControler {
             LOG.d(".login : Construction de la requête d'appel POST à "+LOGIN_URL+ " (authenticity_token="+TOKEN+")");
             Ion.with(context)
                     .load("POST", LOGIN_URL)
-                    .followRedirect(false)
+                    .followRedirect(followRedirect)
                     .noCache()
                     .setBodyParameter("user[username]", username)
                     .setBodyParameter("user[password]", password)

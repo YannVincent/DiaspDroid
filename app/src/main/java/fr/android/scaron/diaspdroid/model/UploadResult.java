@@ -8,6 +8,16 @@ public class UploadResult {
 //    {
 //        "success": true,
     Boolean success;
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(final String error) {
+        this.error = error;
+    }
+
+    String error;
 //            "data": {
 //        "photo": {
 //            "author_id": 7738,
