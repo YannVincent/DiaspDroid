@@ -202,7 +202,7 @@ x-ua-compatible:IE=Edge,chrome=1
             try {
                 LOG.d(".uploadImage : On efface les cookies");
                 CookieControler cookieControler = CookieControler.getInstance(context);
-                cookieControler.clearCookies();
+//                cookieControler.clearCookies();
                 URI uri = URI.create(POD_URL);
 
                 if (!COOKIE_REMEMBER.isEmpty()||isTest) {
@@ -293,11 +293,12 @@ x-requested-with:XMLHttpRequest
                     .noCache()
 //                    .setHeader("x-requested-with", "XMLHttpRequest")
                     .setHeader("User-Agent", USER_AGENT)
-                    .setHeader("content-type", "application/octet-stream")
+//                    .setHeader("content-type", "application/octet-stream")
                     .setHeader("Accept", "application/json")
                     .setHeader("Cache-Control", "no-cache")
                     .setHeader("x-file-name", nameFile)
                     .setHeader("x-csrf-token", token)
+                    .setHeader("authenticity_token", token)
 //                    .noCache()
 //                    .followRedirect(false)
 //                    .setHeader("x-requested-with", "XMLHttpRequest")
@@ -309,7 +310,10 @@ x-requested-with:XMLHttpRequest
 //                    .setHeader("x-file-name", nameFile)
 //                    .setTimeout(60 * 60 * 1000)
 ////                    .setMultipartFile(nameFile, "image/png", fichierToShare)
-                    .setMultipartFile("qqfile", "image/png", fichierToShare)
+                    .setMultipartParameter("photo[pending]","true")
+                    .setMultipartParameter("set_profile_image","")
+                    .setMultipartParameter("qqFile",nameFile)
+                    .setMultipartFile("file", "image/png", fichierToShare)
                     .as(new TypeToken<UploadResult>() {
                     })
                     .withResponse()

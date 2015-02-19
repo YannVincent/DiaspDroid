@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -20,21 +19,18 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.Headers;
+import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
-import org.androidannotations.annotations.EActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.List;
-
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
-import fr.android.scaron.diaspdroid.model.Image;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 //@EActivity(R.layout.activity_share)
@@ -109,21 +105,37 @@ public class ShareActivity extends ActionBarActivity {
                         public void onCompleted(Exception e, Response<UploadResult> responseUploadResult) {
                             LOG.d(ShareActivity.class, "shareCallback, exception ? " + e);
                             UploadResult uploadResult = responseUploadResult.getResult();
-                            if (e!=null && e.getCause()!=null) {
+                            if (e!=null) {
                                 final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShareActivity.this);
                                 final AlertDialog alertDialog = alertDialogBuilder.create();
                                 alertDialog.setIcon(R.drawable.ic_launcher);
                                 alertDialog.setTitle("PB de partage");
-                                alertDialog.setMessage("Votre publication a échouée");
+                                alertDialog.setMessage("Votre publication a échouée\n("+ e.getMessage()+")");
                                 alertDialog.show();
                                 shareText.setText("Le partage de la photo a échouéé");
-                                LOG.d(ShareActivity.class , "shareCallback, cause exception ? " + e.getCause().getMessage());
                                 LOG.e("Callback flux, Erreur : " + e.getMessage());
-                                if (e.getCause()!=null) {
+                                if (e.getCause()!=null){
                                     LOG.e("shareCallback, cause exception ? " + e.getCause().getMessage());
                                 }
                             }
                             LOG.d(ShareActivity.class, "shareCallback, request body : " + responseUploadResult.getRequest().getBody());
+
+                            HeadersResponse responseHeaders = responseUploadResult.getHeaders();
+                            LOG.d(ShareActivity.class, "shareCallback, response headers ? : " + responseHeaders);
+                            if (responseHeaders!=null){
+                                int headerCode = responseHeaders.code();
+                                String headerMessage = responseHeaders.message();
+                                LOG.d(ShareActivity.class, "shareCallback, response headers code : " + headerCode);
+                                LOG.d(ShareActivity.class, "shareCallback, response headers message : " + headerMessage);
+
+                                Headers headers = responseHeaders.getHeaders();
+                                LOG.d(ShareActivity.class, "shareCallback, headers ? : " + headers);
+                                if (headers!=null) {
+                                    LOG.d(ShareActivity.class, "shareCallback, headers values : " +headers.toHeaderArray());
+                                }
+                            }
+
+                            LOG.d(ShareActivity.class, "shareCallback, response body ? : "+uploadResult);
                             if (uploadResult!=null){
                                 LOG.d(ShareActivity.class, "shareCallback, response body : "+uploadResult.toString());
                                 if (uploadResult.getError()!=null){

@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.widget.ProgressBar;
 
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -36,6 +38,7 @@ public class DiasporaControler {
     static String STREAM_URL_NORMAL = POD_URL+"/stream";
     static String STREAM_URL_DELTA = POD_URL+"/stream?max_time=1421018508&_=1421254891463";
     static String STREAM_URL = STREAM_URL_NORMAL;
+    static String RESHARE_URL = POD_URL+"/reshares";
 //    static String POST_IMAGE = POD_URL + "/photos?photo%5Baspect_ids%5D=all";//"/photos?photo%5Bpending%5D=true";
 //    static String POST_IMAGE = POD_URL + "/photos?photo[pending]=true";
     static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true&set_profile_image=&";
@@ -59,6 +62,78 @@ public class DiasporaControler {
 
     static Context contextGlobal;
 
+    public static void repartager(final Context context, final String rootGuid, final FutureCallback<Response<String>> fluxCallback, boolean forceRelogin){
+        boolean bForceLogin = forceRelogin;
+        String methodName = ".repartager : ";
+        if (forceRelogin){
+            return;
+        }
+        contextGlobal = context;
+        //Callback d'envoi du formulaire de login
+        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                String methodName = ".repartager loginCallback: ";
+                boolean resultOK = onCompleteLogin(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Connexion");
+                    alertDialog.setMessage("La connexion a Diaspora a échouée");
+                    alertDialog.show();
+                    return;
+                }
+                //On est loggué donc on demande le flux
+                postReshare(contextGlobal, rootGuid, fluxCallback);
+            }
+        };
+        //Callback de récupération du formulaire de login et d'accès au authenticity_token
+        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                String methodName = ".repartager tokenCallback: ";
+                boolean resultOK = onCompleteGetToken(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Accès");
+                    alertDialog.setMessage("L'accès a Diaspora est impossible");
+                    alertDialog.show();
+                    return;
+                }
+                //On a le token donc on demande le login
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            }
+        };
+        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty())){
+            //Cas ou nous n'avons pas les informations pour se connecter.
+            if (bForceLogin || (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty())) {
+                getToken(contextGlobal, tokenCallback);
+                bForceLogin = false;//on ne tente qu'une fois.
+                return;
+            }
+            //Cas ou nous avons les informations pour se connecter
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+            return;
+        }
+        //Cas ou nous avons les informations de connexion
+        postReshare(contextGlobal, rootGuid, fluxCallback);
+    }
 
     public static void partagerImage(final Context context, final String localPath, final String nameFile, final ProgressBar uploadProgressBar, final FutureCallback<Response<String>> fluxCallback){
 
@@ -174,23 +249,26 @@ public class DiasporaControler {
                 login(contextGlobal, "tilucifer", "tilucifer", loginCallback, false);
             }
         };
-        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
-            //Cas ou nous n'avons pas les informations pour se connecter.
-            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
-                getToken(contextGlobal, tokenCallback);
-                return;
-            }
-            //Cas ou nous avons les informations pour se connecter
-            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
-            return;
-        }
-        if (contextGlobal==null){
-            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
+//        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+//        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
+//            //Cas ou nous n'avons pas les informations pour se connecter.
+//            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
+//                getToken(contextGlobal, tokenCallback);
+//                return;
+//            }
+//            //Cas ou nous avons les informations pour se connecter
+//            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+//            return;
+//        }
+//        if (contextGlobal==null){
+//            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
+
+        //On doit se connecter
+        getToken(contextGlobal, tokenCallback);
 
     }
 
@@ -283,6 +361,42 @@ public class DiasporaControler {
             ACRA.getErrorReporter().handleException(thr);
         }
         LOG.d(".getToken : Sortie");
+    }
+
+
+
+    public static boolean onCompleteRepartager(Exception exception, final Response<String> response){
+        String methodName = ".onCompleteRepartager : ";
+        LOG.d(methodName + "Entrée");
+
+
+        boolean resultOK = true;
+        boolean resultKO = false;
+
+        LOG.d(methodName + ": exception ? "+exception);
+        if (exception != null) {
+            LOG.d(methodName + "Erreur : "+exception.getMessage());
+            exception.printStackTrace();
+            ACRA.getErrorReporter().handleException(exception);
+            LOG.d(methodName + ": Sortie");
+            return resultKO;
+        }
+
+        LOG.d(methodName + ": response ? "+response);
+        if (response!=null){
+            String result = response.getResult();
+            LOG.d(methodName + ": reponse result ? "+result);
+            HeadersResponse resultHeaders = response.getHeaders();
+            LOG.d(methodName + ": reponse headers ? "+resultHeaders);
+            if (resultHeaders.getHeaders()!=null){
+                LOG.d(methodName + ": all headers ? "+resultHeaders.getHeaders());
+                LOG.d(methodName + ": reponse code ? "+resultHeaders.code());
+                LOG.d(methodName + ": reponse message ? "+resultHeaders.message());
+            }
+        }
+
+        LOG.d(methodName + ": Sortie");
+        return resultOK;
     }
 
     public static boolean onCompleteGetToken(Exception exception, Response<String> response){
@@ -603,5 +717,33 @@ public class DiasporaControler {
             throw thr;
         }
         LOG.d(".getStream : Sortie");
+    }
+
+    public static void postReshare(Context context, String rootGuid, FutureCallback<Response<String>> callback){
+        String methodName = ".postReshare : ";
+        LOG.d(methodName+ "Entrée");
+        try{
+            JsonObject jsonParam = new JsonObject();
+            jsonParam.addProperty("root_guid", rootGuid);
+            Ion.with(context)
+                .load("POST", RESHARE_URL)
+                .setHeader("User-Agent", USER_AGENT)
+                .noCache()
+                .setHeader("x-requested-with", "XMLHttpRequest")
+                .setHeader("content-type", "application/json")
+                .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                .setHeader("x-csrf-token", TOKEN)
+                .setJsonObjectBody(jsonParam)
+                .as(new TypeToken<List<Post>>() {
+                })
+                .withResponse();
+
+        }catch(Throwable thr){
+            LOG.e(methodName+ "Erreur : " + thr.toString());
+            ACRA.getErrorReporter().handleException(thr);
+            LOG.d(methodName+ "Sortie");
+            throw thr;
+        }
+        LOG.d(methodName+ "Sortie");
     }
 }

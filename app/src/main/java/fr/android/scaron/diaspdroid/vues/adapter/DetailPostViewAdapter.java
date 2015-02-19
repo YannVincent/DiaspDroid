@@ -1,10 +1,9 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,8 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
+import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Image;
@@ -209,6 +211,39 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             detailPostView.detailIndicsLikeText= (TextView)convertView.findViewById(R.id.detailIndicsLikeText);
             LOG.d(".onActivityCreated find TextView with id  R.id.detailIndicsCommentaireText");
             detailPostView.detailIndicsCommentaireText= (TextView)convertView.findViewById(R.id.detailIndicsCommentaireText);
+
+
+
+            // On crée la fonction pour le bouton like
+            View.OnClickListener likeclickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    if (post!=null && post.getGuid()!=null){
+                        FutureCallback<Response<String>> reshareCallBack = new FutureCallback<Response<String>>() {
+                            @Override
+                            public void onCompleted(Exception e, Response<String> result) {
+                                String methodName = ".getView reshareCallBack onCompleted: ";
+                                boolean resultOK = DiasporaControler.onCompleteRepartager(e, result);
+                                if (!resultOK){
+                                    if (follower==null){
+                                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                                        return;
+                                    }
+                                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(follower);
+                                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                                    alertDialog.setIcon(R.drawable.ic_launcher);
+                                    alertDialog.setTitle("PB Accès");
+                                    alertDialog.setMessage("Le repartage est impossible");
+                                    alertDialog.show();
+                                    return;
+                                }
+                            }
+                        };
+                        DiasporaControler.repartager(follower, post.getGuid(), reshareCallBack, false);
+                    }
+                }
+            };
+
 
                 convertView.setTag(detailPostView);
 //            } else {
