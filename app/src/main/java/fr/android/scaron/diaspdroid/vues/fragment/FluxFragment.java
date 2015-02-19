@@ -109,9 +109,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
             super.onCreate(savedInstanceState);
 
             //Callback de la récupération du flux
-            final FutureCallback<List<Post>> fluxCallback = new FutureCallback<List<Post>>() {
+            final FutureCallback<Response<List<Post>>> fluxCallback = new FutureCallback<Response<List<Post>>>() {
                 @Override
-                public void onCompleted(Exception e, List<Post> posts) {
+                public void onCompleted(Exception e, Response<List<Post>> posts) {
 
                     LOG.d(FluxFragment.class, "Callback flux, exception ? " + e);
                     if (e!=null){
@@ -125,12 +125,12 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                         alertDialog.setMessage("La récupétion de votre flux a échouée");
                         alertDialog.show();
                         LOG.d(FluxFragment.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
-                        //On retente un login complet
-                        DiasporaControler.getStreamFlow(getmActivity(), this, true);
+//                        //On retente un login complet
+//                        DiasporaControler.getStreamFlow(getmActivity(), this, true);
 
                     }
                     if (posts!=null){
-                        mAdapter.setPosts(posts);
+                        mAdapter.setPosts(DiasporaControler.onCompleteStream(e, posts));
                         return;
                     }
                     LOG.e("Callback flux, Erreur : " + e.toString());

@@ -205,6 +205,17 @@ x-ua-compatible:IE=Edge,chrome=1
                 cookieControler.clearCookies();
                 URI uri = URI.create(POD_URL);
 
+                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
+                    String remember = COOKIE_REMEMBER.substring(0,COOKIE_REMEMBER.indexOf(";"));
+                    LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);
+                    if (isTest) {
+                        //TEST ADD COOKIE EN DUR POUR TEST
+                        cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
+                    }else{
+                        cookieControler.storeCookie(uri, "remember_user_token", remember);
+                    }
+
+                }
 //                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
 //                    String session = COOKIE_SESSION_STREAM.substring(0,COOKIE_SESSION_STREAM.indexOf(";"));
 //                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + session);
@@ -214,18 +225,7 @@ x-ua-compatible:IE=Edge,chrome=1
 //                    }else {
 //                        cookieControler.storeCookie(uri, "_diaspora_session", session);
 //                    }
-//                }else
-                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
-                    String remember = COOKIE_REMEMBER.substring(0,COOKIE_REMEMBER.indexOf(";"));
-                    LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);
-                    if (isTest) {
-                    //TEST ADD COOKIE EN DUR POUR TEST
-                    cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
-                    }else{
-                        cookieControler.storeCookie(uri, "remember_user_token", remember);
-                    }
-
-                }
+//                }
 
 
                 if (isTest) {
@@ -296,7 +296,8 @@ x-requested-with:XMLHttpRequest
                     .setHeader("content-type", "application/octet-stream")
                     .setHeader("Accept", "application/json")
                     .setHeader("Cache-Control", "no-cache")
-//                    .setHeader("x-csrf-token", token)
+                    .setHeader("x-file-name", nameFile)
+                    .setHeader("x-csrf-token", token)
 //                    .noCache()
 //                    .followRedirect(false)
 //                    .setHeader("x-requested-with", "XMLHttpRequest")

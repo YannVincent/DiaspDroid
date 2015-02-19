@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
@@ -193,7 +194,7 @@ public class DiasporaControler {
 
     }
 
-    public static void getStreamFlow(final Context context, final FutureCallback<List<Post>> fluxCallback, boolean forceRelogin){
+    public static void getStreamFlow(final Context context, final FutureCallback<Response<List<Post>>> fluxCallback, boolean forceRelogin){
 
         boolean bForceLogin = forceRelogin;
         if (forceRelogin){
@@ -271,6 +272,7 @@ public class DiasporaControler {
             LOG.d(".getToken : Construction de la requête d'appel GET à "+LOGIN_URL);
             Ion.with(context)
                     .load("GET", LOGIN_URL)
+                    .setHeader("User-Agent", USER_AGENT)
                     .followRedirect(true)
                     .noCache()
                     .asString()
@@ -399,7 +401,8 @@ public class DiasporaControler {
             Ion.with(context)
                     .load("POST", LOGIN_URL)
                     .followRedirect(followRedirect)
-                    .addHeader("Accept","*/*")
+                    .addHeader("Accept", "*/*")
+                    .setHeader("User-Agent", USER_AGENT)
                     .noCache()
                     .setBodyParameter("utf-8", "✓")
                     .setBodyParameter("user[username]", username)
@@ -415,6 +418,56 @@ public class DiasporaControler {
             ACRA.getErrorReporter().handleException(thr);
         }
         LOG.d(".login : Sortie");
+    }
+
+
+
+    public static List<Post> onCompleteStream(Exception exception, Response<List<Post>> response) {
+        LOG.d(".onCompleteStream : Entrée");
+        List<Post> result = response.getResult();
+        boolean resultOK = true;
+        boolean resultKO = false;
+
+        if (exception != null) {
+            LOG.d(".onCompleteStream Erreur : "+exception.getMessage());
+            exception.printStackTrace();
+            ACRA.getErrorReporter().handleException(exception);
+            LOG.d(".onCompleteStream : Sortie");
+            return new ArrayList<Post>();
+        }
+
+        if (response==null || response.getHeaders()==null){
+            LOG.d(".onCompleteStream\t**\trecherche impossible de COOKIE_SESSION\t**");
+            return new ArrayList<Post>();
+        }
+        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
+        boolean cookieSessionFound = false;
+        boolean cookieRememberFound = false;
+        for(Header header:headers) {
+            String headerName = header.getName();
+            String headerValue = header.getValue();
+            if (headerName != null && !headerName.isEmpty() &&
+                    headerValue != null && !headerValue.isEmpty() &&
+                    headerName.toLowerCase().equals("set-cookie")) {
+                if (headerValue.startsWith("_diaspora_session=")) {
+                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
+                    cookieSessionFound = true;
+                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM replace to " + COOKIE_SESSION_STREAM + "\t**");
+                }
+            }
+        }
+        if (!cookieSessionFound){
+            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
+        }
+
+        if (result==null || result.isEmpty()){
+            LOG.d(".onCompleteStream\t**\tRESPONSE introuvable\t**");
+            LOG.d(".onCompleteStream : Sortie");
+            return new ArrayList<Post>();
+        }
+        LOG.d(".onCompleteStream : Sortie");
+        return result;
     }
 
 
@@ -492,6 +545,7 @@ public class DiasporaControler {
             Ion.with(context)
                     .load("POST", LOGIN_URL)
                     .setHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .setHeader("User-Agent", USER_AGENT)
                     .setBodyParameter("user[username]", username)
                     .setBodyParameter("user[password]", password)
                     .setBodyParameter("status_message[fake_text]", post)
@@ -511,7 +565,7 @@ public class DiasporaControler {
         LOG.d(".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
     }
 
-    public static void getStream(Context context, FutureCallback<List<Post>> callback){
+    public static void getStream(Context context, FutureCallback<Response<List<Post>>> callback){
         LOG.d(".getStream : Entrée");
         try{
             try {
@@ -533,12 +587,14 @@ public class DiasporaControler {
             LOG.d(".getStream : Construction de la requête d'appel GET à "+STREAM_URL+ " (x-csrf-token="+TOKEN+")");
             Ion.with(context)
                     .load("GET", STREAM_URL)
+                    .setHeader("User-Agent", USER_AGENT)
                     .noCache()
                     .setHeader("x-requested-with", "XMLHttpRequest")
                     .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
                     .setHeader("x-csrf-token", TOKEN)
                     .as(new TypeToken<List<Post>>() {
                     })
+                    .withResponse()
                     .setCallback(callback);
         }catch(Throwable thr){
             LOG.e(".getStream Erreur : " + thr.toString());
