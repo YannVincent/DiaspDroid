@@ -222,6 +222,38 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                 @Override
                 public void onClick(final View v) {
                     if (post!=null && post.getGuid()!=null){
+                        FutureCallback<Response<String>> likeCallBack = new FutureCallback<Response<String>>() {
+                            @Override
+                            public void onCompleted(Exception e, Response<String> result) {
+                                String methodName = ".getView likeCallBack onCompleted: ";
+                                boolean resultOK = DiasporaControler.onCompleteRepartager(e, result);
+                                if (!resultOK){
+                                    if (follower==null){
+                                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                                        return;
+                                    }
+                                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(follower);
+                                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                                    alertDialog.setIcon(R.drawable.ic_launcher);
+                                    alertDialog.setTitle("PB Accès");
+                                    alertDialog.setMessage("Le like est impossible");
+                                    alertDialog.show();
+                                    return;
+                                }
+                            }
+                        };
+                        DiasporaControler.aimer(follower, post.getId(), likeCallBack, false);
+                    }
+                }
+            };
+            // On attache la fonction au bouton like
+            detailPostView.detailLike.setOnClickListener(likeclickListener);
+
+            // On crée la fonction pour le bouton reshare
+            View.OnClickListener reshareclickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    if (post!=null && post.getGuid()!=null){
                         FutureCallback<Response<String>> reshareCallBack = new FutureCallback<Response<String>>() {
                             @Override
                             public void onCompleted(Exception e, Response<String> result) {
@@ -246,8 +278,8 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                     }
                 }
             };
-            // On attache la fonction au bouton like
-            detailPostView.detailLike.setOnClickListener(likeclickListener);
+            // On attache la fonction au bouton reshare
+            detailPostView.detailRepublish.setOnClickListener(reshareclickListener);
 
 
                 convertView.setTag(detailPostView);

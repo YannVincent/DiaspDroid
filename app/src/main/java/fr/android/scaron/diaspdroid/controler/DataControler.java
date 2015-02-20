@@ -52,20 +52,22 @@ public class DataControler extends DiasporaControler {
                     LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
                      if (isTest){
                          //TEST ADD COOKIE EN DUR POUR TEST
-                         cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
+//                         BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; path=/; expires=Fri, 06-Mar-2015 10:19:56 GMT; HttpOnly; secure
+                         cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; path=/; expires=Fri, 06-Mar-2015 10:19:56 GMT; HttpOnly; secure");
+//                         cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
                      }else{
                          cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
                      }
                 }
-                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
-                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_STREAM);
-                    if (isTest){
-                        //TEST ADD COOKIE EN DUR POUR TEST
-                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
-                    }else{
-                        cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_STREAM);
-                    }
-                }
+//                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
+//                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_STREAM);
+//                    if (isTest){
+//                        //TEST ADD COOKIE EN DUR POUR TEST
+//                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
+//                    }else{
+//                        cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_STREAM);
+//                    }
+//                }
 
                 if (isTest) {
                     //TEST ADD COOKIE EN DUR POUR TEST
@@ -191,10 +193,11 @@ x-ua-compatible:IE=Edge,chrome=1
 
  */
 
+        String methodName = ".uploadImage : ";
 
 
 
-        LOG.d(DataControler.class, ".uploadImage : Entrée");
+        LOG.d(methodName + "Entrée");
         try{
             //&qqfile=ic_launcher-web.png
 
@@ -202,58 +205,63 @@ x-ua-compatible:IE=Edge,chrome=1
             try {
                 LOG.d(".uploadImage : On efface les cookies");
                 CookieControler cookieControler = CookieControler.getInstance(context);
-//                cookieControler.clearCookies();
+                cookieControler.clearCookies();
                 URI uri = URI.create(POD_URL);
 
-                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
-                    String remember = COOKIE_REMEMBER.substring(0,COOKIE_REMEMBER.indexOf(";"));
-                    LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);
-                    if (isTest) {
-                        //TEST ADD COOKIE EN DUR POUR TEST
-                        cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
-                    }else{
-                        cookieControler.storeCookie(uri, "remember_user_token", remember);
-                    }
-
+                if (!COOKIE_REMEMBER.isEmpty()) {
+                    LOG.d(methodName+ "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
                 }
-//                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
-//                    String session = COOKIE_SESSION_STREAM.substring(0,COOKIE_SESSION_STREAM.indexOf(";"));
-//                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + session);
+
+//                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
+//                    String remember = COOKIE_REMEMBER;//.substring(0,COOKIE_REMEMBER.indexOf(";"));
+//                    LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);
 //                    if (isTest) {
 //                        //TEST ADD COOKIE EN DUR POUR TEST
-//                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
-//                    }else {
-//                        cookieControler.storeCookie(uri, "_diaspora_session", session);
+//                        cookieControler.storeCookie(uri, "remember_user_token", "BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26");
+//                    }else{
+//                        cookieControler.storeCookie(uri, "remember_user_token", remember);
 //                    }
+//
 //                }
-
-
-                if (isTest) {
-                //TEST ADD COOKIE EN DUR POUR TEST
-                cookieControler.storeCookie(uri, "_pk_id.26.270d", "748f3140b90c4085.1421965980.15.1424126340.1424035050.");
-                cookieControler.storeCookie(uri, "_pk_ses.26.270d", "*");
-                }
+////                if (!COOKIE_SESSION_STREAM.isEmpty()||isTest) {
+////                    String session = COOKIE_SESSION_STREAM.substring(0,COOKIE_SESSION_STREAM.indexOf(";"));
+////                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + session);
+////                    if (isTest) {
+////                        //TEST ADD COOKIE EN DUR POUR TEST
+////                        cookieControler.storeCookie(uri, "_diaspora_session", "BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTViNjdiOGRmZTU3ZTBiMzMzMDlkNDJkYmUzZGQwYzA5BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxT2NQejBsdkYwSG1PaUh2TkRKWW1aYXFObVpxU0ZhdkRtTUV1NDZuZFY2Yz0GOwBG--407bd19b571f9e60899ee0d933c8fcc9a5ee5553");
+////                    }else {
+////                        cookieControler.storeCookie(uri, "_diaspora_session", session);
+////                    }
+////                }
+//
+//
+//                if (isTest) {
+//                //TEST ADD COOKIE EN DUR POUR TEST
+//                cookieControler.storeCookie(uri, "_pk_id.26.270d", "748f3140b90c4085.1421965980.15.1424126340.1424035050.");
+//                cookieControler.storeCookie(uri, "_pk_ses.26.270d", "*");
+//                }
             }catch (IOException ioex){
-                LOG.d(".uploadImage : Impossible de positioner le cookie _diaspora_session ou remember_user_token");
+                LOG.d(methodName + "Impossible de positioner le cookie _diaspora_session ou remember_user_token");
             }
-            LOG.d("Test d'accès au fichier que nous souhaitons partager : "+localPath);
+            LOG.d(methodName + "Test d'accès au fichier que nous souhaitons partager : "+localPath);
             File fichierToShare = new File(localPath);
             if (fichierToShare==null){
-                LOG.e("Mal parti le fichier n'est pas accessible");
-                LOG.d(DataControler.class, ".uploadImage : Sortie");
+                LOG.e(methodName + "Mal parti le fichier n'est pas accessible");
+                LOG.d(methodName + "Sortie");
                 return;
             }
             if (!fichierToShare.exists()){
-                LOG.e("Mal parti v2 le fichier n'existe pas");
-                LOG.d(DataControler.class, ".uploadImage : Sortie");
+                LOG.e(methodName + "Mal parti v2 le fichier n'existe pas");
+                LOG.d(methodName + "Sortie");
                 return;
             }
             if (!fichierToShare.isFile()){
-                LOG.e("Mal parti v3 le chemin ne défini pas un fichier");
-                LOG.d(DataControler.class, ".uploadImage : Sortie");
+                LOG.e(methodName + "Mal parti v3 le chemin ne défini pas un fichier");
+                LOG.d(methodName + "Sortie");
                 return;
             }
-            LOG.d(DataControler.class, ".uploadImage : Construction de la requête d'appel POST à "+POST_IMAGE + "&qqfile=" + nameFile+ " (file="+nameFile+")");
+            LOG.d(methodName + "Construction de la requête d'appel POST à "+POST_IMAGE + "&qqfile=" + nameFile+ " (file="+nameFile+")");
             String token = TOKEN;
 
             if (isTest){
@@ -291,14 +299,14 @@ x-requested-with:XMLHttpRequest
                     */
 
                     .noCache()
-//                    .setHeader("x-requested-with", "XMLHttpRequest")
+                    .setHeader("x-requested-with", "XMLHttpRequest")
                     .setHeader("User-Agent", USER_AGENT)
 //                    .setHeader("content-type", "application/octet-stream")
                     .setHeader("Accept", "application/json")
                     .setHeader("Cache-Control", "no-cache")
-                    .setHeader("x-file-name", nameFile)
-                    .setHeader("x-csrf-token", token)
-                    .setHeader("authenticity_token", token)
+//                    .setHeader("x-file-name", nameFile)
+//                    .setHeader("x-csrf-token", token)
+//                    .setHeader("authenticity_token", token)
 //                    .noCache()
 //                    .followRedirect(false)
 //                    .setHeader("x-requested-with", "XMLHttpRequest")
@@ -321,12 +329,12 @@ x-requested-with:XMLHttpRequest
             //x-csrf-token:nEkhdXfaVQIjPGGIHZZKtiOH5qiahOBlN/uIgWZjlp4=
 //            x-file-name:ic_launcher-web.png
         }catch(Throwable thr){
-            LOG.e(DataControler.class, ".uploadImage Erreur : " + thr.toString());
+            LOG.e(methodName + "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
-            LOG.d(DataControler.class, ".uploadImage : Sortie");
+            LOG.d(methodName + "Sortie");
             throw thr;
         }
-        LOG.d(DataControler.class, ".uploadImage : Sortie");
+        LOG.d(methodName + "Sortie");
     }
 //
 //    public static void getStream(Context context, FutureCallback<List<Post>> callback){

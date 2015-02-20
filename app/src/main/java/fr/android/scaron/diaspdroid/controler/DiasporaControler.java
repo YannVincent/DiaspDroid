@@ -43,6 +43,7 @@ public class DiasporaControler {
     static String STREAM_URL_DELTA = POD_URL+"/stream?max_time=1421018508&_=1421254891463";
     static String STREAM_URL = STREAM_URL_NORMAL;
     static String RESHARE_URL = POD_URL+"/reshares";
+    static String POSTS_URL = POD_URL+"/posts";
 //    static String POST_IMAGE = POD_URL + "/photos?photo%5Baspect_ids%5D=all";//"/photos?photo%5Bpending%5D=true";
 //    static String POST_IMAGE = POD_URL + "/photos?photo[pending]=true";
     static String POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true&set_profile_image=&";
@@ -65,6 +66,80 @@ public class DiasporaControler {
     static String USER_AGENT = "DiaspDroid";
 
     static Context contextGlobal;
+
+    public static void aimer(final Context context, final int postID, final FutureCallback<Response<String>> fluxCallback, boolean forceRelogin){
+        boolean bForceLogin = forceRelogin;
+        String methodName = ".aimer : ";
+        if (forceRelogin){
+            return;
+        }
+        contextGlobal = context;
+        //Callback d'envoi du formulaire de login
+        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                String methodName = ".aimer loginCallback: ";
+                boolean resultOK = onCompleteLogin(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Connexion");
+                    alertDialog.setMessage("La connexion a Diaspora a échouée");
+                    alertDialog.show();
+                    return;
+                }
+                //On est loggué donc on demande le flux
+                postLike(contextGlobal, postID, fluxCallback);
+            }
+        };
+        //Callback de récupération du formulaire de login et d'accès au authenticity_token
+        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+                String methodName = ".aimer tokenCallback: ";
+                boolean resultOK = onCompleteGetToken(e, result);
+                if (!resultOK){
+                    if (contextGlobal==null){
+                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+                        return;
+                    }
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(contextGlobal);
+                    final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setIcon(R.drawable.ic_launcher);
+                    alertDialog.setTitle("PB Accès");
+                    alertDialog.setMessage("L'accès a Diaspora est impossible");
+                    alertDialog.show();
+                    return;
+                }
+                //On a le token donc on demande le login
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            }
+        };
+        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+        if (bForceLogin || COOKIE_REMEMBER.isEmpty()){
+            //Cas ou nous n'avons pas les informations pour se connecter.
+            if (bForceLogin || (COOKIE_SESSION_LOGIN.isEmpty() || TOKEN.isEmpty())) {
+                getToken(contextGlobal, tokenCallback);
+                bForceLogin = false;//on ne tente qu'une fois.
+                return;
+            }
+            //Cas ou nous avons les informations pour se connecter
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+            return;
+        }
+        //Cas ou nous avons les informations de connexion
+        postLike(contextGlobal, postID, fluxCallback);
+    }
+
 
     public static void repartager(final Context context, final String rootGuid, final FutureCallback<Response<String>> fluxCallback, boolean forceRelogin){
         boolean bForceLogin = forceRelogin;
@@ -183,11 +258,11 @@ public class DiasporaControler {
                     return;
                 }
                 //On a le token donc on demande le login
-                login(contextGlobal, "tilucifer", "tilucifer", loginCallback, false);
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
             }
         };
         //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
+        if (COOKIE_REMEMBER.isEmpty()){
             //Cas ou nous n'avons pas les informations pour se connecter.
             if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
                 getToken(contextGlobal, tokenCallback);
@@ -250,29 +325,29 @@ public class DiasporaControler {
                     return;
                 }
                 //On a le token donc on demande le login
-                login(contextGlobal, "tilucifer", "tilucifer", loginCallback, false);
+                login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
             }
         };
-//        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
-//        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_STREAM.isEmpty()){
-//            //Cas ou nous n'avons pas les informations pour se connecter.
-//            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
-//                getToken(contextGlobal, tokenCallback);
-//                return;
-//            }
-//            //Cas ou nous avons les informations pour se connecter
-//            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
-//            return;
-//        }
-//        if (contextGlobal==null){
-//            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
-//            return;
-//        }
-//        //Cas ou nous avons les informations de connexion
-//        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
+        //Cas ou nous n'avons pas les informations de connexion déjà en mémoire.
+        if (COOKIE_REMEMBER.isEmpty()){
+            //Cas ou nous n'avons pas les informations pour se connecter.
+            if (COOKIE_SESSION_LOGIN.isEmpty() && TOKEN.isEmpty()) {
+                getToken(contextGlobal, tokenCallback);
+                return;
+            }
+            //Cas ou nous avons les informations pour se connecter
+            login(contextGlobal, "tilucifer", "tilucifer", loginCallback);
+            return;
+        }
+        if (contextGlobal==null){
+            LOG.e(".getStreamFlow : Le contexte est vide et empêche un traitement");
+            return;
+        }
+        //Cas ou nous avons les informations de connexion
+        DataControler.uploadImage(contextGlobal.getApplicationContext(), localPath, nameFile, message, uploadProgressBar, fluxCallback);
 
-        //On doit se connecter
-        getToken(contextGlobal, tokenCallback);
+//        //On doit se connecter
+//        getToken(contextGlobal, tokenCallback);
 
     }
 
@@ -432,13 +507,15 @@ public class DiasporaControler {
                     headerName.toLowerCase().equals("set-cookie")) {
                 if (headerValue.startsWith("_diaspora_session=")) {
                     LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN found in " + headerValue + "\t**");
+                    COOKIE_SESSION_LOGIN = headerValue.substring("_diaspora_session=".length());
+                    LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN set to " + COOKIE_SESSION_LOGIN + "\t**");
                     cookieSessionFound = true;
-                    if (COOKIE_SESSION_LOGIN.isEmpty()) {
-                        COOKIE_SESSION_LOGIN = headerValue.substring("_diaspora_session=".length());
-                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN set to " + COOKIE_SESSION_LOGIN + "\t**");
-                    } else {
-                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN already set to " + COOKIE_SESSION_LOGIN + "\t**");
-                    }
+//                    if (COOKIE_SESSION_LOGIN.isEmpty()) {
+//                        COOKIE_SESSION_LOGIN = headerValue.substring("_diaspora_session=".length());
+//                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN set to " + COOKIE_SESSION_LOGIN + "\t**");
+//                    } else {
+//                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_LOGIN already set to " + COOKIE_SESSION_LOGIN + "\t**");
+//                    }
                 }
             }
         }
@@ -475,32 +552,6 @@ public class DiasporaControler {
 
     public static void login(Context context, String username, String password, FutureCallback<Response<String>> callback){
         login(context, username, password, callback, false);
-//        LOG.d(".login : Entrée");
-//
-//        try{
-//            LOG.d(".login : On efface les cookies");
-//            CookieControler cookieControler = CookieControler.getInstance(context);
-//            cookieControler.clearCookies();
-//            LOG.d(".login : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
-//            URI uri = URI.create(POD_URL);
-//            cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
-//            LOG.d(".login : Construction de la requête d'appel POST à "+LOGIN_URL+ " (authenticity_token="+TOKEN+")");
-//            Ion.with(context)
-//                    .load("POST", LOGIN_URL)
-//                    .followRedirect(false)
-//                    .noCache()
-//                    .setBodyParameter("user[username]", username)
-//                    .setBodyParameter("user[password]", password)
-//                    .setBodyParameter("user[remember_me]", "1")
-//                    .setBodyParameter("authenticity_token", TOKEN)
-//                    .asString()
-//                    .withResponse()
-//                    .setCallback(callback);
-//        }catch(Throwable thr){
-//            LOG.e(".login Erreur : " + thr.toString());
-//            ACRA.getErrorReporter().handleException(thr);
-//        }
-//        LOG.d(".login : Sortie");
     }
 
 
@@ -522,11 +573,11 @@ public class DiasporaControler {
                     .addHeader("Accept", "*/*")
                     .setHeader("User-Agent", USER_AGENT)
                     .noCache()
-                    .setBodyParameter("utf-8", "✓")
+//                    .setBodyParameter("utf-8", "✓")
                     .setBodyParameter("user[username]", username)
                     .setBodyParameter("user[password]", password)
                     .setBodyParameter("user[remember_me]", "1")
-                    .setBodyParameter("commit", "Sign+in")
+//                    .setBodyParameter("commit", "Sign+in")
                     .setBodyParameter("authenticity_token", TOKEN)
                     .asString()
                     .withResponse()
@@ -554,30 +605,30 @@ public class DiasporaControler {
             return new ArrayList<Post>();
         }
 
-        if (response==null || response.getHeaders()==null){
-            LOG.d(".onCompleteStream\t**\trecherche impossible de COOKIE_SESSION\t**");
-            return new ArrayList<Post>();
-        }
+//        if (response==null || response.getHeaders()==null){
+//            LOG.d(".onCompleteStream\t**\trecherche impossible de COOKIE_SESSION\t**");
+//            return new ArrayList<Post>();
+//        }
         Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
-        boolean cookieSessionFound = false;
-        boolean cookieRememberFound = false;
-        for(Header header:headers) {
-            String headerName = header.getName();
-            String headerValue = header.getValue();
-            if (headerName != null && !headerName.isEmpty() &&
-                    headerValue != null && !headerValue.isEmpty() &&
-                    headerName.toLowerCase().equals("set-cookie")) {
-                if (headerValue.startsWith("_diaspora_session=")) {
-                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
-                    cookieSessionFound = true;
-                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
-                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM replace to " + COOKIE_SESSION_STREAM + "\t**");
-                }
-            }
-        }
-        if (!cookieSessionFound){
-            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
-        }
+//        boolean cookieSessionFound = false;
+//        boolean cookieRememberFound = false;
+//        for(Header header:headers) {
+//            String headerName = header.getName();
+//            String headerValue = header.getValue();
+//            if (headerName != null && !headerName.isEmpty() &&
+//                    headerValue != null && !headerValue.isEmpty() &&
+//                    headerName.toLowerCase().equals("set-cookie")) {
+//                if (headerValue.startsWith("_diaspora_session=")) {
+//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
+//                    cookieSessionFound = true;
+//                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM replace to " + COOKIE_SESSION_STREAM + "\t**");
+//                }
+//            }
+//        }
+//        if (!cookieSessionFound){
+//            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
+//        }
 
         if (result==null || result.isEmpty()){
             LOG.d(".onCompleteStream\t**\tRESPONSE introuvable\t**");
@@ -624,14 +675,16 @@ public class DiasporaControler {
                 }else if (headerValue.startsWith("_diaspora_session=")) {
                     LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
                     cookieSessionFound = true;
-                    if (headerValue.length()>COOKIE_SESSION_STREAM.length()) {
-                        if (COOKIE_SESSION_STREAM.isEmpty()) {
-                            COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
-                            LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
-                        }else{
-                            LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM already set to " + COOKIE_SESSION_STREAM + "\t**");
-                        }
-                    }
+                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+                    LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
+//                    if (headerValue.length()>COOKIE_SESSION_STREAM.length()) {
+//                        if (COOKIE_SESSION_STREAM.isEmpty()) {
+//                            COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+//                            LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
+//                        }else{
+//                            LOG.d(".onCompleteLogin\t**\tCOOKIE_SESSION_STREAM already set to " + COOKIE_SESSION_STREAM + "\t**");
+//                        }
+//                    }
                 }
             }
         }
@@ -750,6 +803,18 @@ public class DiasporaControler {
         String methodName = ".postReshare : ";
         LOG.d(methodName+ "Entrée");
         try{
+            try {
+                LOG.d(methodName+ "On efface les cookies");
+                CookieControler cookieControler = CookieControler.getInstance(context);
+                cookieControler.clearCookies();
+                URI uri = URI.create(POD_URL);
+                if (!COOKIE_REMEMBER.isEmpty()) {
+                    LOG.d(methodName+ "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+                }
+            }catch (IOException ioex){
+                LOG.d(".getStream : Impossible de positioner le cookie remember_user_token");
+            }
             JsonObject jsonParam = new JsonObject();
             jsonParam.addProperty("root_guid", rootGuid);
             Ion.with(context)
@@ -759,10 +824,47 @@ public class DiasporaControler {
                 .setHeader("x-requested-with", "XMLHttpRequest")
                 .setHeader("content-type", "application/json")
                 .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                .setHeader("x-csrf-token", TOKEN)
+//                .setHeader("x-csrf-token", TOKEN)
                 .setJsonObjectBody(jsonParam)
                 .asString()
                 .withResponse();
+
+        }catch(Throwable thr){
+            LOG.e(methodName+ "Erreur : " + thr.toString());
+            ACRA.getErrorReporter().handleException(thr);
+            LOG.d(methodName+ "Sortie");
+            throw thr;
+        }
+        LOG.d(methodName+ "Sortie");
+    }
+
+    public static void postLike(Context context, int postID, FutureCallback<Response<String>> callback){
+        String methodName = ".postReshare : ";
+        LOG.d(methodName+ "Entrée");
+        try{
+            try {
+                LOG.d(methodName+ "On efface les cookies");
+                CookieControler cookieControler = CookieControler.getInstance(context);
+                cookieControler.clearCookies();
+                URI uri = URI.create(POD_URL);
+                if (!COOKIE_REMEMBER.isEmpty()) {
+                    LOG.d(methodName+ "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+                }
+            }catch (IOException ioex){
+                LOG.d(".getStream : Impossible de positioner le cookie remember_user_token");
+            }
+            JsonObject jsonParam = new JsonObject();
+            Ion.with(context)
+                    .load("POST", POSTS_URL+"/"+postID+"/likes")
+                    .setHeader("User-Agent", USER_AGENT)
+                    .noCache()
+                    .setHeader("x-requested-with", "XMLHttpRequest")
+                    .setHeader("content-type", "application/json")
+                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                    .setJsonObjectBody(jsonParam)
+                    .asString()
+                    .withResponse();
 
         }catch(Throwable thr){
             LOG.e(methodName+ "Erreur : " + thr.toString());

@@ -69,8 +69,36 @@ import java.util.List;
         },
 
 */
-public class Pods {
+public class Pods extends GroupList {
 
     private int podcount;
     private List<Pod> pods;
+
+    public Pods(){
+        super("Generated");
+    }
+
+    public Pods(String name){
+        super(name);
+    }
+
+    public void setName(String name){
+        super.name = name;
+    }
+
+    public int getPodcount() {
+        return podcount;
+    }
+
+    public void setPodcount(int podcount) {
+        this.podcount = podcount;
+    }
+
+    public List<Pod> getPods() {
+        return pods;
+    }
+
+    public void setPods(List<Pod> pods) {
+        this.pods = pods;
+    }
 }
