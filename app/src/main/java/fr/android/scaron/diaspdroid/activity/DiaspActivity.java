@@ -228,6 +228,8 @@ public class DiaspActivity extends ActionBarActivity
 
             //noinspection SimplifiableIfStatement
             if (id == R.id.action_settings) {
+                Intent intent = ParamsActivity_.intent(this).get();
+                startActivity(intent);
                 return true;
             }
 

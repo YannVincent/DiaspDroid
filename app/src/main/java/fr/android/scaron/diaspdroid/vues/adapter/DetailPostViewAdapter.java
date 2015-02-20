@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -212,7 +213,9 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             LOG.d(".onActivityCreated find TextView with id  R.id.detailIndicsCommentaireText");
             detailPostView.detailIndicsCommentaireText= (TextView)convertView.findViewById(R.id.detailIndicsCommentaireText);
 
-
+            detailPostView.detailLike = (LinearLayout)convertView.findViewById(R.id.detailLike);
+            detailPostView.detailComment = (LinearLayout)convertView.findViewById(R.id.detailComment);
+            detailPostView.detailRepublish = (LinearLayout)convertView.findViewById(R.id.detailRepublish);
 
             // On crée la fonction pour le bouton like
             View.OnClickListener likeclickListener = new View.OnClickListener() {
@@ -243,6 +246,8 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                     }
                 }
             };
+            // On attache la fonction au bouton like
+            detailPostView.detailLike.setOnClickListener(likeclickListener);
 
 
                 convertView.setTag(detailPostView);

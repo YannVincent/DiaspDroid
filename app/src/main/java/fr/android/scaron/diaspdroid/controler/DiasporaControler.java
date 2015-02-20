@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
@@ -32,6 +33,9 @@ public class DiasporaControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaControler.class);
     private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+
+    static String PODLIST_URL = "http://podupti.me/api.php?key=4r45tg&format=json";
+
     static String POD = "framasphere.org";
     static String POD_URL = "https://"+POD;
     static String LOGIN_URL = POD_URL+"/users/sign_in";
@@ -718,6 +722,29 @@ public class DiasporaControler {
         }
         LOG.d(".getStream : Sortie");
     }
+    public static void getPodList(Context context, FutureCallback<Response<Pods>> callback){
+        String methodName = ".postReshare : ";
+        LOG.d(methodName + "Entrée");
+        try{
+            LOG.d(methodName + "Construction de la requête d'appel GET à "+PODLIST_URL+ " (x-csrf-token="+TOKEN+")");
+            Ion.with(context)
+                    .load("GET", PODLIST_URL)
+                    .setHeader("User-Agent", USER_AGENT)
+                    .noCache()
+                    .setHeader("x-requested-with", "XMLHttpRequest")
+                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                    .as(new TypeToken<Pods>() {
+                    })
+                    .withResponse()
+                    .setCallback(callback);
+        }catch(Throwable thr){
+            LOG.e(methodName + "Erreur : " + thr.toString());
+            ACRA.getErrorReporter().handleException(thr);
+            LOG.d(methodName + "Sortie");
+            throw thr;
+        }
+        LOG.d(methodName + "Sortie");
+    }
 
     public static void postReshare(Context context, String rootGuid, FutureCallback<Response<String>> callback){
         String methodName = ".postReshare : ";
@@ -734,8 +761,7 @@ public class DiasporaControler {
                 .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
                 .setHeader("x-csrf-token", TOKEN)
                 .setJsonObjectBody(jsonParam)
-                .as(new TypeToken<List<Post>>() {
-                })
+                .asString()
                 .withResponse();
 
         }catch(Throwable thr){

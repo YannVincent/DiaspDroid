@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +67,10 @@ public class DetailPostView extends Fragment {
     public TextView detailIndicsReshareText;
     public TextView detailIndicsLikeText;
     public TextView detailIndicsCommentaireText;
+
+    public LinearLayout detailLike;
+    public LinearLayout detailRepublish;
+    public LinearLayout detailComment;
 
     public void setWebVideo(final String htmlSrc){
         LOG.d(".setWebVideo entree avec la valeur : "+htmlSrc);
