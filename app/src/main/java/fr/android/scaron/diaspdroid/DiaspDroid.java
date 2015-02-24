@@ -2,12 +2,15 @@ package fr.android.scaron.diaspdroid;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
-import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.util.StatusPrinter;
+import fr.android.scaron.diaspdroid.controler.DiasporaControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.Pods;
+import fr.android.scaron.diaspdroid.model.TinyDB;
 
 
 @ReportsCrashes(

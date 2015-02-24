@@ -100,5 +100,7 @@ public class Pods extends GroupList {
 
     public void setPods(List<Pod> pods) {
         this.pods = pods;
+        children.clear();
+        children.addAll(pods);
     }
 }

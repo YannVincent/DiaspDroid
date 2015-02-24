@@ -242,7 +242,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                                 }
                             }
                         };
-                        DiasporaControler.aimer(follower, post.getId(), likeCallBack, false);
+                        DiasporaControler.aimer(post.getId(), likeCallBack, false);
                     }
                 }
             };
@@ -274,7 +274,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                                 }
                             }
                         };
-                        DiasporaControler.repartager(follower, post.getGuid(), reshareCallBack, false);
+                        DiasporaControler.repartager(post.getGuid(), reshareCallBack, false);
                     }
                 }
             };

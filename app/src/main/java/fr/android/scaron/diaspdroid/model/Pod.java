@@ -65,6 +65,16 @@ String hidden": "no"
     String datelaststats;
     String hidden;
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(final boolean selected) {
+        this.selected = selected;
+    }
+
+    boolean selected;
+
     public String getId() {
         return id;
     }

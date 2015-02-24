@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.TinyDB;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 //@EActivity(R.layout.activity_share)
@@ -43,11 +45,11 @@ public class ShareActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try{
             super.onCreate(savedInstanceState);
+            DiasporaConfig.init(this.getApplication(), this);
             // Get intent, action and MIME type
             Intent intent = getIntent();
             String action = intent.getAction();
             String type = intent.getType();
-            Ion.getDefault(this).configure().setLogging("diaspdroid.ion", Log.VERBOSE);
             restoreActionBar();
             if (Intent.ACTION_SEND.equals(action) && type != null) {
 //                if ("text/plain".equals(type)) {
@@ -196,7 +198,7 @@ public class ShareActivity extends ActionBarActivity {
 //                            handler.postDelayed(new Runnable() {
 //                                public void run() {
                                     shareText.setText("Partage en cours de la photo : " + imageName + " (" + imageLocalPath + ")-----------\nAvec le message : " + shareText.getText());
-                                    DiasporaControler.partagerImage(ShareActivity.this, imageLocalPath, imageName, shareText.getText().toString(), uploadProgressBar, shareCallback);
+                                    DiasporaControler.partagerImage(imageLocalPath, imageName, shareText.getText().toString(), uploadProgressBar, shareCallback);
 //                                    DiasporaControler.partagerImage(ShareActivity.this, imageLocalPath, imageName, uploadProgressBar, shareCallbackString);
 //                                }
 //                            }, 2000);

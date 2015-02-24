@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.PlaceholderFragment;
 
@@ -45,6 +46,7 @@ public class DiaspActivity extends ActionBarActivity
         try{
             super.onCreate(savedInstanceState);
 
+            DiasporaConfig.init(this.getApplication(), this);
 //            //SET SSL TODO DECOMMENTER
 //            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 //            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -66,7 +68,6 @@ public class DiaspActivity extends ActionBarActivity
             Intent intent = getIntent();
             String action = intent.getAction();
             String type = intent.getType();
-            Ion.getDefault(this).configure().setLogging("diaspdroid.ion", Log.VERBOSE);
             if (Intent.ACTION_SEND.equals(action) && type != null) {
 //                if ("text/plain".equals(type)) {
 //                    handleSendText(intent); // Handle text being sent

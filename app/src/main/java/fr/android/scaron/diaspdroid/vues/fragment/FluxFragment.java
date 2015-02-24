@@ -141,10 +141,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnItemClickLis
                 }
             };
 
-            CookieControler cookieControler = CookieControler.getInstance(getmActivity());
-            cookieControler.clearCookies();
-
-            DiasporaControler.getStreamFlow(getmActivity(), fluxCallback, false);
+            DiasporaControler.getStreamFlow(fluxCallback, false);
 
 //            mAdapter = new PostAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
 //            mAdapter = new DetailPostFragmentAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());

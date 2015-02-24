@@ -6,11 +6,18 @@
     android:orientation="vertical"
     tools:context="fr.android.scaron.diaspdroid.activity..ParamsActivity" >
 
+    <!--<RadioButton-->
+        <!--android:id="@+id/podname"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:text="PodName"-->
+        <!--android:clickable="false"-->
+        <!--android:layout_height="wrap_content" />-->
 
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="PodName"
+        android:clickable="false"
         android:id="@+id/podname" />
     <TextView
         android:id="@+id/poddetail"
