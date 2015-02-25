@@ -1,19 +1,15 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.ActivityManager;
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.androidannotations.annotations.AfterInject;
-import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
-import fr.android.scaron.diaspdroid.DiaspDroid;
 import fr.android.scaron.diaspdroid.R;
 
 /**
@@ -34,18 +30,12 @@ public class MainDrawerFragement extends Fragment{
     @ViewById(R.id.drawerList)
     ListView mDrawerListView;
 
-    @App
-    DiaspDroid diaspApplication;
-
-    @RootContext
-    Context rootContext;
-
     @SystemService
     ActivityManager activityManager;
 
     @AfterInject
     public void init(){
-        adapter = new ArrayAdapter<String>(rootContext, android.R.layout.simple_list_item_1, android.R.id.text1, sections);
+        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, sections);
         mDrawerListView.setAdapter(adapter);
     }
 

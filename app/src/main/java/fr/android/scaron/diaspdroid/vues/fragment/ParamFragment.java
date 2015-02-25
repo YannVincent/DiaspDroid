@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.Receiver;
 import org.androidannotations.annotations.SystemService;
@@ -16,7 +15,6 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.android.scaron.diaspdroid.DiaspDroid;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.GroupList;
@@ -41,8 +39,6 @@ public class ParamFragment extends Fragment {
     TextView podpassword;
     @ViewById(R.id.podselected)
     TextView podselected;
-    @App
-    DiaspDroid customApplication;
 
     @SystemService
     ActivityManager activityManager;
