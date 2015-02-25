@@ -26,7 +26,7 @@ import java.util.Map;
 public class YoutubeControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(YoutubeControler.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     public static Map<String,String> rtspMapping = new Hashtable<String, String>();
 

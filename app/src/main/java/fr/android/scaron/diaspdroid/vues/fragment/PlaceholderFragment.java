@@ -26,7 +26,7 @@ public class PlaceholderFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PlaceholderFragment.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
 
     /**

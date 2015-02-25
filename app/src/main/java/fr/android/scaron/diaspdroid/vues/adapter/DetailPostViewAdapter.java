@@ -54,7 +54,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
 
     private static final int RECOVERY_DIALOG_REQUEST = 1;
     private static Logger LOGGEUR = LoggerFactory.getLogger(DetailPostViewAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
     LayoutInflater inflater;
     FragmentActivity follower;

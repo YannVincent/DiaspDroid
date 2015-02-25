@@ -20,7 +20,7 @@ import fr.android.scaron.diaspdroid.model.Post;
  */
 public class PostOverviewAdapter  extends ArrayAdapter<Post> {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostOverviewAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private Context context;
     private List<Post> items;
 

@@ -9,13 +9,11 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ExpandableListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Text;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
@@ -23,7 +21,6 @@ import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.GroupList;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Pods;
-import fr.android.scaron.diaspdroid.vues.view.DetailPostView;
 import fr.android.scaron.diaspdroid.vues.view.PodView;
 
 /**
@@ -31,7 +28,7 @@ import fr.android.scaron.diaspdroid.vues.view.PodView;
  */
 public class PodListViewAdapter extends BaseExpandableListAdapter {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PodListViewAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     private SparseArray<GroupList> groups;
     public LayoutInflater inflater;

@@ -5,6 +5,7 @@
     <string name="title_section1">Flux</string>
     <string name="title_section2">Mes Amis</string>
     <string name="title_section3">Mon Profil</string>
+    <string name="title_section4">Paramètres</string>
     <string name="navigation_drawer_open">Menu</string>
     <string name="navigation_drawer_close">Fermer</string>
     <string name="action_example">Poster</string>

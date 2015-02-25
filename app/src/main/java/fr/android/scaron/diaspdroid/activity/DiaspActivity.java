@@ -7,13 +7,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.koushikdutta.ion.Ion;
 
 import org.acra.ACRA;
 import org.slf4j.Logger;
@@ -29,8 +26,8 @@ public class DiaspActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, FluxFragment.OnFragmentInteractionListener {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiaspActivity.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
-//    public static LogControler LOG = LogControler.getInstance(LoggerFactory.getLogger(DiaspActivity.class));
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+//    public static LogControler LOG = LogControler.getLoggeur(LoggerFactory.getLogger(DiaspActivity.class));
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -45,7 +42,7 @@ public class DiaspActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         try{
             super.onCreate(savedInstanceState);
-
+            DiasporaConfig.addActivity(this);
             DiasporaConfig.init(this.getApplication(), this);
 //            //SET SSL TODO DECOMMENTER
 //            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
@@ -143,12 +140,17 @@ public class DiaspActivity extends ActionBarActivity
 
             // TODO VALIDER CE BLOC SWITCH
             switch(position){
-                case 0 :
+                case 0 : // FLUX
                     mTitle = getString(R.string.title_section1);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, FluxFragment.newInstance(mTitle.toString(), DiaspActivity.this, position+1))
                             .commit();
 //                    restoreActionBar();
+                    break;
+                case 3 : //PARAMS
+                    mTitle = getString(R.string.title_section3);
+                    Intent intent = ParamsActivity_.intent(this).get();
+                    startActivity(intent);
                     break;
                 default :
                     fragmentManager.beginTransaction()
@@ -248,4 +250,8 @@ public class DiaspActivity extends ActionBarActivity
         Toast.makeText(this, "Flux Fragment : id("+id+")", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onBackPressed() {
+        DiasporaConfig.finishActivities();
+    }
 }

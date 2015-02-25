@@ -1,6 +1,5 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -8,15 +7,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
 import com.google.gson.Gson;
 
 import org.acra.ACRA;
@@ -24,20 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.controler.ProfilControler;
-import fr.android.scaron.diaspdroid.model.Image;
-import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.fragment.DetailPostFragment;
-import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
-import fr.android.scaron.diaspdroid.vues.view.PostView;
 
 /**
  * Created by Sébastien on 16/01/2015.
@@ -45,7 +29,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
 public class DetailPostFragmentAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.OnErrorListener { for test textureview
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DetailPostFragmentAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     LayoutInflater inflater;
     FragmentActivity follower;
     private List<Post> posts = new ArrayList<Post>();

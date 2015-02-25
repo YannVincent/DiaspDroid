@@ -42,7 +42,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView;
 public class PostAdapter extends ArrayAdapter<Post> { // implements MediaPlayer.OnErrorListener { for test textureview
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 //    private final FragmentManager supportFragmentManager;
     LayoutInflater inflater;
     FragmentActivity follower;

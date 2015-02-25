@@ -2,6 +2,8 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.Post;
@@ -33,7 +36,7 @@ import fr.android.scaron.diaspdroid.model.UploadResult;
 public class DiasporaControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaControler.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     static String PODLIST_URL = "http://podupti.me/api.php?key=4r45tg&format=json";
 
@@ -119,6 +122,14 @@ public class DiasporaControler {
                 if (resultOK){
                     final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
                     final AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"OK",new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            DiasporaConfig.ParamsOK=true;
+                            Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
+                            DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
+                        }
+                    });
                     alertDialog.setIcon(R.drawable.ic_launcher);
                     alertDialog.setTitle("Connexion réussie");
                     alertDialog.setMessage("Vos paramètres sont correctes.\nBon surf sur Diaspora !");

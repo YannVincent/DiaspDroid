@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,7 +38,7 @@ import fr.android.scaron.diaspdroid.model.Post;
  */
 public class DetailPostFragment extends Fragment {
     private static Logger LOGGEUR = LoggerFactory.getLogger(DetailPostFragment.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     private YoutubePlayerFragment youTubePlayerFragment;
     final String mimeType = "text/html";

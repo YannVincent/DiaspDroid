@@ -2,13 +2,9 @@ package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,17 +25,10 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.DiaspActivity;
-import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
-import fr.android.scaron.diaspdroid.controler.CookieControler;
-import fr.android.scaron.diaspdroid.controler.DataControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.vues.adapter.DetailPostFragmentAdapter;
 import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
-import fr.android.scaron.diaspdroid.vues.adapter.PostAdapter;
-import fr.android.scaron.diaspdroid.vues.view.DetailPostView;
 
 /**
  * A fragment representing a list of Items.
@@ -53,7 +42,7 @@ import fr.android.scaron.diaspdroid.vues.view.DetailPostView;
 public class FluxFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     /**
      * The fragment argument representing the section number for this
      * fragment.

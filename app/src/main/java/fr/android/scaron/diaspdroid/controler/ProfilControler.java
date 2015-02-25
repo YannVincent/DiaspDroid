@@ -1,18 +1,12 @@
 package fr.android.scaron.diaspdroid.controler;
 
-import android.content.Context;
 import android.widget.ImageView;
 
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
-import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
 
 import fr.android.scaron.diaspdroid.R;
 
@@ -22,7 +16,7 @@ import fr.android.scaron.diaspdroid.R;
 public class ProfilControler extends DiasporaControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ProfilControler.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
 
     public static void putImage(ImageView imageView, String imagePath){

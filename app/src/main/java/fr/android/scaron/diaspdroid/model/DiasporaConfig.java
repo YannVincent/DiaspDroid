@@ -1,19 +1,29 @@
 package fr.android.scaron.diaspdroid.model;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 
 import com.google.gson.Gson;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
+import fr.android.scaron.diaspdroid.controler.LogControler;
 
 /**
  * Created by Sébastien on 22/02/2015.
  */
 public class DiasporaConfig {
+    private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaConfig.class);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     public static String POD_USER;
     public static String POD_PASSWORD;
@@ -24,6 +34,9 @@ public class DiasporaConfig {
     public static Application APPLICATION;
     public static Context APPLICATION_CONTEXT;
     public static TinyDB DB;
+
+    public static boolean ParamsOK;
+    private static final List<Activity> activities = new ArrayList<Activity>();
 
     public static void init(final Application pApplication, final Context pApplicationContext){
         // Chargement de la configuration sauvegardée
@@ -58,6 +71,7 @@ public class DiasporaConfig {
             POD_LIST = pPods;
             POD_LIST_JSON = new Gson().toJson(pPods);
             DB.putString("diaspora_podlist", POD_LIST_JSON);
+            LOG.d("diasporta_podlist = "+POD_LIST_JSON);
         }
     }
 
@@ -74,14 +88,14 @@ public class DiasporaConfig {
         if (context==null){
             context = APPLICATION;
         }
-        if (context!=null){
-            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-            final AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.setIcon(R.drawable.ic_launcher);
-            alertDialog.setTitle("Infos de connexion");
-            alertDialog.setMessage("----RAPPEL ---\nurl:"+POD_URL+"\nuser:"+POD_USER+"\npass:"+POD_PASSWORD+"\n--------------");
-            alertDialog.show();
-        }
+//        if (context!=null){
+//            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+//            final AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.setIcon(R.drawable.ic_launcher);
+//            alertDialog.setTitle("Infos de connexion");
+//            alertDialog.setMessage("----RAPPEL ---\nurl:"+POD_URL+"\nuser:"+POD_USER+"\npass:"+POD_PASSWORD+"\n--------------");
+//            alertDialog.show();
+//        }
     }
 
     public static boolean isValid(){
@@ -90,5 +104,18 @@ public class DiasporaConfig {
             return false;
         }
         return true;
+    }
+
+
+    public static void addActivity(Activity pActivity) {
+        finishActivities();
+        activities.add(pActivity);
+    }
+
+    public static void finishActivities() {
+        for (Activity activity : activities) {
+            activity.finish();
+        }
+        activities.clear();
     }
 }

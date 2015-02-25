@@ -24,7 +24,7 @@ import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 public class CookieControler {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(CookieControler.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     static CookieControler instance;
     CookieManager manager;

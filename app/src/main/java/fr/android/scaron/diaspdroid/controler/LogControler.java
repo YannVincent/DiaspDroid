@@ -21,7 +21,7 @@ public class LogControler {
     }
 
 
-    public static LogControler getInstance(Logger log) {
+    public static LogControler getLoggeur(Logger log) {
         if (Loggeur==null){
             Loggeur= new LogControler(log);
         }

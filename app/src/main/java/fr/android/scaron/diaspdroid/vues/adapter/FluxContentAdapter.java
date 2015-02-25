@@ -35,7 +35,7 @@ public class FluxContentAdapter extends ArrayAdapter<FluxPost>{
     private List<FluxPost> posts = new ArrayList<FluxPost>();
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxContentAdapter.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
 
     public FluxContentAdapter(Activity follower,

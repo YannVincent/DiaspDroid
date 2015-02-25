@@ -1,41 +1,24 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.google.gson.Gson;
 
 import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import fr.android.scaron.diaspdroid.DeveloperKey;
-import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Image;
 import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.vues.fragment.WebViewSupportFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
 
 /**
@@ -43,7 +26,7 @@ import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
  */
 public class DetailPostView extends Fragment {
     private static Logger LOGGEUR = LoggerFactory.getLogger(DetailPostView.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static final int RECOVERY_DIALOG_REQUEST = 1;
 
     final String mimeType = "text/html";

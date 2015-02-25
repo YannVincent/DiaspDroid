@@ -26,7 +26,7 @@ public class DataControler extends DiasporaControler {
 
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(DataControler.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
 
 

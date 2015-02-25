@@ -21,7 +21,7 @@ import fr.android.scaron.diaspdroid.vues.adapter.PostOverviewAdapter;
 
 public class ListPostFragment extends ListFragment {
     private static Logger LOGGEUR = LoggerFactory.getLogger(ListPostFragment.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     private OnItemSelectedListener listener;
     ParseTask parseTask;

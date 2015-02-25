@@ -18,7 +18,7 @@ import fr.android.scaron.diaspdroid.controler.LogControler;
 public class YoutubeActivity extends  YouTubeFailureRecoveryActivity {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(YoutubeActivity.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     String idYoutubeVideo = "";
     YouTubePlayerFragment youTubePlayerFragment;
     @Override

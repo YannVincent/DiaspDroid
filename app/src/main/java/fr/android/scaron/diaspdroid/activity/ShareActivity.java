@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.async.http.Headers;
 import com.koushikdutta.ion.HeadersResponse;
-import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
@@ -32,14 +30,13 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.TinyDB;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 //@EActivity(R.layout.activity_share)
 public class ShareActivity extends ActionBarActivity {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ShareActivity.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -6,9 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.SparseArray;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Response;
 
@@ -16,20 +14,16 @@ import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.GroupList;
 import fr.android.scaron.diaspdroid.model.Pods;
-import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.model.TinyDB;
 import fr.android.scaron.diaspdroid.vues.adapter.PodListViewAdapter;
 
 /**
@@ -38,15 +32,7 @@ import fr.android.scaron.diaspdroid.vues.adapter.PodListViewAdapter;
 @EActivity(R.layout.pod_list)
 public class ParamsActivity extends ActionBarActivity {
     private static Logger LOGGEUR = LoggerFactory.getLogger(ParamsActivity.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
-
-    private TinyDB myDB;
-    String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-            "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
-            "Linux", "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux",
-            "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux", "OS/2",
-            "Android", "iPhone", "WindowsMobile" };
-
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     SparseArray<GroupList> groups = new SparseArray<GroupList>();
     PodListViewAdapter podListViewAdapter;
@@ -72,11 +58,17 @@ public class ParamsActivity extends ActionBarActivity {
         LOG.d(methodName+ "Sortie");
     }
 
+    @Override
+    public void onBackPressed() {
+        podConfigOKClicked();
+    }
+
 
 //    ListView pod_listview;
 
     @AfterViews
     void updateBarIcon() {
+        DiasporaConfig.addActivity(this);
         String methodName = ".updateBarIcon : ";
         LOG.d(methodName+ "Entrée");
         LOG.d(methodName+ "getActionBar");
@@ -142,6 +134,8 @@ public class ParamsActivity extends ActionBarActivity {
                 }
                 LOG.d(methodName+ "podsResponse ? " + podsResponse);
                 if (podsResponse!=null){
+                    LOG.d(methodName+ "podsResponse value? " + podsResponse.toString());
+
                     Pods pods = podsResponse.getResult();
 
                     LOG.e(methodName + "Pods ? : " + pods);

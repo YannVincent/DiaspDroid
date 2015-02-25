@@ -32,7 +32,7 @@ public class FluxContent {
     public static List<Post> POSTS = new ArrayList<Post>();
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxContent.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     /**
      * A map of sample (dummy) items, by ID.
      */

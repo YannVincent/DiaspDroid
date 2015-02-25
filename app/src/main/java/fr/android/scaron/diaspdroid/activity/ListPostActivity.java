@@ -7,24 +7,21 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
 import com.google.gson.Gson;
 
 import org.acra.ACRA;
-import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.vues.fragment.DetailPostFragment;
 import fr.android.scaron.diaspdroid.vues.fragment.ListPostFragment;
 
 public class ListPostActivity extends ActionBarActivity implements ListPostFragment.OnItemSelectedListener {
     private static Logger LOGGEUR = LoggerFactory.getLogger(ListPostActivity.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private boolean mHasOnePane;
     private Post mLastSelectedPost;
 //

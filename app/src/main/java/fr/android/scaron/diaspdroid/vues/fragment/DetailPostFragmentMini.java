@@ -37,7 +37,7 @@ import fr.android.scaron.diaspdroid.model.Post;
  */
 public class DetailPostFragmentMini extends Fragment {
     private static Logger LOGGEUR = LoggerFactory.getLogger(DetailPostFragmentMini.class);
-    private static LogControler LOG = LogControler.getInstance(LOGGEUR);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private View rootview;
     private WebView webview;
     private YoutubePlayerFragment youTubePlayerFragment;
