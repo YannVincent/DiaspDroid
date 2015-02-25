@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
+import org.androidannotations.annotations.EApplication;
 
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
@@ -19,9 +20,9 @@ import fr.android.scaron.diaspdroid.model.TinyDB;
         applicationLogFile = "/sdcard/Android/data/fr.scaron.diaspdroid/logs/diaspdroid.log",
         //customReportContent = { ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT },
 //        logcatArguments = { "-t", "100", "-v", "long", "ActivityManager:I", "MyApp:D", "*:S" }
-        logcatArguments = { "-t", "100", "-v", "long", "ActivityManager:I", "*:S" }
+//        logcatArguments = { "-t", "100", "-v", "long", "ActivityManager:I", "*:S" }
         //,
-        //logcatArguments = { "-t", "100", "-v", "long", "ActivityManager:I", "DiaspDroid:D", "*:S" }
+        logcatArguments = { "-t", "100", "-v", "long", "ActivityManager:I", "DiaspDroid:D", "*:S" }
 )
 public class DiaspDroid extends Application {
     @Override

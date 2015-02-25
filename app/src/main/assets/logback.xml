@@ -11,7 +11,7 @@
       <onMismatch>ACCEPT</onMismatch>
     </filter>
 
-	  <file>${LOG_DIR}/diaspdroid.log</file>
+	  <file>${LOG_DIR}/mainapplication.log</file>
       <includeCallerData>true</includeCallerData>
 
     <encoder>
