@@ -27,55 +27,69 @@
     <!--</application>-->
 
     <application
-        android:name=".DiaspDroid"
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-
-        <activity
-            android:name=".activity.DiaspActivity"
-            android:label="@string/app_name" >
+    android:icon="@drawable/ic_launcher"
+    android:label="@string/app_name"
+    android:name=".DiaspDroid"
+    android:theme="@style/AppTheme" >
+        <activity android:name=".activity.MainActivity"
+        android:label="@string/app_name"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.SEND" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<data android:mimeType="image/*" />-->
-            <!--</intent-filter>-->
-        </activity>
-
-        <activity
-            android:name=".activity.ShareActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <data android:mimeType="image/*" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.YoutubeActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.ParamsActivity_"
-            android:parentActivityName=".activity.DiaspActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-            >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.DiaspActivity" />
         </activity>
     </application>
+
+    <!--<application-->
+        <!--android:name=".DiaspDroid"-->
+        <!--android:allowBackup="true"-->
+        <!--android:icon="@drawable/ic_launcher"-->
+        <!--android:label="@string/app_name"-->
+        <!--android:theme="@style/AppTheme" >-->
+
+        <!--<activity-->
+            <!--android:name=".activity.DiaspActivity"-->
+            <!--android:label="@string/app_name" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+            <!--&lt;!&ndash;<intent-filter>&ndash;&gt;-->
+                <!--&lt;!&ndash;<action android:name="android.intent.action.SEND" />&ndash;&gt;-->
+                <!--&lt;!&ndash;<category android:name="android.intent.category.DEFAULT" />&ndash;&gt;-->
+                <!--&lt;!&ndash;<data android:mimeType="image/*" />&ndash;&gt;-->
+            <!--&lt;!&ndash;</intent-filter>&ndash;&gt;-->
+        <!--</activity>-->
+
+        <!--<activity-->
+            <!--android:name=".activity.ShareActivity"-->
+            <!--android:label="@string/app_name" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.SEND" />-->
+                <!--<data android:mimeType="image/*" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name=".activity.YoutubeActivity"-->
+            <!--android:label="@string/app_name" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--&lt;!&ndash;<category android:name="android.intent.category.LAUNCHER" />&ndash;&gt;-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name=".activity.ParamsActivity_"-->
+            <!--android:parentActivityName=".activity.DiaspActivity"-->
+            <!--android:windowSoftInputMode="stateHidden"-->
+            <!--android:label="@string/app_name" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--</intent-filter>-->
+            <!-->-->
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value=".activity.DiaspActivity" />-->
+        <!--</activity>-->
+    <!--</application>-->
 
 </manifest>
