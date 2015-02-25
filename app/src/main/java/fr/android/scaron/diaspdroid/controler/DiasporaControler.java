@@ -114,32 +114,48 @@ public class DiasporaControler {
     }
 
     public static void testerConnexion(){
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                boolean resultOK = DiasporaControler.onCompleteLogin(e, result);
-                if (resultOK){
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-                    final AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"OK",new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            DiasporaConfig.ParamsOK=true;
-                            Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
-                            DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
-                        }
-                    });
-                    alertDialog.setIcon(R.drawable.ic_launcher);
-                    alertDialog.setTitle("Connexion réussie");
-                    alertDialog.setMessage("Vos paramètres sont correctes.\nBon surf sur Diaspora !");
-                    alertDialog.show();
+        if ("Selectionnez votre POD".equals(DiasporaConfig.POD_URL)){
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+            final AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"OK",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int which) {
+                    alertDialog.dismiss();
                 }
-                return;
+            });
+            alertDialog.setIcon(R.drawable.ic_launcher);
+            alertDialog.setTitle("Paramètres incorrects");
+            alertDialog.setMessage("Il semble y avoir des erreurs !\n Veuillez vérifiers vos paramètres");
+            alertDialog.show();
+        }else {
+            //Callback d'envoi du formulaire de login
+            final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+                @Override
+                public void onCompleted(Exception e, Response<String> result) {
+                    boolean resultOK = DiasporaControler.onCompleteLogin(e, result);
+                    if (resultOK) {
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+                        final AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialog, final int which) {
+                                alertDialog.dismiss();
+                                DiasporaConfig.ParamsOK = true;
+                                Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
+                                DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
+                            }
+                        });
+                        alertDialog.setIcon(R.drawable.ic_launcher);
+                        alertDialog.setTitle("Connexion réussie");
+                        alertDialog.setMessage("Vos paramètres sont correctes.\nBon surf sur Diaspora !");
+                        alertDialog.show();
+                    }
+                    return;
 
-            }
-        };
-        DiasporaControler.login(loginCallback);
+                }
+            };
+            DiasporaControler.login(loginCallback);
+        }
     }
 
     public static void aimer(final int postID, final FutureCallback<Response<String>> aimerCallback, boolean forceRelogin){

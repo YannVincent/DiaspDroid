@@ -6,10 +6,12 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,8 @@ public class DiasporaConfig {
             POD_URL = url;
         }
         if (podlistJson!=null && !podlistJson.isEmpty()){
-            POD_LIST = new Gson().fromJson(podlistJson, Pods.class);
+            Type type = new TypeToken<Pods>(){}.getType();
+            POD_LIST = new Gson().fromJson(podlistJson, type);
             POD_LIST_JSON = podlistJson;
         }
         DiasporaControler.initParams();
@@ -71,7 +74,7 @@ public class DiasporaConfig {
             POD_LIST = pPods;
             POD_LIST_JSON = new Gson().toJson(pPods);
             DB.putString("diaspora_podlist", POD_LIST_JSON);
-            LOG.d("diasporta_podlist = "+POD_LIST_JSON);
+            LOG.d("diasporta_podlist = " + POD_LIST_JSON);
         }
     }
 
@@ -108,7 +111,7 @@ public class DiasporaConfig {
 
 
     public static void addActivity(Activity pActivity) {
-        finishActivities();
+        finishOtherActivities(pActivity);
         activities.add(pActivity);
     }
 
@@ -117,5 +120,14 @@ public class DiasporaConfig {
             activity.finish();
         }
         activities.clear();
+    }
+
+    public static void finishOtherActivities(Activity pActivity) {
+        for (Activity activity : activities) {
+            if (activity.getClass() != pActivity.getClass()){
+                activity.finish();
+            }
+            activities.clear();
+        }
     }
 }
