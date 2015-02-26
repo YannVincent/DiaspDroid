@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.vues.fragment.MainDrawerFragment_;
 
 
 @ReportsCrashes(
@@ -20,7 +19,7 @@ import fr.android.scaron.diaspdroid.vues.fragment.MainDrawerFragment_;
 )
 @EApplication
 public class MainApplication extends Application {
-    private static Logger LOGGEUR = LoggerFactory.getLogger(MainApplication_.class);
+    private static Logger LOGGEUR = LoggerFactory.getLogger(MainApplication.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     @Override
     public void onCreate() {
