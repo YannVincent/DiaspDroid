@@ -79,7 +79,7 @@ public class MySupportFragment extends Fragment {
 
 	@AfterViews
 	void calledAfterViewInjection() {
-
+        myTextView.setText("MySupportFragement loaded");
 	}
 
 }
