@@ -109,7 +109,7 @@ public class YoutubeControler {
                             videoView.setVideoURI(video);
 
                         } catch (Exception exception) {
-                            LOG.e(".getView Error : "+e.getMessage());
+                            LOG.e(".getView Error : "+e.getMessage(), e);
                             exception.printStackTrace();
                         }
 
@@ -232,7 +232,7 @@ public class YoutubeControler {
 //            }
 //            return cursor;
         } catch (Exception ex) {
-            LOG.e("Get Url Video RTSP Exception======>>" + ex.toString());
+            LOG.e("Get Url Video RTSP Exception======>>" + ex.toString(), ex);
         }
         return urlYoutube;
 

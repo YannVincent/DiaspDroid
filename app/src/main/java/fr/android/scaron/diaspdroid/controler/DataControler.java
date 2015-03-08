@@ -329,7 +329,7 @@ x-requested-with:XMLHttpRequest
             //x-csrf-token:nEkhdXfaVQIjPGGIHZZKtiOH5qiahOBlN/uIgWZjlp4=
 //            x-file-name:ic_launcher-web.png
         }catch(Throwable thr){
-            LOG.e(methodName + "Erreur : " + thr.toString());
+            LOG.e(methodName + "Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             LOG.d(methodName + "Sortie");
             throw thr;

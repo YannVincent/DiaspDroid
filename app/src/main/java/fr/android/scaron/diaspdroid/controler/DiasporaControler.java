@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.activity.DiaspActivity;
+//import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.Post;
@@ -141,8 +141,8 @@ public class DiasporaControler {
                             public void onClick(final DialogInterface dialog, final int which) {
                                 alertDialog.dismiss();
                                 DiasporaConfig.ParamsOK = true;
-                                Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
-                                DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
+//                                Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
+//                                DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
                             }
                         });
                         alertDialog.setIcon(R.drawable.ic_launcher);
@@ -306,7 +306,7 @@ public class DiasporaControler {
                         .withResponse()
                         .setCallback(callback);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
             }
         }
@@ -457,7 +457,7 @@ public class DiasporaControler {
                         .withResponse()
                         .setCallback(callback);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
             }
         }
@@ -611,7 +611,7 @@ public class DiasporaControler {
                     .withResponse()
                     .setCallback(callback);
         }catch(Throwable thr){
-            LOG.e("Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
         }
         LOG.d(".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
@@ -653,10 +653,10 @@ public class DiasporaControler {
                         .withResponse()
                         .setCallback(callback);
             } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString());
+                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
                 ACRA.getErrorReporter().handleException(ioex);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
                 LOG.d(methodName + "Sortie");
                 throw thr;
@@ -687,7 +687,7 @@ public class DiasporaControler {
                         .withResponse()
                         .setCallback(callback);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
                 LOG.d(methodName + "Sortie");
                 throw thr;
@@ -732,10 +732,10 @@ public class DiasporaControler {
                         .setCallback(callback);
 
             } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString());
+                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
                 ACRA.getErrorReporter().handleException(ioex);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
                 LOG.d(methodName + "Sortie");
                 throw thr;
@@ -778,10 +778,10 @@ public class DiasporaControler {
                         .setCallback(callback);
 
             } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString());
+                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
                 ACRA.getErrorReporter().handleException(ioex);
             } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString());
+                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
                 ACRA.getErrorReporter().handleException(thr);
                 LOG.d(methodName + "Sortie");
                 throw thr;

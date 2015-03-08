@@ -83,7 +83,7 @@ public class ShareActivity extends ActionBarActivity {
                                 alertDialog.show();
                                 shareText.setText("Le partage de la photo a échouéé");
                                 LOG.d(ShareActivity.class , "shareCallback, cause exception ? " + e.getCause().getMessage());
-                                LOG.e("Callback flux, Erreur : " + e.getMessage());
+                                LOG.e("Callback flux, Erreur : " + e.getMessage(), e);
                                 if (e.getCause()!=null) {
                                     LOG.e("shareCallback, cause exception ? " + e.getCause().getMessage());
                                 }
@@ -112,7 +112,7 @@ public class ShareActivity extends ActionBarActivity {
                                 alertDialog.setMessage("Votre publication a échouée\n("+ e.getMessage()+")");
                                 alertDialog.show();
                                 shareText.setText("Le partage de la photo a échouéé");
-                                LOG.e("Callback flux, Erreur : " + e.getMessage());
+                                LOG.e("Callback flux, Erreur : " + e.getMessage(),e);
                                 if (e.getCause()!=null){
                                     LOG.e("shareCallback, cause exception ? " + e.getCause().getMessage());
                                 }

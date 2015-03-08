@@ -77,7 +77,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             setPosts(posts);
             LOG.d("DetailPostFragmentAdapter sortie");
         } catch (Throwable thr) {
-            LOG.e(".DetailPostFragmentAdapter Erreur : " + thr.toString());
+            LOG.e(".DetailPostFragmentAdapter Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -97,7 +97,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             super.notifyDataSetChanged();
             LOG.d(".setPosts sortie");
         } catch (Throwable thr) {
-            LOG.e(".setPosts Erreur : "+thr.toString());
+            LOG.e(".setPosts Erreur : "+thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -110,7 +110,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             LOG.d(".getCount sortie return size = "+posts.size());
             return posts.size();
         } catch (Throwable thr) {
-            LOG.e(".getCount Erreur : "+thr.toString());
+            LOG.e(".getCount Erreur : "+thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -130,7 +130,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             LOG.d(".getItemId sortie with id = "+posts.get(position).getId().longValue());
             return posts.get(position).getId().longValue();
         } catch (Throwable thr) {
-            LOG.e(".getItemId Erreur : "+thr.toString());
+            LOG.e(".getItemId Erreur : "+thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -337,7 +337,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
             LOG.d(".getView sortie with convertView = "+convertView);
             return convertView;
         } catch (Throwable thr) {
-            LOG.e("getView Erreur : "+thr.toString());
+            LOG.e("getView Erreur : "+thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -693,7 +693,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
 //            texte.loadDataWithBaseURL("file:///android_asset/", sbHtml.toString(), mimeType, encoding, "");
             LOG.d(".setPost sortie en succès");
         }catch(Throwable thr) {
-            LOG.e(".setPost sortie en Erreur ("+thr.toString()+")");
+            LOG.e(".setPost sortie en Erreur ("+thr.toString()+")", thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -766,47 +766,6 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
         public void onThumbnailError(YouTubeThumbnailView view, YouTubeThumbnailLoader.ErrorReason errorReason) {
             view.setImageResource(R.drawable.no_thumbnail);
         }
-    }
-
-    public void setYoutubeVideo(final String urlSrc, FragmentTransaction sfmTx, YoutubePlayerFragment youTubePlayerFragment){
-        LOG.d(".setYoutubeVideo entree avec l'id : "+urlSrc);
-        try {
-            LOG.d(".setYoutubeVideo find youtube fragment with id  R.id.detailPostObjectData");
-
-            LOG.d(".setYoutubeVideo add add(R.id.detailPostObjectData, youTubePlayerFragment) in FragmentTransaction");
-            sfmTx.replace(R.id.detailPostObjectData, youTubePlayerFragment);
-            sfmTx.commit();
-
-            LOG.d(".setYoutubeVideo create youtubeListener");
-            YouTubePlayer.OnInitializedListener youtubeListener = new YouTubePlayer.OnInitializedListener() {
-                @Override
-                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player,
-                                                    boolean wasRestored) {
-//                    if (!wasRestored) {
-                    LOG.d(".onInitializationSuccess ID de la vidéo récoltée '" + urlSrc + "'");
-                    player.cueVideo(urlSrc);
-//                    }
-                }
-                @Override
-                public void onInitializationFailure(YouTubePlayer.Provider provider,
-                                                    YouTubeInitializationResult errorReason) {
-                    if (errorReason.isUserRecoverableError()) {
-                        errorReason.getErrorDialog(follower, RECOVERY_DIALOG_REQUEST).show();
-                    } else {
-                        String errorMessage = String.format(follower.getString(R.string.error_player), errorReason.toString());
-                        Toast.makeText(follower, errorMessage, Toast.LENGTH_LONG).show();
-                    }
-                }
-            };
-            LOG.d(".setYoutubeVideo initialize api youTubePlayerFragment");
-            youTubePlayerFragment.initialize(DeveloperKey.DEVELOPER_KEY, youtubeListener);
-            LOG.d(".setYoutubeVideo initialized api youTubePlayerFragment");
-        }catch(Throwable thr) {
-            LOG.e(".setYoutubeVideo sortie en Erreur ("+thr.toString()+")");
-            ACRA.getErrorReporter().handleException(thr);
-            throw thr;
-        }
-        LOG.d(".setYoutubeVideo sortie");
     }
 
 }

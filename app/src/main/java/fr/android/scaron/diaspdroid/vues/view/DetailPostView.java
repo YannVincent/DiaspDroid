@@ -74,7 +74,7 @@ public class DetailPostView extends Fragment {
                 webvideo.setScrollbarFadingEnabled(false);
             }
         }catch(Throwable thr) {
-            LOG.e(".setWebVideo sortie en Erreur ("+thr.toString()+")");
+            LOG.e(".setWebVideo sortie en Erreur ("+thr.toString()+")", thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
@@ -112,7 +112,7 @@ public class DetailPostView extends Fragment {
 //            texte.loadDataWithBaseURL("file:///android_asset/", sbHtml.toString(), mimeType, encoding, "");
             LOG.d(".setPost sortie en succès");
         }catch(Throwable thr) {
-            LOG.e(".setPost sortie en Erreur ("+thr.toString()+")");
+            LOG.e(".setPost sortie en Erreur ("+thr.toString()+")", thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

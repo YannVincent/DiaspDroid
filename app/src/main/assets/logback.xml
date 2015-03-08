@@ -3,7 +3,6 @@
 <configuration>
     <property name="LOG_DIR" value="/sdcard/Android/data/fr.scaron.diaspdroid/logs" />
 
-
   <appender name="DiaspDroid" class="ch.qos.logback.core.FileAppender">
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>DEBUG</level>

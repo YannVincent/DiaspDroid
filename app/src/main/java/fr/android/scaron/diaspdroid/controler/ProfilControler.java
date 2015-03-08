@@ -26,7 +26,7 @@ public class ProfilControler extends DiasporaControler {
 //          .error(R.drawable.placeholder_image)
                     .load(imagePath);
         }catch(Throwable thr){
-            LOG.e("Erreur : " + thr.toString());
+            LOG.e("Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }

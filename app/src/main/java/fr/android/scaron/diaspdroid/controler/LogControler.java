@@ -2,6 +2,7 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.util.Log;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,4 +71,13 @@ public class LogControler {
         log.error(message);
         Log.e("app:fr.android.scaron.diaspdroid ("+className+")", className+" : "+message);
     }
+
+
+    public void e(String message, Throwable exception){
+        String stack = ExceptionUtils.getStackTrace(exception);
+        log.error(message+"\n--- stack ---"+stack+"-------------");
+        Log.e("app:fr.android.scaron.diaspdroid ("+className+")", className+" : "+message);
+    }
+
+
 }
