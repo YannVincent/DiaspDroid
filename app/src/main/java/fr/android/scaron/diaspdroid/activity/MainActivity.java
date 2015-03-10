@@ -2,11 +2,17 @@ package fr.android.scaron.diaspdroid.activity;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -23,7 +29,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.vues.fragment.FluxFrag_;
+import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ParamsFragment_;
 
 /**
@@ -38,6 +44,7 @@ public class MainActivity extends ActionBarActivity {
     boolean listItemClicked=false;
     String[] drawerArray;
     private List<String> drawerItems;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @ViewById(R.id.diaspora_main)
     DrawerLayout diasporaMain;
@@ -51,7 +58,8 @@ public class MainActivity extends ActionBarActivity {
     @AfterViews
     void init(){
         String TAG_METHOD = ".init -> ";
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
         LOG.d(TAG + TAG_METHOD + "entrée");
         try{
             LOG.d(TAG + TAG_METHOD + "Add Activity in Config : " + this);
@@ -64,6 +72,25 @@ public class MainActivity extends ActionBarActivity {
             // Set the adapter for the list view
             diasporaMainDrawer.setAdapter(new ArrayAdapter<String>(this,
                     R.layout.drawer_list_item, drawerArray));
+
+            mDrawerToggle = new ActionBarDrawerToggle(
+                    this,                  /* host Activity */
+                    diasporaMain,         /* DrawerLayout object */
+                    R.string.navigation_drawer_open,  /* "open drawer" description */
+                    R.string.navigation_drawer_close  /* "close drawer" description */
+            ) {
+                public void onDrawerClosed(View view) {
+                    super.onDrawerClosed(view);
+//                    getActionBar().setTitle(mTitle);
+                }
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+//                    getActionBar().setTitle(mDrawerTitle);
+                }
+            };
+            diasporaMain.setDrawerListener(mDrawerToggle);
+
+
             //On selectionne la vue Flux par défaut
             listItemClicked(drawerItems.get(0));
         }catch(Throwable thr) {
@@ -108,8 +135,9 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, new FluxFrag_())
+                .replace(R.id.diaspora_main_content, new FluxFragment_())
                 .commit();
+        setActionBarMain();
     }
     void setParamsFragment(String title, int position){
         // update the main content by replacing fragments
@@ -117,6 +145,43 @@ public class MainActivity extends ActionBarActivity {
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, new ParamsFragment_())
                 .commit();
+        resetActionBarMain(title);
+    }
+
+    void resetActionBarMain(String title){
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(title);
+    }
+
+    void setActionBarMain(){
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.actionbar_main, null);
+        TextView mTitleTextView = (TextView) mCustomView.findViewById(R.id.actbar_name);
+        mTitleTextView.setText("My Own Title");
+
+        LinearLayout actbarDrawerBtn = (LinearLayout) mCustomView
+                .findViewById(R.id.actbar_drawer_btn);
+        actbarDrawerBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (diasporaMain.isDrawerOpen(diasporaMainDrawer)) {
+                    diasporaMain.closeDrawer(diasporaMainDrawer);
+                }else{
+                    diasporaMain.openDrawer(diasporaMainDrawer);
+                }
+            }
+        });
+
+        actionBar.setCustomView(mCustomView);
+        actionBar.setDisplayShowCustomEnabled(true);
     }
 
 

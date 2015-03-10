@@ -25,9 +25,9 @@ import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
 
 @EFragment(R.layout.fragment_flux_list)
-public class FluxFrag extends Fragment {
+public class FluxFragment extends Fragment {
 
-    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFrag.class);
+    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
     @ViewById(R.id.fragment_flux_list)
@@ -50,7 +50,7 @@ public class FluxFrag extends Fragment {
                 @Override
                 public void onCompleted(Exception e, Response<List<Post>> posts) {
 
-                    LOG.d(FluxFrag.class, "Callback flux, exception ? " + e);
+                    LOG.d(FluxFragment.class, "Callback flux, exception ? " + e);
                     if (e!=null){
                         e.printStackTrace();
                     }
@@ -61,7 +61,7 @@ public class FluxFrag extends Fragment {
                         alertDialog.setTitle("PB Données");
                         alertDialog.setMessage("La récupétion de votre flux a échouée");
                         alertDialog.show();
-                        LOG.d(FluxFrag.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
+                        LOG.d(FluxFragment.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
                     }
                     if (posts!=null){
                         adapter.setPosts(DiasporaControler.onCompleteStream(e, posts));

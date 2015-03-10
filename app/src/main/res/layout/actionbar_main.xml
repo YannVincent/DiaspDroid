@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <LinearLayout  android:id="@+id/actbar_drawer_btn"
+                  android:orientation="horizontal"
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent">
+    <ImageView android:id="@+id/actbar_drawer_icon"
+        android:layout_width="24sp"
+        android:layout_height="24sp"
+        android:layout_marginTop="20sp"
+        android:src="@drawable/ic_drawer"/>
+    <!--<ImageView android:id="@+id/actbar_lancher_icon"-->
+        <!--android:layout_width="34sp"-->
+        <!--android:layout_height="34sp"-->
+        <!--android:layout_marginTop="8sp"-->
+        <!--android:layout_marginLeft="-12sp"-->
+        <!--android:layout_toRightOf="@id/actbar_drawer_icon"-->
+        <!--android:src="@drawable/ic_launcher"/>-->
+        </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_toRightOf="@id/actbar_drawer_btn"
+        android:layout_marginLeft="12sp"
+        android:layout_height="64sp">
+
+        <ImageView android:id="@+id/actbar_avatar_icon"
+                   android:layout_width="64sp"
+                   android:layout_height="64sp"
+                   android:background="#ffffff"
+                   android:padding="0.1px"
+                   android:src="@drawable/ic_launcher"/>
+        <TextView android:id="@+id/actbar_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Sebastien Caron"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_toRightOf="@id/actbar_avatar_icon"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginLeft="@dimen/margin_medium"
+            />
+        <TextView android:id="@+id/actbar_adress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="tilucifer@framasphere.org"
+            android:textColor="@color/secondary_text_default_material_dark"
+            android:layout_toRightOf="@id/actbar_avatar_icon"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_below="@id/actbar_name"
+            />
+        </RelativeLayout>
+</LinearLayout>
