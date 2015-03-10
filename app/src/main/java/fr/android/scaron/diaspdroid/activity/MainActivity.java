@@ -150,16 +150,18 @@ public class MainActivity extends ActionBarActivity {
 
     void resetActionBarMain(String title){
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(false);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+//        actionBar.setDisplayShowCustomEnabled(false);
+//        actionBar.setDisplayShowHomeEnabled(true);
+//        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(title);
     }
 
     void setActionBarMain(){
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
+//        actionBar.setDisplayShowHomeEnabled(false);
+//        actionBar.setDisplayShowTitleEnabled(false);
         LayoutInflater mInflater = LayoutInflater.from(this);
 
         View mCustomView = mInflater.inflate(R.layout.actionbar_main, null);
@@ -181,7 +183,7 @@ public class MainActivity extends ActionBarActivity {
         });
 
         actionBar.setCustomView(mCustomView);
-        actionBar.setDisplayShowCustomEnabled(true);
+//        actionBar.setDisplayShowCustomEnabled(true);
     }
 
 
