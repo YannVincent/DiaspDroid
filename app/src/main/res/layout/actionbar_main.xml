@@ -3,26 +3,28 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <LinearLayout  android:id="@+id/actbar_drawer_btn"
-                  android:orientation="horizontal"
-                  android:layout_width="wrap_content"
-                  android:layout_height="match_parent">
-    <ImageView android:id="@+id/actbar_drawer_icon"
-        android:layout_width="24sp"
-        android:layout_height="24sp"
-        android:layout_marginTop="20sp"
-        android:src="@drawable/ic_drawer"/>
-    <!--<ImageView android:id="@+id/actbar_lancher_icon"-->
-        <!--android:layout_width="34sp"-->
-        <!--android:layout_height="34sp"-->
-        <!--android:layout_marginTop="8sp"-->
-        <!--android:layout_marginLeft="-12sp"-->
-        <!--android:layout_toRightOf="@id/actbar_drawer_icon"-->
-        <!--android:src="@drawable/ic_launcher"/>-->
-        </LinearLayout>
+    <!--<LinearLayout  android:id="@+id/actbar_drawer_btn"-->
+                  <!--android:orientation="horizontal"-->
+                  <!--android:layout_width="wrap_content"-->
+                  <!--android:layout_height="match_parent">-->
+    <!--<ImageView android:id="@+id/actbar_drawer_icon"-->
+        <!--android:layout_width="24sp"-->
+        <!--android:layout_height="24sp"-->
+        <!--android:layout_marginTop="20sp"-->
+        <!--android:src="@drawable/ic_drawer"/>-->
+    <!--&lt;!&ndash;<ImageView android:id="@+id/actbar_lancher_icon"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="34sp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="34sp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_marginTop="8sp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_marginLeft="-12sp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_toRightOf="@id/actbar_drawer_icon"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:src="@drawable/ic_launcher"/>&ndash;&gt;-->
+        <!--</LinearLayout>-->
+
+    <!--
+        android:layout_toRightOf="@id/actbar_drawer_btn" -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_toRightOf="@id/actbar_drawer_btn"
         android:layout_marginLeft="12sp"
         android:layout_height="64sp">
 

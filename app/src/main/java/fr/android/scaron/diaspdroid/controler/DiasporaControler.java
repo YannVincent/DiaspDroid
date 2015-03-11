@@ -3,7 +3,6 @@ package fr.android.scaron.diaspdroid.controler;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
@@ -24,11 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
-//import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
+
+//import fr.android.scaron.diaspdroid.activity.DiaspActivity;
 
 /**
  * Created by Sébastien on 24/01/2015.
@@ -41,7 +41,7 @@ public class DiasporaControler {
     static String PODLIST_URL = "http://podupti.me/api.php?key=4r45tg&format=json";
 
     static String POD = "framasphere.org";
-    static String POD_URL = "https://"+POD;
+    public static String POD_URL = "https://"+POD;
     static String POD_USER = "tilucifer";
     static String POD_PASSWORD = "tilucifer";
     static String LOGIN_URL = POD_URL+"/users/sign_in";
