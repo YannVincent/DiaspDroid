@@ -42,6 +42,7 @@ public class FluxFragment extends Fragment {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+    private static String TAG = "FluxFragment";
     @RestService
     UserPublicPostsService restClient;
     @Bean
@@ -58,6 +59,8 @@ public class FluxFragment extends Fragment {
 
     @Background
     void getInfosUserForBar(){
+        String TAG_METHOD = TAG + ".getInfosUserForBar : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         restClient.setRootUrl(DiasporaControler.POD_URL);
         List<Post> postsUser = restClient.getInfo("tilucifer");
         Post first = postsUser.get(0);
@@ -68,9 +71,12 @@ public class FluxFragment extends Fragment {
         serviceControler.seLogguer();
 
         updateActionBar(userName, userAdress, userAvatar);
+        LOG.d(TAG_METHOD+ "Sortie");
     }
     @UiThread
     void updateActionBar(String userName, String userAdress, String userAvatar){
+        String TAG_METHOD = TAG + ".updateActionBar : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
 ////        actionBar.setDisplayShowHomeEnabled(false);
@@ -87,6 +93,7 @@ public class FluxFragment extends Fragment {
         ProfilControler.putImage(mTitleAvatarView, userAvatar);
         actionBar.setCustomView(mCustomView);
 //        actionBar.setDisplayShowCustomEnabled(true);
+        LOG.d(TAG_METHOD+ "Sortie");
     }
     @AfterViews
     void bindAdapter() {
@@ -95,18 +102,23 @@ public class FluxFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        String TAG_METHOD = TAG + ".onCreate : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         try{
             super.onCreate(savedInstanceState);
+            LOG.d(TAG_METHOD+ "call getInfosUserForBar");
             getInfosUserForBar();
 
 
 
+            LOG.d(TAG_METHOD+ "create fluxCallback");
             //Callback de la récupération du flux
             final FutureCallback<Response<List<Post>>> fluxCallback = new FutureCallback<Response<List<Post>>>() {
                 @Override
                 public void onCompleted(Exception e, Response<List<Post>> posts) {
 
-                    LOG.d(FluxFragment.class, "Callback flux, exception ? " + e);
+                    String TAG_METHOD = TAG + ".fluxCallback.onCompleted : ";
+                    LOG.d(TAG_METHOD+ "exception ? " + e);
                     if (e!=null){
                         e.printStackTrace();
                     }
@@ -117,25 +129,28 @@ public class FluxFragment extends Fragment {
                         alertDialog.setTitle("PB Données");
                         alertDialog.setMessage("La récupétion de votre flux a échouée");
                         alertDialog.show();
-                        LOG.d(FluxFragment.class , "Callback flux, cause exception ? " + e.getCause().getMessage());
+                        LOG.d(TAG_METHOD+ "cause exception ? " + e.getCause().getMessage());
                     }
                     if (posts!=null){
                         adapter.setPosts(DiasporaControler.onCompleteStream(e, posts));
                         return;
                     }
-                    LOG.e("Callback flux, Erreur : " + e.toString());
+                    LOG.e(TAG_METHOD+ "Erreur : " + e.toString());
                     if (e.getCause()!=null) {
-                        LOG.e("Callback flux, cause exception ? " + e.getCause().getMessage());
+                        LOG.e(TAG_METHOD+ "cause exception ? " + e.getCause().getMessage());
                     }
                     ACRA.getErrorReporter().handleException(e);
                 }
             };
 
+            LOG.d(TAG_METHOD+ "call getStreamFlow");
             DiasporaControler.getStreamFlow(fluxCallback, false);
+            LOG.d(TAG_METHOD+ "create DetailPostViewAdapter");
             adapter = new DetailPostViewAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
         } catch (Throwable thr) {
-            LOG.e("Erreur : " + thr.toString());
+            LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
+            LOG.d(TAG_METHOD+ "Sortie");
             throw thr;
         }
     }

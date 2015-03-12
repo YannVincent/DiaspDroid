@@ -28,7 +28,7 @@ public interface LoginService {
     @Accept(MediaType.APPLICATION_FORM_URLENCODED)
     @RequiresHeader("x-csrf-token")
     @RequiresCookie("_diaspora_session")
-    String postLogin(String userName, String userPassword);
+    String postLogin();
 
 
 

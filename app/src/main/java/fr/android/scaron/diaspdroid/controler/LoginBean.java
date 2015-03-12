@@ -49,7 +49,7 @@ public class LoginBean {
             return resultKO;
         }
         loginService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
-        String loggued = loginService.postLogin(DiasporaControler.POD_USER, DiasporaControler.POD_PASSWORD);
+        String loggued = loginService.postLogin();
 
         LOG.d(TAG_METHOD+ "Login obtenu ? "+loggued);
         LOG.d(TAG_METHOD+ "Sortie");
