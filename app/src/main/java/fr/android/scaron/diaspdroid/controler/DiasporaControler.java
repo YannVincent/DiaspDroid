@@ -141,6 +141,7 @@ public class DiasporaControler {
                             public void onClick(final DialogInterface dialog, final int which) {
                                 alertDialog.dismiss();
                                 DiasporaConfig.ParamsOK = true;
+                                DiasporaConfig.DB.putBoolean("configOK", true);
 //                                Intent intent = new Intent(DiasporaConfig.APPLICATION_CONTEXT, DiaspActivity.class);
 //                                DiasporaConfig.APPLICATION_CONTEXT.startActivity(intent);
                             }

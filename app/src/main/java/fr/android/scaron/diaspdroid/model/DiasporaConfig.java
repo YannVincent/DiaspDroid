@@ -49,6 +49,7 @@ public class DiasporaConfig {
         final String password=DiasporaConfig.DB.getString("diaspora_password");
         final String url=DiasporaConfig.DB.getString("diaspora_pod");
         final String podlistJson=DiasporaConfig.DB.getString("diaspora_podlist");
+        final Boolean configOK=DiasporaConfig.DB.getBoolean("configOK");
 
         if (user!=null && !user.isEmpty()){
             POD_USER = user;
@@ -63,6 +64,9 @@ public class DiasporaConfig {
             Type type = new TypeToken<Pods>(){}.getType();
             POD_LIST = new Gson().fromJson(podlistJson, type);
             POD_LIST_JSON = podlistJson;
+        }
+        if (configOK!=null){
+            ParamsOK = configOK;
         }
         DiasporaControler.initParams();
         CookieControler.init();

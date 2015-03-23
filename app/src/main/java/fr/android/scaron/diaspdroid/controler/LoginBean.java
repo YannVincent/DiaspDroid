@@ -25,6 +25,7 @@ public class LoginBean {
 
     @AfterInject
     public void init(){
+        loginService.setRootUrl(DiasporaControler.POD_URL);
         if (DiasporaControler.COOKIE_SESSION_STREAM!=null && !DiasporaControler.COOKIE_SESSION_STREAM.isEmpty()) {
             loginService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_STREAM);
         }else if (DiasporaControler.COOKIE_SESSION_LOGIN!=null && !DiasporaControler.COOKIE_SESSION_LOGIN.isEmpty()) {

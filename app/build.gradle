@@ -59,7 +59,8 @@ dependencies {
 //    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.+'
 //    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.+'
 //    common 'log4j:log4j:1.2.14'
-
+    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
     androidTestCompile 'junit:junit:4.10'
 }
 

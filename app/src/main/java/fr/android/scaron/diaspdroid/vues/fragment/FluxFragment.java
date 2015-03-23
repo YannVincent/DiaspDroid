@@ -68,7 +68,9 @@ public class FluxFragment extends Fragment {
         String userAdress = first.getAuthor().getDiaspora_id();
 
         String userAvatar = first.getAuthor().getAvatar().getLarge();
-        serviceControler.seLogguer();
+
+//        //TODO VALIDER CE TEST
+//        serviceControler.seLogguer();
 
         updateActionBar(userName, userAdress, userAvatar);
         LOG.d(TAG_METHOD+ "Sortie");

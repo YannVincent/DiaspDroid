@@ -18,6 +18,10 @@
     </encoder>
   </appender>
 
+  <logger name="org.springframework.web" level="DEBUG" additivity="false">
+      <appender-ref ref="DiaspDroid" />
+  </logger>
+
   <!-- Write DEBUG messages from class B to its own log -->
   <logger name="fr.android.scaron.diaspdroid" level="DEBUG" additivity="false">
     <appender-ref ref="DiaspDroid" />
