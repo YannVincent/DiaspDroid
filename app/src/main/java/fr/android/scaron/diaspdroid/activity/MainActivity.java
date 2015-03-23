@@ -82,8 +82,13 @@ public class MainActivity extends ActionBarActivity {
             setUpDrawer();
 
 
-            //On selectionne la vue Flux par défaut
-            listItemClicked(drawerItems.get(0));
+            if (DiasporaConfig.ParamsOK) {
+                //On selectionne la vue Flux par défaut
+                listItemClicked(drawerItems.get(0));
+            }else{
+                //On selectionne la vue Paramètres par défaut
+                listItemClicked(drawerItems.get(3));
+            }
         }catch(Throwable thr) {
             LOG.e(TAG + TAG_METHOD + "Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);

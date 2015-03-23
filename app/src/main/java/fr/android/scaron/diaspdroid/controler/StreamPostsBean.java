@@ -3,6 +3,7 @@ package fr.android.scaron.diaspdroid.controler;
 import android.content.Context;
 
 import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.rest.RestService;
@@ -17,13 +18,16 @@ public class StreamPostsBean {
 
     @RestService
     StreamPostsService streamPostsService;
+    @Bean
+    ErrorHandlerBean errorHandlerBean;
 
     @AfterInject
     public void init(){
+        streamPostsService.setRestErrorHandler(errorHandlerBean);
         if (DiasporaControler.COOKIE_REMEMBER!=null && !DiasporaControler.COOKIE_REMEMBER.isEmpty()) {
             streamPostsService.setCookie("remember_user_token", DiasporaControler.COOKIE_REMEMBER);
-        }else if (DiasporaControler.COOKIE_SESSION_STREAM!=null && !DiasporaControler.COOKIE_SESSION_STREAM.isEmpty()) {
-            streamPostsService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_STREAM);
+//        }else if (DiasporaControler.COOKIE_SESSION_STREAM!=null && !DiasporaControler.COOKIE_SESSION_STREAM.isEmpty()) {
+//            streamPostsService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_STREAM);
         }else if (DiasporaControler.COOKIE_SESSION_LOGIN!=null && !DiasporaControler.COOKIE_SESSION_LOGIN.isEmpty()) {
             streamPostsService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_LOGIN);
         } else if (DiasporaControler.COOKIE_SESSION_TOKEN!=null && !DiasporaControler.COOKIE_SESSION_TOKEN.isEmpty()) {

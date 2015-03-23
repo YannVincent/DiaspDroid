@@ -6,6 +6,7 @@ import org.androidannotations.annotations.rest.RequiresCookie;
 import org.androidannotations.annotations.rest.RequiresHeader;
 import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.api.rest.MediaType;
+import org.androidannotations.api.rest.RestClientErrorHandling;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import fr.android.scaron.diaspdroid.model.Post;
  */
 @Rest(converters={GsonHttpMessageConverter.class})
 @Accept(MediaType.APPLICATION_JSON)
-public interface StreamPostsService {
+public interface StreamPostsService extends RestClientErrorHandling {
 
     @Get("/stream")
     @RequiresCookie("remember_user_token")

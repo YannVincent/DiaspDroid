@@ -1,7 +1,6 @@
 package fr.android.scaron.diaspdroid.model;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 
@@ -15,7 +14,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.CookieControler;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
@@ -49,6 +47,7 @@ public class DiasporaConfig {
         final String password=DiasporaConfig.DB.getString("diaspora_password");
         final String url=DiasporaConfig.DB.getString("diaspora_pod");
         final String podlistJson=DiasporaConfig.DB.getString("diaspora_podlist");
+        final Boolean configOK = DiasporaConfig.DB.getBoolean("configOK");
 
         if (user!=null && !user.isEmpty()){
             POD_USER = user;
@@ -63,6 +62,9 @@ public class DiasporaConfig {
             Type type = new TypeToken<Pods>(){}.getType();
             POD_LIST = new Gson().fromJson(podlistJson, type);
             POD_LIST_JSON = podlistJson;
+        }
+        if (configOK!=null){
+            ParamsOK = configOK.booleanValue();
         }
         DiasporaControler.initParams();
         CookieControler.init();
