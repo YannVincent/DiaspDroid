@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.Trace;

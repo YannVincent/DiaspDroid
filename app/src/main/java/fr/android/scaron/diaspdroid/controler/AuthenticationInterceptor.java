@@ -4,6 +4,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -14,9 +15,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.List;
 
 /**
- * Created by CARON-08651 on 11/03/2015.
+ * Created by Sébastien on 11/03/2015.
  */
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
@@ -32,11 +34,13 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String TAG_METHOD = TAG + ".intercept : ";
         LOG.d(TAG_METHOD+ "Entrée");
-        //UnsupportedOperationException donc on commente
-//        HttpHeaders httpHeaders = request.getHeaders();
-//        if (httpHeaders!=null) {
-//            List<String> cookies = httpHeaders.get("coookie");
-//            LOG.d(TAG_METHOD + "cookies found ? " + (cookies!=null));
+        HttpHeaders httpHeaders = request.getHeaders();
+        if (httpHeaders!=null) {
+            List<String> cookies = httpHeaders.get("coookie");
+            LOG.d(TAG_METHOD + "cookies found ? " + (cookies!=null));
+            LOG.d(TAG_METHOD + "cookies : " + cookies);
+
+//        //UnsupportedOperationException donc on commente
 //            if (cookies==null){
 //                StringBuilder cookieValueSB = new StringBuilder();
 //                boolean cookieRememberAdded = false;
@@ -54,7 +58,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
 //            }
 //            cookies = httpHeaders.get("coookie");
 //            LOG.d(TAG_METHOD + "cookies added found ? " + (cookies!=null));
-//        }
+        }
         StringBuilder sbBody = new StringBuilder();//new String(body, Charset.forName("UTF-8")));
         if (request.getMethod()== HttpMethod.POST) {
             sbBody.append(ulrEncode("user[username]")+"=" + ulrEncode(authenticationStore.getUsername()));

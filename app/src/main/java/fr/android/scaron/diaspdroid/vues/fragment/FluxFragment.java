@@ -33,6 +33,7 @@ import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.controler.RestServiceControler;
+import fr.android.scaron.diaspdroid.controler.StreamPostsBean;
 import fr.android.scaron.diaspdroid.controler.UserPublicPostsService;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
@@ -71,6 +72,12 @@ public class FluxFragment extends Fragment {
 
 //        //TODO VALIDER CE TEST
 //        serviceControler.seLogguer();
+        //for test full rest getstream
+        LOG.d(TAG_METHOD+ "call serviceControler.getStream");
+        List<Post> posts = serviceControler.getStream();
+        if (posts!=null) {
+            adapter.setPosts(posts);
+        }
 
         updateActionBar(userName, userAdress, userAvatar);
         LOG.d(TAG_METHOD+ "Sortie");
@@ -145,10 +152,12 @@ public class FluxFragment extends Fragment {
                 }
             };
 
-            LOG.d(TAG_METHOD+ "call getStreamFlow");
-            DiasporaControler.getStreamFlow(fluxCallback, false);
+//            //Commented for test
+//            LOG.d(TAG_METHOD+ "call getStreamFlow");
+//            DiasporaControler.getStreamFlow(fluxCallback, false);
             LOG.d(TAG_METHOD+ "create DetailPostViewAdapter");
             adapter = new DetailPostViewAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
+
         } catch (Throwable thr) {
             LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);

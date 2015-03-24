@@ -5,6 +5,7 @@ import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.RequiresCookie;
 import org.androidannotations.annotations.rest.RequiresHeader;
 import org.androidannotations.annotations.rest.Rest;
+import org.androidannotations.annotations.rest.SetsCookie;
 import org.androidannotations.api.rest.MediaType;
 import org.androidannotations.api.rest.RestClientErrorHandling;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
@@ -21,8 +22,9 @@ import fr.android.scaron.diaspdroid.model.Post;
 public interface StreamPostsService extends RestClientErrorHandling {
 
     @Get("/stream")
-    @RequiresCookie("remember_user_token")
-    @RequiresHeader("x-csrf-token")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+//    @RequiresHeader("x-csrf-token")
     List<Post> getStream();
 
     void setRootUrl(String rootUrl);
