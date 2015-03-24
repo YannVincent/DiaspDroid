@@ -3,11 +3,14 @@ package fr.android.scaron.diaspdroid.controler;
 import android.content.Context;
 
 import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 
 /**
  * Created by Sébastien on 11/03/2015.
@@ -22,10 +25,12 @@ public class LoginBean {
 
     @RestService
     LoginService loginService;
+    @Bean
+    ErrorHandlerBean errorHandlerBean;
 
     @AfterInject
     public void init(){
-        loginService.setRootUrl(DiasporaControler.POD_URL);
+        loginService.setRestErrorHandler(errorHandlerBean);
         if (DiasporaControler.COOKIE_SESSION_STREAM!=null && !DiasporaControler.COOKIE_SESSION_STREAM.isEmpty()) {
             loginService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_STREAM);
         }else if (DiasporaControler.COOKIE_SESSION_LOGIN!=null && !DiasporaControler.COOKIE_SESSION_LOGIN.isEmpty()) {
@@ -43,13 +48,19 @@ public class LoginBean {
         LOG.d(TAG_METHOD+ "Entrée");
         boolean resultOK = true;
         boolean resultKO = false;
+        loginService.setRootUrl(DiasporaConfig.POD_URL);
         boolean getTokenOK = getToken(loginService.getLoginHTML());
         LOG.d(TAG_METHOD+ "Token crsf obtenu ? "+getTokenOK);
         if (!getTokenOK){
             LOG.d(TAG_METHOD+ "Sortie en erreur");
             return resultKO;
         }
-        loginService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+//        loginService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+        DiasporaControler.COOKIE_SESSION_TOKEN = loginService.getCookie("_diaspora_session");
+        if (DiasporaControler.COOKIE_SESSION_TOKEN!=null && !DiasporaControler.COOKIE_SESSION_TOKEN.isEmpty()) {
+            loginService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_TOKEN);
+        }
+        loginService.setRootUrl(DiasporaConfig.POD_URL);
         String loggued = loginService.postLogin();
 
         LOG.d(TAG_METHOD+ "Login obtenu ? "+loggued);

@@ -27,9 +27,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.TinyDB;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
-import fr.android.scaron.diaspdroid.vues.fragment.TestFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ParamsFragment_;
 
 /**
@@ -83,7 +81,8 @@ public class MainActivity extends ActionBarActivity {
 
             setUpDrawer();
 
-            if (DiasporaConfig.DB.getBoolean("configOK")) {
+
+            if (DiasporaConfig.ParamsOK) {
                 //On selectionne la vue Flux par défaut
                 listItemClicked(drawerItems.get(0));
             }else{
@@ -142,11 +141,9 @@ public class MainActivity extends ActionBarActivity {
     }
     void setAmisFragment(String title, int position){
         // update the main content by replacing fragments
-        TestFragment_ testFragment = new TestFragment_();
-        testFragment.setActivityParent(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, testFragment)
+                .replace(R.id.diaspora_main_content, new ParamsFragment_())
                 .commit();
         resetActionBarMain(title);
     }

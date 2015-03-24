@@ -20,7 +20,7 @@ import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
- * Created by Maison on 13/01/2015.
+ * Created by Sébastien on 13/01/2015.
  */
 public class DataControler extends DiasporaControler {
 
@@ -58,6 +58,11 @@ public class DataControler extends DiasporaControler {
                      }else{
                          cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
                      }
+                }
+
+                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+                    LOG.d(".uploadImage" + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
                 }
 //                if (!COOKIE_SESSION_LOGIN.isEmpty()||isTest) {
 //                    LOG.d(".uploadImage : On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
@@ -213,6 +218,10 @@ x-ua-compatible:IE=Edge,chrome=1
                     cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
                 }
 
+                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+                }
 //                if (!COOKIE_REMEMBER.isEmpty()||isTest) {
 //                    String remember = COOKIE_REMEMBER;//.substring(0,COOKIE_REMEMBER.indexOf(";"));
 //                    LOG.d(".uploadImage : On ajoute le cookie remember_user_token=" + remember);

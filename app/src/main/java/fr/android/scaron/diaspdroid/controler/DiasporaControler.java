@@ -440,7 +440,7 @@ public class DiasporaControler {
                 LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_TOKEN);
                 URI uri = URI.create(POD_URL);
                 cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_TOKEN);
-                cookieControler.storeCookie(uri, "path", "/; secure");
+                //cookieControler.storeCookie(uri, "path", "/; secure");
                 LOG.d(methodName + "Construction de la requête d'appel POST à " + LOGIN_URL + " (authenticity_token=" + TOKEN + ")");
                 Ion.with(context)
                         .load("POST", LOGIN_URL)
@@ -448,12 +448,12 @@ public class DiasporaControler {
                         .addHeader("Accept", "*/*")
                         .setHeader("User-Agent", USER_AGENT)
                         .noCache()
-                        .setBodyParameter("utf-8", "✓")
+                        //.setBodyParameter("utf-8", "✓")
                         .setBodyParameter("authenticity_token", TOKEN)
                         .setBodyParameter("user[username]", POD_USER)
                         .setBodyParameter("user[password]", POD_PASSWORD)
                         .setBodyParameter("user[remember_me]", "1")
-                        .setBodyParameter("commit", "Connexion")
+                        //.setBodyParameter("commit", "Connexion")
                         .asString()
                         .withResponse()
                         .setCallback(callback);
@@ -481,30 +481,26 @@ public class DiasporaControler {
             return new ArrayList<Post>();
         }
 
-//        if (response==null || response.getHeaders()==null){
-//            LOG.d(".onCompleteStream\t**\trecherche impossible de COOKIE_SESSION\t**");
-//            return new ArrayList<Post>();
+//        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
+//        boolean cookieSessionFound = false;
+//        boolean cookieRememberFound = false;
+//        for(Header header:headers) {
+//            String headerName = header.getName();
+//            String headerValue = header.getValue();
+//            if (headerName != null && !headerName.isEmpty() &&
+//                    headerValue != null && !headerValue.isEmpty() &&
+//                    headerName.toLowerCase().equals("set-cookie")) {
+//                if (headerValue.startsWith("_diaspora_session=")) {
+//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
+//                    cookieSessionFound = true;
+//                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
+//                }
+//            }
 //        }
-        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
-        boolean cookieSessionFound = false;
-        boolean cookieRememberFound = false;
-        for(Header header:headers) {
-            String headerName = header.getName();
-            String headerValue = header.getValue();
-            if (headerName != null && !headerName.isEmpty() &&
-                    headerValue != null && !headerValue.isEmpty() &&
-                    headerName.toLowerCase().equals("set-cookie")) {
-                if (headerValue.startsWith("_diaspora_session=")) {
-                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
-                    cookieSessionFound = true;
-                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
-                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
-                }
-            }
-        }
-        if (!cookieSessionFound){
-            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
-        }
+//        if (!cookieSessionFound){
+//            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
+//        }
 
         if (result==null || result.isEmpty()){
             LOG.d(".onCompleteStream\t**\tRESPONSE introuvable\t**");
@@ -716,6 +712,10 @@ public class DiasporaControler {
                     LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
                     cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
                 }
+                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+                }
                 JsonObject jsonParam = new JsonObject();
                 LOG.d(methodName + "Construction de la requête d'appel POST à " + RESHARE_URL + " (root_guid=" + rootGuid + ")");
                 jsonParam.addProperty("root_guid", rootGuid);
@@ -763,6 +763,10 @@ public class DiasporaControler {
                 if (!COOKIE_REMEMBER.isEmpty()) {
                     LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
                     cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+                }
+                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
                 }
                 JsonObject jsonParam = new JsonObject();
                 LOG.d(methodName + "Construction de la requête d'appel POST à " + POSTS_URL + "/" + postID + "/likes");
