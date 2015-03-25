@@ -54,6 +54,8 @@ public class FluxFragment extends Fragment {
     ActionBarActivity activity;
     DetailPostViewAdapter adapter;
 
+    List<Post> posts;
+
     public void setActivityParent(ActionBarActivity activity){
         this.activity = activity;
     }
@@ -63,21 +65,23 @@ public class FluxFragment extends Fragment {
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD+ "Entrée");
         restClient.setRootUrl(DiasporaControler.POD_URL);
+        LOG.d(TAG_METHOD + "call restClient.getInfo");
         List<Post> postsUser = restClient.getInfo("tilucifer");
+
+
+
+//        //TODO VALIDER CE TEST
+//        serviceControler.seLogguer();
+        //for test full rest getstream
+        LOG.d(TAG_METHOD+ "call serviceControler.getStream");
+        posts = serviceControler.getStream();
+
         Post first = postsUser.get(0);
         String userName = first.getAuthor().getName();
         String userAdress = first.getAuthor().getDiaspora_id();
 
         String userAvatar = first.getAuthor().getAvatar().getLarge();
 
-//        //TODO VALIDER CE TEST
-//        serviceControler.seLogguer();
-        //for test full rest getstream
-        LOG.d(TAG_METHOD+ "call serviceControler.getStream");
-        List<Post> posts = serviceControler.getStream();
-        if (posts!=null) {
-            adapter.setPosts(posts);
-        }
 
         updateActionBar(userName, userAdress, userAvatar);
         LOG.d(TAG_METHOD+ "Sortie");
@@ -102,11 +106,25 @@ public class FluxFragment extends Fragment {
         ProfilControler.putImage(mTitleAvatarView, userAvatar);
         actionBar.setCustomView(mCustomView);
 //        actionBar.setDisplayShowCustomEnabled(true);
+
+        LOG.d(TAG_METHOD + "Entrée");
+        if (posts != null) {
+            LOG.d(TAG_METHOD + "adapter.setPosts(posts) with " + posts);
+            if (adapter!=null) {
+                adapter.setPosts(posts);
+            }
+        }
+
+
         LOG.d(TAG_METHOD+ "Sortie");
     }
     @AfterViews
     void bindAdapter() {
+        String TAG_METHOD = TAG + ".bindAdapter : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD+ "mListView.setAdapter");
         mListView.setAdapter(adapter);
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
     @Override
@@ -158,13 +176,25 @@ public class FluxFragment extends Fragment {
             LOG.d(TAG_METHOD+ "create DetailPostViewAdapter");
             adapter = new DetailPostViewAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
 
+            LOG.d(TAG_METHOD+ "Sortie");
         } catch (Throwable thr) {
             LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());
             ACRA.getErrorReporter().handleException(thr);
-            LOG.d(TAG_METHOD+ "Sortie");
+            LOG.d(TAG_METHOD+ "Sortie en erreur");
             throw thr;
         }
     }
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//        String TAG_METHOD = TAG + ".onActivityCreated : ";
+//        LOG.d(TAG_METHOD+ "Entrée");
+//        super.onActivityCreated(savedInstanceState);
+//        if (posts!=null) {
+//            LOG.d(TAG_METHOD+ "adapter.setPosts(posts) with "+posts);
+//            adapter.setPosts(posts);
+//        }
+//        LOG.d(TAG_METHOD+ "Sortie");
+//    }
 
 
 }

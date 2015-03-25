@@ -10,7 +10,11 @@ import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.Post;
 
 /**
  * Created by Sébastien on 11/03/2015.
@@ -66,6 +70,18 @@ public class LoginBean {
         LOG.d(TAG_METHOD+ "Login obtenu ? "+loggued);
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
+    }
+
+    public List<Post> getStream(){
+        boolean logged = seLogguer();
+        if (logged){
+            return loginService.getStream();//streamPostsService.getStream();
+        }
+        List<Post> emptyError =  new ArrayList<Post>();
+        Post empty = new Post();
+        empty.setText("Aucune réponse n'a été trouvée");
+        emptyError.add(empty);
+        return emptyError;
     }
 
     public boolean getToken(String response){

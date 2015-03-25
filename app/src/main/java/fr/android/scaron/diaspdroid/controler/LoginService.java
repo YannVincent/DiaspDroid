@@ -11,6 +11,8 @@ import org.androidannotations.api.rest.RestClientErrorHandling;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
+import java.util.List;
+
 /**
  * Created by Sébastien on 11/03/2015.
  */
@@ -26,11 +28,16 @@ public interface LoginService extends RestClientErrorHandling {
     @Post("/users/sign_in")
     @Accept(MediaType.TEXT_HTML)
 //    @RequiresHeader("x-csrf-token")
+//    @RequiresCookie("_diaspora_session")
     @RequiresCookie("_diaspora_session")
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     String postLogin();
 
 
+    @Get("/stream")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    List<fr.android.scaron.diaspdroid.model.Post> getStream();
 
     void setRootUrl(String rootUrl);
     void setCookie(String name, String value);

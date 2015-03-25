@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by Sébastien on 11/03/2015.
  */
-@EBean(scope = EBean.Scope.Singleton)
+@EBean//(scope = EBean.Scope.Singleton)
 public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     private static Logger LOGGEUR = LoggerFactory.getLogger(AuthenticationInterceptor.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
@@ -36,28 +36,10 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
         LOG.d(TAG_METHOD+ "Entrée");
         HttpHeaders httpHeaders = request.getHeaders();
         if (httpHeaders!=null) {
-            List<String> cookies = httpHeaders.get("coookie");
-            LOG.d(TAG_METHOD + "cookies found ? " + (cookies!=null));
-            LOG.d(TAG_METHOD + "cookies : " + cookies);
-
-//        //UnsupportedOperationException donc on commente
-//            if (cookies==null){
-//                StringBuilder cookieValueSB = new StringBuilder();
-//                boolean cookieRememberAdded = false;
-//                if (DiasporaControler.COOKIE_REMEMBER!=null){
-//                    cookieValueSB.append("remember_user_token="+DiasporaControler.COOKIE_REMEMBER);
-//                    cookieRememberAdded = true;
-//                }
-//                if (DiasporaControler.COOKIE_SESSION_TOKEN!=null){
-//                    if (cookieRememberAdded){
-//                        cookieValueSB.append(", ");
-//                    }
-//                    cookieValueSB.append("_diaspora_session="+DiasporaControler.COOKIE_SESSION_TOKEN);
-//                }
-//                httpHeaders.add("cookie", cookieValueSB.toString());
-//            }
-//            cookies = httpHeaders.get("coookie");
-//            LOG.d(TAG_METHOD + "cookies added found ? " + (cookies!=null));
+            LOG.d(TAG_METHOD + "httpHeaders : " + httpHeaders);
+            List<String> cookies = httpHeaders.get("Cookie");
+            LOG.d(TAG_METHOD + "Cookie found ? " + (cookies!=null));
+            LOG.d(TAG_METHOD + "Cookie : " + cookies);
         }
         StringBuilder sbBody = new StringBuilder();//new String(body, Charset.forName("UTF-8")));
         if (request.getMethod()== HttpMethod.POST) {
@@ -75,14 +57,6 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
 
         LOG.d(TAG_METHOD+ "Sortie");
         return executionResult;
-
-//        HttpAuthentication authentication = new HttpAuthentication() {
-//            @Override
-//            public String getHeaderValue() {
-//                return null;
-//            }
-//        }
-//        return execution.execute(request, body);
     }
 
     String ulrEncode(String data){

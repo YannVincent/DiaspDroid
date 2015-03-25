@@ -18,16 +18,16 @@ public class RestServiceControler {
     @RootContext
     Context context;
 
-    @Bean
-    LoginBean loginBean;
+//    @Bean
+//    LoginBean loginBean;
 
     @Bean
     StreamPostsBean streamBean;
 
 
-    public void seLogguer(){
-        loginBean.seLogguer();
-    }
+//    public void seLogguer(){
+//        loginBean.seLogguer();
+//    }
 
     public List<Post> getStream(){ return streamBean.getStream();}
 

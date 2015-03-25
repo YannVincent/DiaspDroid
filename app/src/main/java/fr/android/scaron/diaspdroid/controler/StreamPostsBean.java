@@ -50,7 +50,7 @@ public class StreamPostsBean {
     public List<Post> getStream(){
         boolean logged = loginBean.seLogguer();
         if (logged){
-            return streamPostsService.getStream();
+            return loginBean.getStream();//streamPostsService.getStream();
         }
         List<Post> emptyError =  new ArrayList<Post>();
         Post empty = new Post();
