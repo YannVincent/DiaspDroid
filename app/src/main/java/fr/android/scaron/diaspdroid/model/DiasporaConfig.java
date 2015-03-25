@@ -24,6 +24,7 @@ import fr.android.scaron.diaspdroid.controler.LogControler;
 public class DiasporaConfig {
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaConfig.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+    private static final String TAG = "DiasporaConfig";
 
     public static String POD_USER;
     public static String POD_PASSWORD;

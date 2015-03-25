@@ -10,10 +10,10 @@ import org.springframework.core.NestedRuntimeException;
  * Created by Sébastien on 23/03/2015.
  */
 @EBean
-public class ErrorHandlerBean implements RestErrorHandler {
-    private static Logger LOGGEUR = LoggerFactory.getLogger(LoginBean.class);
+public class DiasporaErrorHandlerBean implements RestErrorHandler {
+    private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaBean.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = "LoginBean";
+    private static String TAG = "DiasporaBean";
 
     @Override
     public void onRestClientExceptionThrown(NestedRuntimeException e) {

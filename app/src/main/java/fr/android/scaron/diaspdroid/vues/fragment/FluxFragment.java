@@ -21,7 +21,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
-import fr.android.scaron.diaspdroid.controler.RestServiceControler;
-import fr.android.scaron.diaspdroid.controler.StreamPostsBean;
-import fr.android.scaron.diaspdroid.controler.UserPublicPostsService;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
 
@@ -44,10 +41,8 @@ public class FluxFragment extends Fragment {
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = "FluxFragment";
-    @RestService
-    UserPublicPostsService restClient;
     @Bean
-    RestServiceControler serviceControler;
+    DiasporaBean diasporaBean;
 
     @ViewById(R.id.fragment_flux_list)
     AbsListView mListView;
@@ -63,26 +58,15 @@ public class FluxFragment extends Fragment {
     @Background
     void getInfosUserForBar(){
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        restClient.setRootUrl(DiasporaControler.POD_URL);
-        LOG.d(TAG_METHOD + "call restClient.getInfo");
-        List<Post> postsUser = restClient.getInfo("tilucifer");
-
-
-
-//        //TODO VALIDER CE TEST
-//        serviceControler.seLogguer();
-        //for test full rest getstream
-        LOG.d(TAG_METHOD+ "call serviceControler.getStream");
-        posts = serviceControler.getStream();
-
+        LOG.d(TAG_METHOD + "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getInfo");
+        List<Post> postsUser = diasporaBean.getInfo("tilucifer");
+        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
+        posts = diasporaBean.getStream();
         Post first = postsUser.get(0);
         String userName = first.getAuthor().getName();
         String userAdress = first.getAuthor().getDiaspora_id();
-
         String userAvatar = first.getAuthor().getAvatar().getLarge();
-
-
         updateActionBar(userName, userAdress, userAvatar);
         LOG.d(TAG_METHOD+ "Sortie");
     }

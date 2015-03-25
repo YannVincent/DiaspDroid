@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by Sébastien on 11/03/2015.
  */
-@EBean//(scope = EBean.Scope.Singleton)
+@EBean(scope = EBean.Scope.Singleton)
 public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     private static Logger LOGGEUR = LoggerFactory.getLogger(AuthenticationInterceptor.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
@@ -33,7 +33,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String TAG_METHOD = TAG + ".intercept : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD+ "Entrée ("+request.getURI()+" ["+request.getMethod()+"])");
         HttpHeaders httpHeaders = request.getHeaders();
         if (httpHeaders!=null) {
             LOG.d(TAG_METHOD + "httpHeaders : " + httpHeaders);
@@ -41,21 +41,31 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
             LOG.d(TAG_METHOD + "Cookie found ? " + (cookies!=null));
             LOG.d(TAG_METHOD + "Cookie : " + cookies);
         }
-        StringBuilder sbBody = new StringBuilder();//new String(body, Charset.forName("UTF-8")));
-        if (request.getMethod()== HttpMethod.POST) {
+        ClientHttpResponse executionResult;
+        if (request.getMethod()== HttpMethod.POST && request.getURI().toString().endsWith("/users/sign_in")) {
+            StringBuilder sbBody = new StringBuilder();
             sbBody.append(ulrEncode("user[username]")+"=" + ulrEncode(authenticationStore.getUsername()));
             sbBody.append("&"+ulrEncode("user[password]")+"=" + ulrEncode(authenticationStore.getPassword()));
 //            sbBody.append("&commit=Connexion");
 //            sbBody.append("&utf-8=✓");
             sbBody.append("&"+ulrEncode("authenticity_token")+"=" + ulrEncode(authenticationStore.getToken()));
             sbBody.append("&"+ulrEncode("user[remember_me]")+"=1");
+            LOG.d(TAG_METHOD + "sbBody urlencoded : " + sbBody.toString());
+            byte[] bodyEncoded = sbBody.toString().getBytes(Charset.forName("UTF-8"));
+            LOG.d(TAG_METHOD+ "execution.execute ("+request.getURI()+" ["+request.getMethod()+"]))");
+            executionResult = execution.execute(request, bodyEncoded);
+            if (executionResult!=null) {
+                LOG.d(TAG_METHOD + "execution.execute ("+request.getURI()+" ["+request.getMethod()+"])), result code "+executionResult.getStatusCode());
+            }
+        }else {
+            LOG.d(TAG_METHOD + "sbBody : " + new String(body, Charset.forName("UTF-8")));
+            LOG.d(TAG_METHOD+ "execution.execute ("+request.getURI()+" ["+request.getMethod()+"]))");
+            executionResult = execution.execute(request, body);
+            if (executionResult!=null) {
+                LOG.d(TAG_METHOD + "execution.execute ("+request.getURI()+" ["+request.getMethod()+"])), result code "+executionResult.getStatusCode());
+            }
         }
-
-        LOG.d(TAG_METHOD + "sbBody urlencoded : " + sbBody.toString());
-        byte[] bodyEncoded = sbBody.toString().getBytes(Charset.forName("UTF-8"));
-        ClientHttpResponse executionResult = execution.execute(request, bodyEncoded);
-
-        LOG.d(TAG_METHOD+ "Sortie");
+        LOG.d(TAG_METHOD+ "Sortie ("+request.getURI()+" ["+request.getMethod()+"])");
         return executionResult;
     }
 
