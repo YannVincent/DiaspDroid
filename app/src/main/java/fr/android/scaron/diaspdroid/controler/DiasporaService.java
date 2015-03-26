@@ -1,13 +1,18 @@
 package fr.android.scaron.diaspdroid.controler;
 
+import com.google.gson.JsonObject;
+
 import org.androidannotations.annotations.rest.Accept;
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;
 import org.androidannotations.annotations.rest.RequiresCookie;
+import org.androidannotations.annotations.rest.RequiresHeader;
 import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.annotations.rest.SetsCookie;
 import org.androidannotations.api.rest.MediaType;
 import org.androidannotations.api.rest.RestClientErrorHandling;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.util.MultiValueMap;
@@ -19,7 +24,7 @@ import fr.android.scaron.diaspdroid.model.UploadResult;
 /**
  * Created by Sébastien on 11/03/2015.
  */
-@Rest(converters={GsonHttpMessageConverter.class, StringHttpMessageConverter.class}, interceptors = { AuthenticationInterceptor.class })
+@Rest(converters={GsonHttpMessageConverter.class, StringHttpMessageConverter.class,  ByteArrayHttpMessageConverter.class, FormHttpMessageConverter.class}, interceptors = { AuthenticationInterceptor.class })
 public interface DiasporaService extends RestClientErrorHandling {
 
     @Get("/users/sign_in")
@@ -48,7 +53,16 @@ public interface DiasporaService extends RestClientErrorHandling {
     @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-    UploadResult uploadFile(MultiValueMap<String, Object> mapParts, String fileName);
+//    @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name"})
+    @RequiresHeader("x-csrf-token")
+    @Accept(MediaType.MULTIPART_FORM_DATA)
+    UploadResult uploadFile(String fileName, MultiValueMap<String, Object> mapParts);
+
+    @Post("/reshares")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    @Accept(MediaType.APPLICATION_JSON)
+    String reshare(JsonObject jsonParam);
 
     void setRootUrl(String rootUrl);
     void setCookie(String name, String value);

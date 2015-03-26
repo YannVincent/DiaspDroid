@@ -17,6 +17,8 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+
 /**
  * Created by Sébastien on 11/03/2015.
  */
@@ -42,20 +44,36 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
             LOG.d(TAG_METHOD + "Cookie : " + cookies);
         }
         ClientHttpResponse executionResult;
-        if (request.getMethod()== HttpMethod.POST && request.getURI().toString().endsWith("/users/sign_in")) {
+        if (request.getMethod()== HttpMethod.POST){
             StringBuilder sbBody = new StringBuilder();
-            sbBody.append(ulrEncode("user[username]")+"=" + ulrEncode(authenticationStore.getUsername()));
-            sbBody.append("&"+ulrEncode("user[password]")+"=" + ulrEncode(authenticationStore.getPassword()));
+            if (request.getURI().toString().endsWith("/users/sign_in")) {
+                sbBody.append(ulrEncode("user[username]") + "=" + ulrEncode(authenticationStore.getUsername()));
+                sbBody.append("&" + ulrEncode("user[password]") + "=" + ulrEncode(authenticationStore.getPassword()));
 //            sbBody.append("&commit=Connexion");
 //            sbBody.append("&utf-8=✓");
-            sbBody.append("&"+ulrEncode("authenticity_token")+"=" + ulrEncode(authenticationStore.getToken()));
-            sbBody.append("&"+ulrEncode("user[remember_me]")+"=1");
-            LOG.d(TAG_METHOD + "sbBody urlencoded : " + sbBody.toString());
-            byte[] bodyEncoded = sbBody.toString().getBytes(Charset.forName("UTF-8"));
-            LOG.d(TAG_METHOD+ "execution.execute ("+request.getURI()+" ["+request.getMethod()+"]))");
-            executionResult = execution.execute(request, bodyEncoded);
-            if (executionResult!=null) {
-                LOG.d(TAG_METHOD + "execution.execute ("+request.getURI()+" ["+request.getMethod()+"])), result code "+executionResult.getStatusCode());
+                sbBody.append("&" + ulrEncode("authenticity_token") + "=" + ulrEncode(authenticationStore.getToken()));
+                sbBody.append("&" + ulrEncode("user[remember_me]") + "=1");
+                LOG.d(TAG_METHOD + "sbBody urlencoded : " + sbBody.toString());
+                byte[] bodyEncoded = sbBody.toString().getBytes(Charset.forName("UTF-8"));
+                LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "]))");
+                executionResult = execution.execute(request, bodyEncoded);
+                if (executionResult != null) {
+                    LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "])), result code " + executionResult.getStatusCode());
+                }
+            }else if (request.getURI().toString().startsWith(DiasporaConfig.POD_URL+"/photos")) {
+                byte[] bodyEmpty = sbBody.toString().getBytes(Charset.forName("UTF-8"));
+                LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "]))");
+                executionResult = execution.execute(request, bodyEmpty);
+                if (executionResult != null) {
+                    LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "])), result code " + executionResult.getStatusCode());
+                }
+            }else {
+                LOG.d(TAG_METHOD + "sbBody : " + new String(body, Charset.forName("UTF-8")));
+                LOG.d(TAG_METHOD+ "execution.execute ("+request.getURI()+" ["+request.getMethod()+"]))");
+                executionResult = execution.execute(request, body);
+                if (executionResult!=null) {
+                    LOG.d(TAG_METHOD + "execution.execute ("+request.getURI()+" ["+request.getMethod()+"])), result code "+executionResult.getStatusCode());
+                }
             }
         }else {
             LOG.d(TAG_METHOD + "sbBody : " + new String(body, Charset.forName("UTF-8")));

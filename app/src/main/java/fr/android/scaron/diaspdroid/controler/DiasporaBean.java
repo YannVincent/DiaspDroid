@@ -2,6 +2,8 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.content.Context;
 
+import com.google.gson.JsonObject;
+
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -13,6 +15,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +32,8 @@ public class DiasporaBean {
     private static Logger LOGGEUR = LoggerFactory.getLogger(DiasporaBean.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = "DiasporaBean";
+
+    private static DiasporaBean instance;
     @RootContext
     Context context;
 
@@ -36,8 +42,16 @@ public class DiasporaBean {
     @Bean
     DiasporaErrorHandlerBean diasporaErrorHandlerBean;
 
+    private static void setInstance(DiasporaBean instance){
+        DiasporaBean.instance = instance;
+    }
+    public static DiasporaBean getInstance(){
+        return DiasporaBean.instance;
+    }
+
     @AfterInject
     public void init(){
+        setInstance(this);
         diasporaService.setRestErrorHandler(diasporaErrorHandlerBean);
 //        if (DiasporaControler.COOKIE_SESSION_STREAM!=null && !DiasporaControler.COOKIE_SESSION_STREAM.isEmpty()) {
 //            diasporaService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_STREAM);
@@ -63,17 +77,37 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie en erreur");
             return resultKO;
         }
-//        diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
-        DiasporaControler.COOKIE_SESSION_TOKEN = diasporaService.getCookie("_diaspora_session");
-        if (DiasporaControler.COOKIE_SESSION_TOKEN!=null && !DiasporaControler.COOKIE_SESSION_TOKEN.isEmpty()) {
-            diasporaService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_TOKEN);
-        }
+////        diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+//        DiasporaControler.COOKIE_SESSION_TOKEN = diasporaService.getCookie("_diaspora_session");
+//        if (DiasporaControler.COOKIE_SESSION_TOKEN!=null && !DiasporaControler.COOKIE_SESSION_TOKEN.isEmpty()) {
+//            diasporaService.setCookie("_diaspora_session", DiasporaControler.COOKIE_SESSION_TOKEN);
+//        }
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         String loggued = diasporaService.postLogin();
 
         LOG.d(TAG_METHOD+ "Login obtenu ? "+loggued);
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
+    }
+
+    public String reshare(String rootGuid){
+        String TAG_METHOD = TAG + ".reshare : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        String reponseReshare="Echec";
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged) {
+            LOG.d(TAG_METHOD + "logged successfully");
+            if (DiasporaControler.TOKEN != null && !DiasporaControler.TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+                JsonObject jsonParam = new JsonObject();
+                LOG.d(TAG_METHOD + "Ajout du root_guid=" + rootGuid);
+                jsonParam.addProperty("root_guid", rootGuid);
+                reponseReshare = diasporaService.reshare(jsonParam);
+            }
+        }
+        LOG.d(TAG_METHOD+ "Sortie");
+        return reponseReshare;
     }
 
     public UploadResult uploadFile(String fileName, String localPath){
@@ -83,11 +117,24 @@ public class DiasporaBean {
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
+            LOG.d(TAG_METHOD+ "logged successfully");
+            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            }
+//            diasporaService.setHeader("x-requested-with", "XMLHttpRequest");
+//            diasporaService.setHeader("x-file-name", fileName);
+//            diasporaService.setHeader("content-type", "application/octet-stream");
             MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
             LOG.d(TAG_METHOD+ "add part file");
-            mvMap.add("file", new FileSystemResource(localPath));
+            mvMap.add("filename", fileName);
+//            mvMap.add("file", new FileSystemResource(localPath));
+            try {
+                mvMap.add("file", new FileInputStream(localPath));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
-            UploadResult uploadResult = diasporaService.uploadFile(mvMap, fileName);
+            UploadResult uploadResult = diasporaService.uploadFile(fileName, mvMap);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
                 LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
@@ -96,6 +143,7 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie");
             return uploadResult;
         }
+        LOG.d(TAG_METHOD+ "logged failure");
         return null;
     }
 

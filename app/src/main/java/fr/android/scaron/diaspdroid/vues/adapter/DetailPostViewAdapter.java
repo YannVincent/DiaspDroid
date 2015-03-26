@@ -24,6 +24,9 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.EProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +40,7 @@ import java.util.regex.Pattern;
 import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
+import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
@@ -44,6 +48,7 @@ import fr.android.scaron.diaspdroid.model.Image;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
 import fr.android.scaron.diaspdroid.vues.view.DetailPostView;
 
@@ -61,6 +66,7 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
     private List<Post> posts = new ArrayList<Post>();
     private final ThumbnailListener thumbnailListener;
 
+    DiasporaBean diasporaService;
 
 
     public DetailPostViewAdapter(FragmentActivity follower, int ressource, List<Post> posts){
@@ -254,27 +260,29 @@ public class DetailPostViewAdapter extends ArrayAdapter<Post> { // implements Me
                 @Override
                 public void onClick(final View v) {
                     if (post!=null && post.getGuid()!=null){
-                        FutureCallback<Response<String>> reshareCallBack = new FutureCallback<Response<String>>() {
-                            @Override
-                            public void onCompleted(Exception e, Response<String> result) {
-                                String methodName = ".getView reshareCallBack onCompleted: ";
-                                boolean resultOK = DiasporaControler.onCompleteRepartager(e, result);
-                                if (!resultOK){
-                                    if (follower==null){
-                                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
-                                        return;
-                                    }
-                                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(follower);
-                                    final AlertDialog alertDialog = alertDialogBuilder.create();
-                                    alertDialog.setIcon(R.drawable.ic_launcher);
-                                    alertDialog.setTitle("PB Accès");
-                                    alertDialog.setMessage("Le repartage est impossible");
-                                    alertDialog.show();
-                                    return;
-                                }
-                            }
-                        };
-                        DiasporaControler.repartager(post.getGuid(), reshareCallBack, false);
+//                        FutureCallback<Response<String>> reshareCallBack = new FutureCallback<Response<String>>() {
+//                            @Override
+//                            public void onCompleted(Exception e, Response<String> result) {
+//                                String methodName = ".getView reshareCallBack onCompleted: ";
+//                                boolean resultOK = DiasporaControler.onCompleteRepartager(e, result);
+//                                if (!resultOK){
+//                                    if (follower==null){
+//                                        LOG.e(methodName + "Le contexte est vide et empêche un traitement");
+//                                        return;
+//                                    }
+//                                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(follower);
+//                                    final AlertDialog alertDialog = alertDialogBuilder.create();
+//                                    alertDialog.setIcon(R.drawable.ic_launcher);
+//                                    alertDialog.setTitle("PB Accès");
+//                                    alertDialog.setMessage("Le repartage est impossible");
+//                                    alertDialog.show();
+//                                    return;
+//                                }
+//                            }
+//                        };
+//                        DiasporaControler.repartager(post.getGuid(), reshareCallBack, false);
+                        diasporaService = DiasporaBean.getInstance();
+                        diasporaService.reshare(post.getGuid());
                     }
                 }
             };
