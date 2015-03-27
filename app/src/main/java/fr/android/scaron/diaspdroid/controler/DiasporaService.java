@@ -61,6 +61,7 @@ public interface DiasporaService extends RestClientErrorHandling {
     @Post("/reshares")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
+    @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
     String reshare(JsonObject jsonParam);
 

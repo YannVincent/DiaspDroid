@@ -8,6 +8,8 @@ import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
+import org.androidannotations.annotations.SupposeBackground;
+import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +66,7 @@ public class DiasporaBean {
 //            diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
 //        }
     }
-
+    @SupposeBackground
     public boolean seLogguer(){
         String TAG_METHOD = TAG + ".seLogguer : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -89,7 +91,7 @@ public class DiasporaBean {
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
     }
-
+    @SupposeBackground
     public String reshare(String rootGuid){
         String TAG_METHOD = TAG + ".reshare : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -110,6 +112,14 @@ public class DiasporaBean {
         return reponseReshare;
     }
 
+
+    @SupposeUiThread
+    public String callReshare(JsonObject jsonParam){
+
+        return diasporaService.reshare(jsonParam);
+    }
+
+    @SupposeBackground
     public UploadResult uploadFile(String fileName, String localPath){
         String TAG_METHOD = TAG + ".uploadFile : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -146,7 +156,7 @@ public class DiasporaBean {
         LOG.d(TAG_METHOD+ "logged failure");
         return null;
     }
-
+    @SupposeBackground
     public List<Post> getInfo(String userName){
         String TAG_METHOD = TAG + ".getInfo : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -157,7 +167,7 @@ public class DiasporaBean {
         LOG.d(TAG_METHOD+ "Sortie");
         return infos;
     }
-
+    @SupposeBackground
     public List<Post> getStream(){
         String TAG_METHOD = TAG + ".getStream : ";
         LOG.d(TAG_METHOD+ "Entrée");
