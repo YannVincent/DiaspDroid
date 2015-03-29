@@ -31,9 +31,9 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.controler.PostsAdapter;
 import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.vues.adapter.DetailPostViewAdapter;
 
 @EFragment(R.layout.fragment_flux_list)
 public class FluxFragment extends Fragment {
@@ -44,10 +44,12 @@ public class FluxFragment extends Fragment {
     @Bean
     DiasporaBean diasporaBean;
 
+    @Bean
+    PostsAdapter adapter;
+
     @ViewById(R.id.fragment_flux_list)
     AbsListView mListView;
     ActionBarActivity activity;
-    DetailPostViewAdapter adapter;
 
     List<Post> posts;
 
@@ -61,7 +63,7 @@ public class FluxFragment extends Fragment {
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getInfo");
         List<Post> postsUser = diasporaBean.getInfo("tilucifer");
-        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
+//        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
         posts = diasporaBean.getStream();
         Post first = postsUser.get(0);
         String userName = first.getAuthor().getName();
@@ -91,7 +93,6 @@ public class FluxFragment extends Fragment {
         actionBar.setCustomView(mCustomView);
 //        actionBar.setDisplayShowCustomEnabled(true);
 
-        LOG.d(TAG_METHOD + "Entrée");
         if (posts != null) {
             LOG.d(TAG_METHOD + "adapter.setPosts(posts) with " + posts);
             if (adapter!=null) {
@@ -120,46 +121,6 @@ public class FluxFragment extends Fragment {
             LOG.d(TAG_METHOD+ "call getInfosUserForBar");
             getInfosUserForBar();
 
-
-
-            LOG.d(TAG_METHOD+ "create fluxCallback");
-            //Callback de la récupération du flux
-            final FutureCallback<Response<List<Post>>> fluxCallback = new FutureCallback<Response<List<Post>>>() {
-                @Override
-                public void onCompleted(Exception e, Response<List<Post>> posts) {
-
-                    String TAG_METHOD = TAG + ".fluxCallback.onCompleted : ";
-                    LOG.d(TAG_METHOD+ "exception ? " + e);
-                    if (e!=null){
-                        e.printStackTrace();
-                    }
-                    if (e!=null && e.getCause()!=null) {
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                        final AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.setIcon(R.drawable.ic_launcher);
-                        alertDialog.setTitle("PB Données");
-                        alertDialog.setMessage("La récupétion de votre flux a échouée");
-                        alertDialog.show();
-                        LOG.d(TAG_METHOD+ "cause exception ? " + e.getCause().getMessage());
-                    }
-                    if (posts!=null){
-                        adapter.setPosts(DiasporaControler.onCompleteStream(e, posts));
-                        return;
-                    }
-                    LOG.e(TAG_METHOD+ "Erreur : " + e.toString());
-                    if (e.getCause()!=null) {
-                        LOG.e(TAG_METHOD+ "cause exception ? " + e.getCause().getMessage());
-                    }
-                    ACRA.getErrorReporter().handleException(e);
-                }
-            };
-
-//            //Commented for test
-//            LOG.d(TAG_METHOD+ "call getStreamFlow");
-//            DiasporaControler.getStreamFlow(fluxCallback, false);
-            LOG.d(TAG_METHOD+ "create DetailPostViewAdapter");
-            adapter = new DetailPostViewAdapter(getActivity(), R.layout.fragment_flux_list, new ArrayList<Post>());
-
             LOG.d(TAG_METHOD+ "Sortie");
         } catch (Throwable thr) {
             LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());
@@ -168,17 +129,6 @@ public class FluxFragment extends Fragment {
             throw thr;
         }
     }
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        String TAG_METHOD = TAG + ".onActivityCreated : ";
-//        LOG.d(TAG_METHOD+ "Entrée");
-//        super.onActivityCreated(savedInstanceState);
-//        if (posts!=null) {
-//            LOG.d(TAG_METHOD+ "adapter.setPosts(posts) with "+posts);
-//            adapter.setPosts(posts);
-//        }
-//        LOG.d(TAG_METHOD+ "Sortie");
-//    }
 
 
 }

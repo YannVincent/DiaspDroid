@@ -112,14 +112,15 @@ public class ParamsFragment extends Fragment {
             podpassword.setText(DiasporaConfig.POD_PASSWORD);
         }
 
-        //Restore PODList from memory
-        if (DiasporaConfig.POD_LIST_JSON!=null && !DiasporaConfig.POD_LIST_JSON.isEmpty()&&
-                DiasporaConfig.POD_LIST!=null && DiasporaConfig.POD_LIST.getPods()!=null && DiasporaConfig.POD_LIST.getPodcount()>0){
-            LOG.d(methodName + "Chargement des pods en mémoire");
-            podListViewAdapter.addGroup(DiasporaConfig.POD_LIST);
-            LOG.d(methodName + "Sortie");
-            return;
-        }
+        //TODO valider la restauration depuis la mémoire
+//        //Restore PODList from memory
+//        if (DiasporaConfig.POD_LIST_JSON!=null && !DiasporaConfig.POD_LIST_JSON.isEmpty()&&
+//                DiasporaConfig.POD_LIST!=null && DiasporaConfig.POD_LIST.getPods()!=null && DiasporaConfig.POD_LIST.getPodcount()>0){
+//            LOG.d(methodName + "Chargement des pods en mémoire");
+//            podListViewAdapter.addGroup(DiasporaConfig.POD_LIST);
+//            LOG.d(methodName + "Sortie");
+//            return;
+//        }
 
         //Callback de la récupération du flux
         final FutureCallback<Response<Pods>> podListCallback = new FutureCallback<Response<Pods>>() {

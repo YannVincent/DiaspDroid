@@ -93,43 +93,10 @@ public class PodListViewAdapter extends BaseExpandableListAdapter {
                     positionTemp++;
                 }
 
-//                pods.children.clear();
-//                pods.children.addAll(pods.getPods());
                 DiasporaConfig.setPods(pods);
                 litview.collapseGroup(groupID);
                 LOG.d(methodName + "notifyDataSetChanged");
                 notifyDataSetChanged();
-
-
-////                PodView podView = (PodView)v.getTag();
-//                GroupList group = (GroupList)getGroup(groupID);
-//                int positionTemp = 0;
-////                podView.check.setSelected(true);
-////                children.setSelected(true);
-//                for (Object podObject:group.children){
-//                    Pod pod=(Pod)podObject;
-//                    if (positionTemp == childPosition){
-//                        LOG.d(methodName + "set children selected true at position " + positionTemp);
-//                        pod.setSelected(true);
-//                    }else {
-//                        LOG.d(methodName + "set children selected false at position "+positionTemp);
-//                        pod.setSelected(false);
-//                    }
-//                    group.children.set(positionTemp, pod);
-//                    positionTemp++;
-//                }
-//
-//                DiasporaConfig.setPods(pods);
-////                LOG.d(methodName + "cleargroups");
-////                clearGroups();
-////                LOG.d(methodName + "addGroup "+group);
-////                addGroup(group);
-//                litview.collapseGroup(groupID);
-//                LOG.d(methodName + "notifyDataSetChanged");
-//                notifyDataSetChanged();
-////                LOG.d(methodName + "super.notifyDataSetChanged");
-////                PodListViewAdapter.super.notifyDataSetChanged();
-
 
                 TextView podSelected = (TextView) activity.findViewById(R.id.podselected);
                 String podName = children.getDomain();
@@ -144,8 +111,6 @@ public class PodListViewAdapter extends BaseExpandableListAdapter {
                 podSelected.setText(podUrl);
                 LOG.d(methodName + "Show message " + children.getDomain());
                 Toast.makeText(activity, children.getDomain(), Toast.LENGTH_SHORT).show();
-//                GroupList group = (GroupList) getGroup(groupID);
-//                ((CheckedTextView) convertView)
                 LOG.d(methodName + "Sortie");
             }
         });
