@@ -4,8 +4,8 @@ apply plugin: 'android-apt'
 def AAVersion = '3.2'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 //    systemProperty 'logback.configurationFile', 'assets/logback.xml'
     packagingOptions {
         exclude 'META-INF/license.txt'
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "fr.android.scaron.diaspdroid"
         minSdkVersion 11
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -35,8 +35,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 //    compile fileTree(dir: 'libs', include: ['*.properties'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-v4:21.0.3'
+
+    compile 'com.android.support:appcompat-v7:+'
+//    compile 'com.android.support:appcompat-v7:21.0.3'
+//    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:+'
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
 //    compile 'ch.acra:acra:4.5.0'
