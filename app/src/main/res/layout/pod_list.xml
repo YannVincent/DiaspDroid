@@ -2,138 +2,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:layout_marginTop="@dimen/margin_medium"
-              android:layout_marginLeft="@dimen/margin_medium"
-              android:layout_marginRight="@dimen/margin_medium"
-              android:layout_marginBottom="@dimen/margin_medium"
+              android:padding="10dip"
               android:orientation="vertical" >
-    <!--<ListView-->
-        <!--android:id="@+id/pod_listview"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content" />-->
-<!--
-    <TextView
-        android:id="@+id/podConfig"
-        android:textAlignment="center"
-        android:paddingLeft="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
-        android:layout_marginTop="@dimen/margin_large"
-        android:text="Informations de connexion à Diaspora"
-        android:layout_marginBottom="@dimen/margin_large"
-        android:textColor="#0a5f8c"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:background="@drawable/borderbg"
-                  android:orientation="vertical" >-->
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/margin_small" >
     <TextView
         android:id="@+id/poduser_label"
-        android:paddingLeft="25dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
-        android:layout_weight="1"
-        android:textColor="#3f8fba"
-        android:text="Utilisateur"
-        android:textSize="16sp" />
+        android:text="Utilisateur"/>
     <EditText
         android:id="@+id/poduser"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
         android:hint="Utilisateur sur le POD"
-        android:textSize="14sp"
-        android:layout_weight="1"
-        android:textStyle="bold" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/margin_small" >
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="20dip" />
     <TextView
         android:id="@+id/podpassword_label"
-        android:paddingLeft="25dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="#3f8fba"
-        android:text="Mot de passe"
-        android:textSize="16sp"/>
+        android:text="Mot de passe"/>
     <EditText
         android:id="@+id/podpassword"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
         android:hint="Password sur le POD"
-        android:layout_weight="1"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-        </LinearLayout>
-    <LinearLayout
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="20dip" />
+
+    <!-- Link to Registration Screen -->
+    <TextView android:id="@+id/link_to_register"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="@dimen/margin_large"
-
-        android:background="@drawable/borderbg">
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        <TextView
-            android:id="@+id/podselected"
-            android:paddingLeft="25dp"
-            android:layout_width="fill_parent"
-            android:layout_height="30dip"
-            android:layout_gravity="center_vertical"
-            android:text="Selectionnez votre POD"
-            android:textColor="#0a5f8c"
-            android:textSize="16sp"
-            android:layout_weight="0.25"
-            android:textStyle="bold"
-            android:paddingTop="5sp"/>
-
-            <LinearLayout android:id="@+id/podConfigOK"
-                          android:layout_weight="0.75"
-                          android:layout_width="fill_parent"
-                          android:gravity="center"
-                          android:layout_height="30dip"
-                          android:background="@drawable/borderbgbtns"
-                          android:orientation="horizontal"
-                          android:clickable="true">
-
-                <ImageView
-                    android:layout_width="25sp"
-                    android:layout_height="25sp"
-                    android:layout_marginRight="15dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_valider" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textSize="11sp"
-                    android:textColor="#141823"
-                    android:textStyle="italic"
-                    android:text="Valider" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-        <ExpandableListView
+        android:layout_marginTop="40dip"
+        android:layout_marginBottom="40dip"
+        android:text="Nouveau sur diaspora ? Inscrivez-vous"
+        android:gravity="center"
+        android:textSize="20dip"
+        android:textColor="#0b84aa"/>
+    <TextView
+        android:id="@+id/podselected"
+        android:paddingLeft="25dp"
+        android:layout_width="fill_parent"
+        android:layout_height="30dip"
+        android:layout_gravity="center_vertical"
+        android:text="Selectionnez votre POD"
+        android:textColor="#0a5f8c"
+        android:textSize="16sp"
+        android:layout_weight="0.25"
+        android:textStyle="bold"
+        android:paddingTop="5sp"/>
+    <ExpandableListView
         android:id="@+id/pod_listview"
         android:layout_width="fill_parent"
         android:layout_marginTop="@dimen/margin_small"
@@ -142,9 +60,35 @@
         android:choiceMode="singleChoice"
         android:descendantFocusability="beforeDescendants"
         android:layout_height="wrap_content" />
+
+
+
+    <LinearLayout android:id="@+id/podConfigOK"
+        android:layout_width="fill_parent"
+        android:gravity="center"
+        android:layout_height="30dip"
+        android:background="@drawable/borderbgbtns"
+        android:orientation="horizontal"
+        android:clickable="true">
+
+        <ImageView
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_marginRight="15dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_valider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#141823"
+            android:textStyle="italic"
+            android:text="Valider" />
+
     </LinearLayout>
 
-    <!--
-        </LinearLayout>
-        -->
+
 </LinearLayout>

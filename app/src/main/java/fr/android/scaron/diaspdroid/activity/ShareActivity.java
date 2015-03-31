@@ -1,5 +1,6 @@
 package fr.android.scaron.diaspdroid.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -167,14 +168,14 @@ public class ShareActivity  extends ActionBarActivity {
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "response body ? : "+uploadResult);
         if (uploadResult==null){
-//            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-//            final AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.setIcon(R.drawable.ic_launcher);
-//            alertDialog.setTitle("Echec de publication");
-//            alertDialog.setMessage("Votre publication a échouée\n" +
-//                    "(Erreur obtenue : pas de réponse du service)");
-//            alertDialog.show();
-////                uploadProgressBar.setVisibility(View.GONE);
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+            final AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setIcon(R.drawable.ic_launcher);
+            alertDialog.setTitle("Echec de publication");
+            alertDialog.setMessage("Votre publication a échouée\n" +
+                    "(Erreur obtenue : pas de réponse du service)");
+            alertDialog.show();
+//                uploadProgressBar.setVisibility(View.GONE);
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : pas de réponse du service)");
             return;
@@ -182,13 +183,13 @@ public class ShareActivity  extends ActionBarActivity {
 
         LOG.d(TAG_METHOD + "response body : "+uploadResult.toString());
         if (uploadResult.getError()!=null){
-//            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-//            final AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.setIcon(R.drawable.ic_launcher);
-//            alertDialog.setTitle("Echec de publication");
-//            alertDialog.setMessage("Votre publication a échouée\n(Erreur obtenue : "+uploadResult.getError()+")");
-//            alertDialog.show();
-////            uploadProgressBar.setVisibility(View.GONE);
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+            final AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setIcon(R.drawable.ic_launcher);
+            alertDialog.setTitle("Echec de publication");
+            alertDialog.setMessage("Votre publication a échouée\n(Erreur obtenue : "+uploadResult.getError()+")");
+            alertDialog.show();
+//            uploadProgressBar.setVisibility(View.GONE);
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : \"+uploadResult.getError()+\")\");");
             return;
@@ -201,26 +202,26 @@ public class ShareActivity  extends ActionBarActivity {
                 urlSharedImg = uploadResult.getData().getPhoto().getProcessed_image().getUrl();
             }
             if (urlSharedImg==null){
-//                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-//                final AlertDialog alertDialog = alertDialogBuilder.create();
-//                alertDialog.setIcon(R.drawable.ic_launcher);
-//                alertDialog.setTitle("Publication réussie");
-//                alertDialog.setMessage("Votre publication a bien été effectuée\n--------------\nimage:"+
-//                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
-//                alertDialog.show();
-//                LOG.d(TAG_METHOD + "publication réussie");
-////                uploadProgressBar.setVisibility(View.GONE);
+                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+                final AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setIcon(R.drawable.ic_launcher);
+                alertDialog.setTitle("Publication réussie");
+                alertDialog.setMessage("Votre publication a bien été effectuée\n--------------\nimage:"+
+                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
+                alertDialog.show();
+                LOG.d(TAG_METHOD + "publication réussie");
+//                uploadProgressBar.setVisibility(View.GONE);
                 shareMessage.setText("Votre publication a bien été effectuée\n--------------\nimage:"+
                         urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
                 return;
             }else{
-//                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-//                final AlertDialog alertDialog = alertDialogBuilder.create();
-//                alertDialog.setIcon(R.drawable.ic_launcher);
-//                alertDialog.setTitle("Echec de publication");
-//                alertDialog.setMessage("Votre publication a échouée");
-//                alertDialog.show();
-////                uploadProgressBar.setVisibility(View.GONE);
+                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+                final AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setIcon(R.drawable.ic_launcher);
+                alertDialog.setTitle("Echec de publication");
+                alertDialog.setMessage("Votre publication a échouée");
+                alertDialog.show();
+//                uploadProgressBar.setVisibility(View.GONE);
                 shareMessage.setText("Le partage de la photo a échouéé");
                 return;
             }
