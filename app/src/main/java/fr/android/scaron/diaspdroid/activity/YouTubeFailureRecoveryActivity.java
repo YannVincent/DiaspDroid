@@ -14,7 +14,7 @@ import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
 
 /**
- * An abstract activity which deals with recovering from errors which may occur during API
+ * An abstract context which deals with recovering from errors which may occur during API
  * initialization, but can be corrected through user action.
  */
 public abstract class YouTubeFailureRecoveryActivity extends YouTubeBaseActivity implements

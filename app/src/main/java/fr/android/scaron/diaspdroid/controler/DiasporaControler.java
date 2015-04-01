@@ -28,7 +28,7 @@ import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
-//import fr.android.scaron.diaspdroid.activity.DiaspActivity;
+//import fr.android.scaron.diaspdroid.context.DiaspActivity;
 
 /**
  * Created by Sébastien on 24/01/2015.

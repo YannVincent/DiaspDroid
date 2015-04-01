@@ -28,7 +28,7 @@
     <!--<fragment-->
         <!--android:id="@+id/myListFragment"-->
         <!--android:tag="myListFragmentTag"-->
-        <!--android:name="fr.android.scaron.diaspdroid.activity.NavigationDrawerFragment_"-->
+        <!--android:name="fr.android.scaron.diaspdroid.context.NavigationDrawerFragment_"-->
         <!--android:layout_width="0dp"-->
         <!--android:layout_height="fill_parent"-->
         <!--android:layout_weight="1" />-->
