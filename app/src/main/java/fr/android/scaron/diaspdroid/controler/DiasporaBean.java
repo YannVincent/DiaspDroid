@@ -8,12 +8,9 @@ import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
-import org.androidannotations.annotations.SupposeBackground;
-import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -23,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
@@ -41,6 +39,8 @@ public class DiasporaBean {
 
     @RestService
     DiasporaService diasporaService;
+    @RestService
+    PodsService podsService;
     @Bean
     DiasporaErrorHandlerBean diasporaErrorHandlerBean;
 
@@ -65,6 +65,12 @@ public class DiasporaBean {
 //        if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
 //            diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
 //        }
+    }
+
+
+
+    public List<Pod> getPods(){
+        return podsService.getPods();
     }
 
     public boolean seLogguer(){

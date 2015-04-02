@@ -16,44 +16,25 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.SparseArray;
 import android.widget.Button;
-import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Response;
-
-import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.controler.PodsService;
-import fr.android.scaron.diaspdroid.controler.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.GroupList;
-import fr.android.scaron.diaspdroid.model.Pod;
-import fr.android.scaron.diaspdroid.model.Pods;
-import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.adapter.PodListViewAdapter;
-import fr.android.scaron.diaspdroid.vues.adapter.PodsAdapter;
+import fr.android.scaron.diaspdroid.vues.dialog.PodsListDialog;
 
 //import org.androidannotations.test15.R;
 //import org.androidannotations.test15.ebean.SomeBean;
@@ -93,8 +74,8 @@ public class ParamsFragment extends Fragment {
 
     @Click(R.id.podBtnSelect)
     void showDialogSelectPod(){
-        DialogFragment dialogFragment = new DialogFragment();
-        dialogFragment.setTargetFragment(new PodsFragment_(), getTargetRequestCode());
+        PodsListDialog dialogFragment = new PodsListDialog();
+//        dialogFragment.setTargetFragment(new PodsFragment_(), getTargetRequestCode());
         dialogFragment.show(getFragmentManager(),"podSelection");
 //        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
 //        final AlertDialog alertDialog = alertDialogBuilder.create();
