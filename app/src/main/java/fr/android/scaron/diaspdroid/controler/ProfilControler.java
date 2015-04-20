@@ -19,18 +19,18 @@ public class ProfilControler extends DiasporaControler {
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
 
 
-    public static void putImage(ImageView imageView, String imagePath){
-        try{
-            Ion.with(imageView)
-                    .placeholder(R.drawable.placeholder_image)
-//          .error(R.drawable.placeholder_image)
-                    .load(imagePath);
-        }catch(Throwable thr){
-            LOG.e("Erreur : " + thr.toString(), thr);
-            ACRA.getErrorReporter().handleException(thr);
-            throw thr;
-        }
-    }
+//    public static void putImage(ImageView imageView, String imagePath){
+//        try{
+//            Ion.with(imageView)
+//                    .placeholder(R.drawable.placeholder_image)
+////          .error(R.drawable.placeholder_image)
+//                    .load(imagePath);
+//        }catch(Throwable thr){
+//            LOG.e("Erreur : " + thr.toString(), thr);
+//            ACRA.getErrorReporter().handleException(thr);
+//            throw thr;
+//        }
+//    }
 
 //    public static void getToken(Context context, FutureCallback<Response<String>> callback){
 //        LOG.d(".getToken : Entrée");

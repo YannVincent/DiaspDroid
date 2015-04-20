@@ -2,10 +2,12 @@ package fr.android.scaron.diaspdroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Comparator;
+
 /**
  * Created by Sébastien on 19/02/2015.
  */
-public class Pod {
+public class Pod implements Comparable<Pod>{
 
     /*
     "id": "114",
@@ -289,5 +291,15 @@ String hidden": "no"
 
     public void setHidden(final String hidden) {
         this.hidden = hidden;
+    }
+
+//    @Override
+//    public int compare(final Pod lhs, final Pod rhs) {
+//        return lhs.getDomain().toLowerCase().compareTo(rhs.getDomain().toLowerCase());
+//    }
+
+    @Override
+    public int compareTo(final Pod another) {
+        return getDomain().toLowerCase().compareTo(another.getDomain().toLowerCase());
     }
 }

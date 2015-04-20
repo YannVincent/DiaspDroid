@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Pod;
+import fr.android.scaron.diaspdroid.model.Pods;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
@@ -30,5 +31,5 @@ import fr.android.scaron.diaspdroid.model.UploadResult;
 public interface PodsService extends RestClientErrorHandling {
 
     @Get("http://podupti.me/api.php?key=4r45tg&format=json")
-    List<Pod> getPods();
+    Pods getPods();
 }

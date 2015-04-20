@@ -122,7 +122,8 @@ public class Post {
     Boolean favorite;
     //"nsfw": false,
 
-    Boolean nsfw;
+//    Boolean nsfw;
+    Object nsfw;
 //    "author": {
 //        "id": 7449,
 //                "guid": "50b8df903074013219742a0000053625",
@@ -429,9 +430,12 @@ public class Post {
         this.favorite = favorite;
     }
 
-    public Boolean getNsfw() {
+    public Object getNsfw() {
         return nsfw;
     }
+//    public Boolean getNsfw() {
+//        return nsfw;
+//    }
 
     public void setNsfw(Boolean nsfw) {
         this.nsfw = nsfw;

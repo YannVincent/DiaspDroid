@@ -16,7 +16,7 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.widget.ListView;
 
 import org.acra.ACRA;
@@ -31,6 +31,7 @@ import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
@@ -41,7 +42,7 @@ import fr.android.scaron.diaspdroid.vues.adapter.PodsAdapter;
 
 
 @EFragment(R.layout.fragment_pod_list)
-public class PodsFragment extends Fragment {
+public class PodsFragment extends DialogFragment {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PodsFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
@@ -62,11 +63,15 @@ public class PodsFragment extends Fragment {
     @AfterViews
     void bindAdapter() {
         podList.setAdapter(adapter);
+        getDialog().setTitle("Liste de pods");
     }
 
     @Background
     void getPodsService(){
-        pods = podsService.getPods();
+        pods = podsService.getPods().getPods();
+        if (pods!=null){
+            Collections.sort(pods);
+        }
         updateAdapter();
     }
 
@@ -90,13 +95,5 @@ public class PodsFragment extends Fragment {
             LOG.d(TAG_METHOD+ "Sortie en erreur");
             throw thr;
         }
-    }
-
-    @ItemClick(R.id.pod_listview)
-    void podListClicked(Pod pod) {
-        String methodName = ".podClicked : ";
-        LOG.d(methodName+ "Entrée");
-
-        LOG.d(methodName+ "Sortie");
     }
 }

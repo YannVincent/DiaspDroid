@@ -1,4 +1,4 @@
-package fr.android.scaron.diaspdroid.controler;
+package fr.android.scaron.diaspdroid.vues.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -7,15 +7,16 @@ import android.widget.BaseAdapter;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterInject;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.view.PostView;
 import fr.android.scaron.diaspdroid.vues.view.PostView_;
@@ -41,17 +42,28 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        PostView postView;
-        if (convertView == null) {
-            postView = PostView_.build(context);
-        } else {
-            postView = (PostView) convertView;
+        if (convertView != null) {
+            PostView postViewConv = (PostView) convertView;
+            LOG.i("getView for position "+position+" -> comparaison of posts ids ("+getItem(position).getId()+"=="+postViewConv.postId+") ?"+(getItem(position).getId()==postViewConv.postId));
+            if (getItem(position).getId()==postViewConv.postId){
+                return convertView;
+            }
         }
-
+        PostView postView  = PostView_.build(context);
         postView.bind(getItem(position));
-
+        postView.setTag(getItem(position));
         return postView;
+//        PostView postView;
+//        if (convertView == null) {
+//            postView = PostView_.build(context);
+//            postView.bind(getItem(position));
+//
+//        } else {
+//            postView = (PostView) convertView;
+//            postView.refresh();
+//        }
+//
+//        return postView;
     }
 
     @Override
@@ -84,7 +96,7 @@ public class PostsAdapter extends BaseAdapter {
                 this.posts = new ArrayList<Post>();
             }else{
                 LOG.d(TAG_METHOD + "set this.posts with"+posts);
-                this.posts = posts;
+                this.posts = Collections.checkedList(posts, Post.class);
             }
             LOG.d(TAG_METHOD + "notifyDataSetChanged");
             super.notifyDataSetChanged();

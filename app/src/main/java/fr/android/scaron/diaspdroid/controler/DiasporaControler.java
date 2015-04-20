@@ -83,36 +83,6 @@ public class DiasporaControler {
         POSTS_URL = POD_URL+"/posts";
         POST_IMAGE = POD_URL + "/photos?photo%5Bpending%5D=true&set_profile_image=&";
     }
-
-
-    public static void connecter(final FutureCallback<Response<String>> callback){
-
-        //Callback de récupération du formulaire de login et d'accès au authenticity_token
-        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                boolean resultOK = onCompleteGetToken(e, result);
-                if (!resultOK){
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-                    final AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.setIcon(R.drawable.ic_launcher);
-                    alertDialog.setTitle("PB Accès");
-                    alertDialog.setMessage("L'accès a Diaspora est impossible");
-                    alertDialog.show();
-                    return;
-                }
-                //On a le token donc on demande le login
-                login(callback);
-            }
-        };
-        //Cas ou nous n'avons pas les informations pour se connecter.
-        if ((COOKIE_SESSION_TOKEN.isEmpty() && TOKEN.isEmpty())) {
-            getToken(tokenCallback);
-            return;
-        }
-        login(callback);
-    }
-
     public static void testerConnexion(){
         if ("Selectionnez votre POD".equals(DiasporaConfig.POD_URL)){
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
@@ -158,271 +128,6 @@ public class DiasporaControler {
             DiasporaControler.login(loginCallback);
         }
     }
-
-    public static void aimer(final int postID, final FutureCallback<Response<String>> aimerCallback, boolean forceRelogin){
-        boolean bForceLogin = forceRelogin;
-        String methodName = ".aimer : ";
-        if (forceRelogin){
-            return;
-        }
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                if (onCompleteLogin(e, result)){
-                    //On est loggué donc on demande le flux
-                    postLike(postID, aimerCallback);
-                }
-            }
-        };
-        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
-        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty())){
-            //Cas ou nous n'avons pas toutes les informations pour se connecter
-            connecter(loginCallback);
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        postLike(postID, aimerCallback);
-    }
-
-
-    public static void repartager(final String rootGuid, final FutureCallback<Response<String>> repartagerCallback, boolean forceRelogin){
-        boolean bForceLogin = forceRelogin;
-        String methodName = ".repartager : ";
-        if (forceRelogin){
-            return;
-        }
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                if (onCompleteLogin(e, result)){
-                    //On est loggué donc on demande le flux
-                    postReshare(rootGuid, repartagerCallback);
-                }
-            }
-        };
-        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
-            //Cas ou nous n'avons pas toutes les informations pour se connecter
-            connecter(loginCallback);
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        postReshare(rootGuid, repartagerCallback);
-    }
-
-    public static void partagerImage(final String localPath, final String nameFile, final ProgressBar uploadProgressBar, final FutureCallback<Response<String>> partagerImageCallback){
-
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                if (onCompleteLogin(e, result)){
-                    //On est loggué donc on demande le flux
-                    DataControler.uploadImage(localPath, nameFile, uploadProgressBar, partagerImageCallback);
-                }
-            }
-        };
-        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
-            //Cas ou nous n'avons pas toutes les informations pour se connecter
-            connecter(loginCallback);
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        DataControler.uploadImage(localPath, nameFile, uploadProgressBar, partagerImageCallback);
-
-    }
-
-    public static void partagerImage(final String localPath, final String nameFile, final String message, final ProgressBar uploadProgressBar, final FutureCallback<Response<UploadResult>> partagerImageCallback){
-
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                if (onCompleteLogin(e, result)){
-                    //On est loggué donc on demande le flux
-                    DataControler.uploadImage(localPath, nameFile, message, uploadProgressBar, partagerImageCallback);
-                }
-            }
-        };
-        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
-        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
-            //Cas ou nous n'avons pas toutes les informations pour se connecter
-            connecter(loginCallback);
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        DataControler.uploadImage(localPath, nameFile, message, uploadProgressBar, partagerImageCallback);
-
-    }
-
-    public static void getStreamFlow(final FutureCallback<Response<List<Post>>> fluxCallback, boolean forceRelogin){
-
-        boolean bForceLogin = forceRelogin;
-        if (forceRelogin){
-            return;
-        }
-        //Callback d'envoi du formulaire de login
-        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
-            @Override
-            public void onCompleted(Exception e, Response<String> result) {
-                if (onCompleteLogin(e, result)){
-                    //On est loggué donc on demande le flux
-                    getStream(fluxCallback);
-                }
-            }
-        };
-
-        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
-        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty())){
-            //Cas ou nous n'avons pas toutes les informations pour se connecter
-            connecter(loginCallback);
-            return;
-        }
-        //Cas ou nous avons les informations de connexion
-        getStream(fluxCallback);
-
-    }
-
-    public static void getToken(FutureCallback<Response<String>> callback){
-        String methodName = ".getToken : ";
-        LOG.d(methodName + "Entrée");
-        Context context = DiasporaConfig.APPLICATION_CONTEXT;
-        if (context == null){
-            context = DiasporaConfig.APPLICATION;
-        }
-        if (context == null){
-            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+LOGIN_URL);
-        }else {
-            try {
-                LOG.d(methodName + "Construction de la requête d'appel GET à " + LOGIN_URL);
-                Ion.with(context)
-                        .load("GET", LOGIN_URL)
-                        .setHeader("User-Agent", USER_AGENT)
-                        .followRedirect(true)
-                        .noCache()
-                        .asString()
-                        .withResponse()
-                        .setCallback(callback);
-            } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
-                ACRA.getErrorReporter().handleException(thr);
-            }
-        }
-        LOG.d(methodName + "Sortie");
-    }
-
-
-
-    public static boolean onCompleteRepartager(Exception exception, final Response<String> response){
-        String methodName = ".onCompleteRepartager : ";
-        LOG.d(methodName + "Entrée");
-
-
-        boolean resultOK = true;
-        boolean resultKO = false;
-
-        LOG.d(methodName + ": exception ? "+exception);
-        if (exception != null) {
-            LOG.d(methodName + "Erreur : "+exception.getMessage());
-            exception.printStackTrace();
-            ACRA.getErrorReporter().handleException(exception);
-            LOG.d(methodName + ": Sortie");
-            return resultKO;
-        }
-
-        LOG.d(methodName + ": response ? "+response);
-        if (response!=null){
-            String result = response.getResult();
-            LOG.d(methodName + ": reponse result ? "+result);
-            HeadersResponse resultHeaders = response.getHeaders();
-            LOG.d(methodName + ": reponse headers ? "+resultHeaders);
-            if (resultHeaders.getHeaders()!=null){
-                LOG.d(methodName + ": all headers ? "+resultHeaders.getHeaders());
-                LOG.d(methodName + ": reponse code ? "+resultHeaders.code());
-                LOG.d(methodName + ": reponse message ? "+resultHeaders.message());
-            }
-        }
-
-        LOG.d(methodName + ": Sortie");
-        return resultOK;
-    }
-
-    public static boolean onCompleteGetToken(Exception exception, Response<String> response){
-        LOG.d(".onCompleteGetToken : Entrée");
-        String result = response.getResult();
-        boolean resultOK = true;
-        boolean resultKO = false;
-
-        if (exception != null) {
-            LOG.d(".onCompleteGetToken Erreur : "+exception.getMessage());
-            exception.printStackTrace();
-            ACRA.getErrorReporter().handleException(exception);
-            LOG.d(".onCompleteGetToken : Sortie");
-            return resultKO;
-        }
-
-        if (response==null || response.getHeaders()==null){
-            LOG.d(".onCompleteGetToken\t**\trecherche impossible de COOKIE_SESSION_TOKEN\t**");
-            LOG.d(".onCompleteGetToken : Sortie");
-            return resultKO;
-        }
-        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
-        boolean cookieSessionFound = false;
-        for(Header header:headers) {
-            String headerName = header.getName();
-            String headerValue = header.getValue();
-            if (headerName != null && !headerName.isEmpty() &&
-                    headerValue != null && !headerValue.isEmpty() &&
-                    headerName.toLowerCase().equals("set-cookie")) {
-                if (headerValue.startsWith("_diaspora_session=")) {
-                    LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN found in " + headerValue + "\t**");
-                    COOKIE_SESSION_TOKEN = headerValue.substring("_diaspora_session=".length());
-                    LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN set to " + COOKIE_SESSION_TOKEN + "\t**");
-                    cookieSessionFound = true;
-//                    if (COOKIE_SESSION_TOKEN.isEmpty()) {
-//                        COOKIE_SESSION_TOKEN = headerValue.substring("_diaspora_session=".length());
-//                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN set to " + COOKIE_SESSION_TOKEN + "\t**");
-//                    } else {
-//                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN already set to " + COOKIE_SESSION_TOKEN + "\t**");
-//                    }
-                }
-            }
-        }
-        if (!cookieSessionFound){
-            LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN introuvable\t**");
-            LOG.d(".onCompleteGetToken : Sortie");
-            return resultKO;
-        }
-
-        if (result==null || result.isEmpty()){
-            LOG.d(".parseLoginAsync\t**\tRESPONSE introuvable\t**");
-            LOG.d(".onCompleteGetToken : Sortie");
-            return resultKO;
-        }
-        int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
-        if (indexTokenName<=0) {
-            LOG.d(".onCompleteGetToken\t**\tIMPOSSIBLE de trouver le token");
-            LOG.d(".onCompleteGetToken : Sortie");
-            return resultKO;
-        }
-        int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
-        LOG.d(".onCompleteGetToken	**	token found in "+result.substring(indexToken, result.indexOf("/>", indexToken)));
-        indexToken = indexToken+"<meta content=\"".length();
-        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken+1);
-        if (TOKEN.isEmpty()) {
-            TOKEN = result.substring(indexToken, indexEndToken);
-            LOG.d(".onCompleteGetToken\t**\ttoken récolté '" + TOKEN + "'");
-        }else{
-            LOG.d(".onCompleteGetToken\t**\ttoken déjà récolté '" + TOKEN + "'");
-        }
-        LOG.d(".onCompleteGetToken : Sortie");
-        return resultOK;
-    }
-
-
     public static void login(FutureCallback<Response<String>> callback){
         String methodName = ".login : ";
         LOG.d(methodName + "Entrée");
@@ -448,12 +153,12 @@ public class DiasporaControler {
                         .addHeader("Accept", "*/*")
                         .setHeader("User-Agent", USER_AGENT)
                         .noCache()
-                        //.setBodyParameter("utf-8", "✓")
+                                //.setBodyParameter("utf-8", "✓")
                         .setBodyParameter("authenticity_token", TOKEN)
                         .setBodyParameter("user[username]", POD_USER)
                         .setBodyParameter("user[password]", POD_PASSWORD)
                         .setBodyParameter("user[remember_me]", "1")
-                        //.setBodyParameter("commit", "Connexion")
+                                //.setBodyParameter("commit", "Connexion")
                         .asString()
                         .withResponse()
                         .setCallback(callback);
@@ -464,54 +169,6 @@ public class DiasporaControler {
         }
         LOG.d(".login : Sortie");
     }
-
-
-
-    public static List<Post> onCompleteStream(Exception exception, Response<List<Post>> response) {
-        LOG.d(".onCompleteStream : Entrée");
-        List<Post> result = response.getResult();
-        boolean resultOK = true;
-        boolean resultKO = false;
-
-        if (exception != null) {
-            LOG.d(".onCompleteStream Erreur : "+exception.getMessage());
-            exception.printStackTrace();
-            ACRA.getErrorReporter().handleException(exception);
-            LOG.d(".onCompleteStream : Sortie");
-            return new ArrayList<Post>();
-        }
-
-//        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
-//        boolean cookieSessionFound = false;
-//        boolean cookieRememberFound = false;
-//        for(Header header:headers) {
-//            String headerName = header.getName();
-//            String headerValue = header.getValue();
-//            if (headerName != null && !headerName.isEmpty() &&
-//                    headerValue != null && !headerValue.isEmpty() &&
-//                    headerName.toLowerCase().equals("set-cookie")) {
-//                if (headerValue.startsWith("_diaspora_session=")) {
-//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
-//                    cookieSessionFound = true;
-//                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
-//                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
-//                }
-//            }
-//        }
-//        if (!cookieSessionFound){
-//            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
-//        }
-
-        if (result==null || result.isEmpty()){
-            LOG.d(".onCompleteStream\t**\tRESPONSE introuvable\t**");
-            LOG.d(".onCompleteStream : Sortie");
-            return new ArrayList<Post>();
-        }
-        LOG.d(".onCompleteStream : Sortie");
-        return result;
-    }
-
-
     public static boolean onCompleteLogin(Exception exception, Response<String> response) {
         LOG.d(".onCompleteLogin : Entrée");
         String result = response.getResult();
@@ -587,211 +244,557 @@ public class DiasporaControler {
     }
 
 
+//    public static void connecter(final FutureCallback<Response<String>> callback){
+//
+//        //Callback de récupération du formulaire de login et d'accès au authenticity_token
+//        final FutureCallback<Response<String>> tokenCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                boolean resultOK = onCompleteGetToken(e, result);
+//                if (!resultOK){
+//                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+//                    final AlertDialog alertDialog = alertDialogBuilder.create();
+//                    alertDialog.setIcon(R.drawable.ic_launcher);
+//                    alertDialog.setTitle("PB Accès");
+//                    alertDialog.setMessage("L'accès a Diaspora est impossible");
+//                    alertDialog.show();
+//                    return;
+//                }
+//                //On a le token donc on demande le login
+//                login(callback);
+//            }
+//        };
+//        //Cas ou nous n'avons pas les informations pour se connecter.
+//        if ((COOKIE_SESSION_TOKEN.isEmpty() && TOKEN.isEmpty())) {
+//            getToken(tokenCallback);
+//            return;
+//        }
+//        login(callback);
+//    }
 
-    public static void post(String post, String username, String password, FutureCallback<Response<String>> callback){
-        LOG.d(".post : Entrée (username="+username+" , password="+password+", token="+TOKEN+")");
-        try{
-            Ion.with(DiasporaConfig.APPLICATION_CONTEXT)
-                    .load("POST", LOGIN_URL)
-                    .setHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .setHeader("User-Agent", USER_AGENT)
-                    .setBodyParameter("user[username]", username)
-                    .setBodyParameter("user[password]", password)
-                    .setBodyParameter("status_message[fake_text]", post)
-                    .setBodyParameter("status_message[text]", post)
-                    .setBodyParameter("user[remember_me]", "1")
-                    .setBodyParameter("authenticity_token",TOKEN)
-                    .setBodyParameter("aspect_ids[]", "public")//public, all_aspects
-                    .setBodyParameter("utf8","&#10003;")
-                    .setBodyParameter("commit","Share")
-                    .asString()
-                    .withResponse()
-                    .setCallback(callback);
-        }catch(Throwable thr){
-            LOG.e("Erreur : " + thr.toString(), thr);
-            ACRA.getErrorReporter().handleException(thr);
-        }
-        LOG.d(".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
-    }
 
-    public static void getStream(FutureCallback<Response<List<Post>>> callback){
-        String methodName = ".getStream : ";
-        LOG.d(methodName + "Entrée");
-        Context context = DiasporaConfig.APPLICATION_CONTEXT;
-        if (context == null){
-            context = DiasporaConfig.APPLICATION;
-        }
-        if (context == null){
-            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+STREAM_URL+ " (x-csrf-token="+TOKEN+")");
-        }else {
-            try {
-                LOG.d(methodName + "On efface les cookies");
-                CookieControler cookieControler = CookieControler.getInstance();
-                cookieControler.clearCookies();
-                URI uri = URI.create(POD_URL);
-                if (!COOKIE_REMEMBER.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
-                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
-                }
-                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
-                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
-                }
-                LOG.d(methodName + "Construction de la requête d'appel GET à " + STREAM_URL + " (x-csrf-token=" + TOKEN + ")");
-                Ion.with(context)
-                        .load("GET", STREAM_URL)
-                        .setHeader("User-Agent", USER_AGENT)
-                        .noCache()
-                        .setHeader("x-requested-with", "XMLHttpRequest")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                        .setHeader("x-csrf-token", TOKEN)
-                        .as(new TypeToken<List<Post>>() {
-                        })
-                        .withResponse()
-                        .setCallback(callback);
-            } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
-                ACRA.getErrorReporter().handleException(ioex);
-            } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
-                ACRA.getErrorReporter().handleException(thr);
-                LOG.d(methodName + "Sortie");
-                throw thr;
-            }
-        }
-        LOG.d(methodName + "Sortie");
-    }
-    public static void getPodList(FutureCallback<Response<Pods>> callback){
-        String methodName = ".getPodList : ";
-        LOG.d(methodName + "Entrée");
-        Context context = DiasporaConfig.APPLICATION_CONTEXT;
-        if (context == null){
-            context = DiasporaConfig.APPLICATION;
-        }
-        if (context == null){
-            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+PODLIST_URL+ " (x-csrf-token="+TOKEN+")");
-        }else {
-            try {
-                LOG.d(methodName + "Construction de la requête d'appel GET à " + PODLIST_URL + " (x-csrf-token=" + TOKEN + ")");
-                Ion.with(context)
-                        .load("GET", PODLIST_URL)
-                        .setHeader("User-Agent", USER_AGENT)
-                        .noCache()
-                        .setHeader("x-requested-with", "XMLHttpRequest")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                        .as(new TypeToken<Pods>() {
-                        })
-                        .withResponse()
-                        .setCallback(callback);
-            } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
-                ACRA.getErrorReporter().handleException(thr);
-                LOG.d(methodName + "Sortie");
-                throw thr;
-            }
-        }
-        LOG.d(methodName + "Sortie");
-    }
 
-    public static void postReshare(String rootGuid, FutureCallback<Response<String>> callback){
-        String methodName = ".postReshare : ";
-        LOG.d(methodName + "Entrée");
-        Context context = DiasporaConfig.APPLICATION_CONTEXT;
-        if (context == null){
-            context = DiasporaConfig.APPLICATION;
-        }
-        if (context == null){
-            LOG.i(methodName + "ANNULATION Construction de la requête d'appel POST à "+RESHARE_URL+ " (root_guid="+rootGuid+")");
-        }else {
-            try {
-                LOG.d(methodName + "On efface les cookies");
-                CookieControler cookieControler = CookieControler.getInstance();
-                cookieControler.clearCookies();
-                URI uri = URI.create(POD_URL);
-                if (!COOKIE_REMEMBER.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
-                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
-                }
-                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
-                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
-                }
-                JsonObject jsonParam = new JsonObject();
-                LOG.d(methodName + "Construction de la requête d'appel POST à " + RESHARE_URL + " (root_guid=" + rootGuid + ")");
-                jsonParam.addProperty("root_guid", rootGuid);
-                Ion.with(context)
-                        .load("POST", RESHARE_URL)
-                        .setHeader("User-Agent", USER_AGENT)
-                        .noCache()
-                        .setHeader("x-requested-with", "XMLHttpRequest")
-                        .setHeader("content-type", "application/json")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-//                .setHeader("x-csrf-token", TOKEN)
-                        .setJsonObjectBody(jsonParam)
-                        .asString()
-                        .withResponse()
-                        .setCallback(callback);
+//    public static void aimer(final int postID, final FutureCallback<Response<String>> aimerCallback, boolean forceRelogin){
+//        boolean bForceLogin = forceRelogin;
+//        String methodName = ".aimer : ";
+//        if (forceRelogin){
+//            return;
+//        }
+//        //Callback d'envoi du formulaire de login
+//        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                if (onCompleteLogin(e, result)){
+//                    //On est loggué donc on demande le flux
+//                    postLike(postID, aimerCallback);
+//                }
+//            }
+//        };
+//        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
+//        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty())){
+//            //Cas ou nous n'avons pas toutes les informations pour se connecter
+//            connecter(loginCallback);
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        postLike(postID, aimerCallback);
+//    }
+//
+//
+//    public static void repartager(final String rootGuid, final FutureCallback<Response<String>> repartagerCallback, boolean forceRelogin){
+//        boolean bForceLogin = forceRelogin;
+//        String methodName = ".repartager : ";
+//        if (forceRelogin){
+//            return;
+//        }
+//        //Callback d'envoi du formulaire de login
+//        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                if (onCompleteLogin(e, result)){
+//                    //On est loggué donc on demande le flux
+//                    postReshare(rootGuid, repartagerCallback);
+//                }
+//            }
+//        };
+//        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
+//        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
+//            //Cas ou nous n'avons pas toutes les informations pour se connecter
+//            connecter(loginCallback);
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        postReshare(rootGuid, repartagerCallback);
+//    }
+//
+//    public static void partagerImage(final String localPath, final String nameFile, final ProgressBar uploadProgressBar, final FutureCallback<Response<String>> partagerImageCallback){
+//
+//        //Callback d'envoi du formulaire de login
+//        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                if (onCompleteLogin(e, result)){
+//                    //On est loggué donc on demande le flux
+//                    DataControler.uploadImage(localPath, nameFile, uploadProgressBar, partagerImageCallback);
+//                }
+//            }
+//        };
+//        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
+//        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
+//            //Cas ou nous n'avons pas toutes les informations pour se connecter
+//            connecter(loginCallback);
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        DataControler.uploadImage(localPath, nameFile, uploadProgressBar, partagerImageCallback);
+//
+//    }
+//
+//    public static void partagerImage(final String localPath, final String nameFile, final String message, final ProgressBar uploadProgressBar, final FutureCallback<Response<UploadResult>> partagerImageCallback){
+//
+//        //Callback d'envoi du formulaire de login
+//        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                if (onCompleteLogin(e, result)){
+//                    //On est loggué donc on demande le flux
+//                    DataControler.uploadImage(localPath, nameFile, message, uploadProgressBar, partagerImageCallback);
+//                }
+//            }
+//        };
+//        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
+//        if (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty()){
+//            //Cas ou nous n'avons pas toutes les informations pour se connecter
+//            connecter(loginCallback);
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        DataControler.uploadImage(localPath, nameFile, message, uploadProgressBar, partagerImageCallback);
+//
+//    }
+//
+//    public static void getStreamFlow(final FutureCallback<Response<List<Post>>> fluxCallback, boolean forceRelogin){
+//
+//        boolean bForceLogin = forceRelogin;
+//        if (forceRelogin){
+//            return;
+//        }
+//        //Callback d'envoi du formulaire de login
+//        final FutureCallback<Response<String>> loginCallback = new FutureCallback<Response<String>>() {
+//            @Override
+//            public void onCompleted(Exception e, Response<String> result) {
+//                if (onCompleteLogin(e, result)){
+//                    //On est loggué donc on demande le flux
+//                    getStream(fluxCallback);
+//                }
+//            }
+//        };
+//
+//        //Cas ou nous n'avons pas toutes les informations de connexion déjà en mémoire.
+//        if (bForceLogin || (COOKIE_REMEMBER.isEmpty() && COOKIE_SESSION_LOGIN.isEmpty())){
+//            //Cas ou nous n'avons pas toutes les informations pour se connecter
+//            connecter(loginCallback);
+//            return;
+//        }
+//        //Cas ou nous avons les informations de connexion
+//        getStream(fluxCallback);
+//
+//    }
 
-            } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
-                ACRA.getErrorReporter().handleException(ioex);
-            } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
-                ACRA.getErrorReporter().handleException(thr);
-                LOG.d(methodName + "Sortie");
-                throw thr;
-            }
-        }
-        LOG.d(methodName+ "Sortie");
-    }
+//    public static void getToken(FutureCallback<Response<String>> callback){
+//        String methodName = ".getToken : ";
+//        LOG.d(methodName + "Entrée");
+//        Context context = DiasporaConfig.APPLICATION_CONTEXT;
+//        if (context == null){
+//            context = DiasporaConfig.APPLICATION;
+//        }
+//        if (context == null){
+//            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+LOGIN_URL);
+//        }else {
+//            try {
+//                LOG.d(methodName + "Construction de la requête d'appel GET à " + LOGIN_URL);
+//                Ion.with(context)
+//                        .load("GET", LOGIN_URL)
+//                        .setHeader("User-Agent", USER_AGENT)
+//                        .followRedirect(true)
+//                        .noCache()
+//                        .asString()
+//                        .withResponse()
+//                        .setCallback(callback);
+//            } catch (Throwable thr) {
+//                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
+//                ACRA.getErrorReporter().handleException(thr);
+//            }
+//        }
+//        LOG.d(methodName + "Sortie");
+//    }
+//
+//
+//
+//    public static boolean onCompleteRepartager(Exception exception, final Response<String> response){
+//        String methodName = ".onCompleteRepartager : ";
+//        LOG.d(methodName + "Entrée");
+//
+//
+//        boolean resultOK = true;
+//        boolean resultKO = false;
+//
+//        LOG.d(methodName + ": exception ? "+exception);
+//        if (exception != null) {
+//            LOG.d(methodName + "Erreur : "+exception.getMessage());
+//            exception.printStackTrace();
+//            ACRA.getErrorReporter().handleException(exception);
+//            LOG.d(methodName + ": Sortie");
+//            return resultKO;
+//        }
+//
+//        LOG.d(methodName + ": response ? "+response);
+//        if (response!=null){
+//            String result = response.getResult();
+//            LOG.d(methodName + ": reponse result ? "+result);
+//            HeadersResponse resultHeaders = response.getHeaders();
+//            LOG.d(methodName + ": reponse headers ? "+resultHeaders);
+//            if (resultHeaders.getHeaders()!=null){
+//                LOG.d(methodName + ": all headers ? "+resultHeaders.getHeaders());
+//                LOG.d(methodName + ": reponse code ? "+resultHeaders.code());
+//                LOG.d(methodName + ": reponse message ? "+resultHeaders.message());
+//            }
+//        }
+//
+//        LOG.d(methodName + ": Sortie");
+//        return resultOK;
+//    }
+//
+//    public static boolean onCompleteGetToken(Exception exception, Response<String> response){
+//        LOG.d(".onCompleteGetToken : Entrée");
+//        String result = response.getResult();
+//        boolean resultOK = true;
+//        boolean resultKO = false;
+//
+//        if (exception != null) {
+//            LOG.d(".onCompleteGetToken Erreur : "+exception.getMessage());
+//            exception.printStackTrace();
+//            ACRA.getErrorReporter().handleException(exception);
+//            LOG.d(".onCompleteGetToken : Sortie");
+//            return resultKO;
+//        }
+//
+//        if (response==null || response.getHeaders()==null){
+//            LOG.d(".onCompleteGetToken\t**\trecherche impossible de COOKIE_SESSION_TOKEN\t**");
+//            LOG.d(".onCompleteGetToken : Sortie");
+//            return resultKO;
+//        }
+//        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
+//        boolean cookieSessionFound = false;
+//        for(Header header:headers) {
+//            String headerName = header.getName();
+//            String headerValue = header.getValue();
+//            if (headerName != null && !headerName.isEmpty() &&
+//                    headerValue != null && !headerValue.isEmpty() &&
+//                    headerName.toLowerCase().equals("set-cookie")) {
+//                if (headerValue.startsWith("_diaspora_session=")) {
+//                    LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN found in " + headerValue + "\t**");
+//                    COOKIE_SESSION_TOKEN = headerValue.substring("_diaspora_session=".length());
+//                    LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN set to " + COOKIE_SESSION_TOKEN + "\t**");
+//                    cookieSessionFound = true;
+////                    if (COOKIE_SESSION_TOKEN.isEmpty()) {
+////                        COOKIE_SESSION_TOKEN = headerValue.substring("_diaspora_session=".length());
+////                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN set to " + COOKIE_SESSION_TOKEN + "\t**");
+////                    } else {
+////                        LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN already set to " + COOKIE_SESSION_TOKEN + "\t**");
+////                    }
+//                }
+//            }
+//        }
+//        if (!cookieSessionFound){
+//            LOG.d(".onCompleteGetToken\t**\tCOOKIE_SESSION_TOKEN introuvable\t**");
+//            LOG.d(".onCompleteGetToken : Sortie");
+//            return resultKO;
+//        }
+//
+//        if (result==null || result.isEmpty()){
+//            LOG.d(".parseLoginAsync\t**\tRESPONSE introuvable\t**");
+//            LOG.d(".onCompleteGetToken : Sortie");
+//            return resultKO;
+//        }
+//        int indexTokenName = result.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
+//        if (indexTokenName<=0) {
+//            LOG.d(".onCompleteGetToken\t**\tIMPOSSIBLE de trouver le token");
+//            LOG.d(".onCompleteGetToken : Sortie");
+//            return resultKO;
+//        }
+//        int indexToken = result.indexOf("<meta content=\"", indexTokenName + 1);
+//        LOG.d(".onCompleteGetToken	**	token found in "+result.substring(indexToken, result.indexOf("/>", indexToken)));
+//        indexToken = indexToken+"<meta content=\"".length();
+//        int indexEndToken = result.indexOf("\" name=\"csrf-token\"", indexToken+1);
+//        if (TOKEN.isEmpty()) {
+//            TOKEN = result.substring(indexToken, indexEndToken);
+//            LOG.d(".onCompleteGetToken\t**\ttoken récolté '" + TOKEN + "'");
+//        }else{
+//            LOG.d(".onCompleteGetToken\t**\ttoken déjà récolté '" + TOKEN + "'");
+//        }
+//        LOG.d(".onCompleteGetToken : Sortie");
+//        return resultOK;
+//    }
 
-    public static void postLike(int postID, FutureCallback<Response<String>> callback){
-        String methodName = ".postLike : ";
-        LOG.d(methodName + "Entrée");
-        Context context = DiasporaConfig.APPLICATION_CONTEXT;
-        if (context == null){
-            context = DiasporaConfig.APPLICATION;
-        }
-        if (context == null){
-            LOG.i(methodName + "ANNULATION Construction de la requête d'appel POST à " + POSTS_URL + "/" + postID + "/likes");
-        }else {
-            try {
-                LOG.d(methodName + "On efface les cookies");
-                CookieControler cookieControler = CookieControler.getInstance();
-                cookieControler.clearCookies();
-                URI uri = URI.create(POD_URL);
-                if (!COOKIE_REMEMBER.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
-                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
-                }
-                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
-                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
-                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
-                }
-                JsonObject jsonParam = new JsonObject();
-                LOG.d(methodName + "Construction de la requête d'appel POST à " + POSTS_URL + "/" + postID + "/likes");
-                Ion.with(context)
-                        .load("POST", POSTS_URL + "/" + postID + "/likes")
-                        .setHeader("User-Agent", USER_AGENT)
-                        .noCache()
-                        .setHeader("x-requested-with", "XMLHttpRequest")
-                        .setHeader("content-type", "application/json")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                        .setJsonObjectBody(jsonParam)
-                        .asString()
-                        .withResponse()
-                        .setCallback(callback);
 
-            } catch (IOException ioex) {
-                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
-                ACRA.getErrorReporter().handleException(ioex);
-            } catch (Throwable thr) {
-                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
-                ACRA.getErrorReporter().handleException(thr);
-                LOG.d(methodName + "Sortie");
-                throw thr;
-            }
-        }
-        LOG.d(methodName+ "Sortie");
-    }
+
+
+
+
+//    public static List<Post> onCompleteStream(Exception exception, Response<List<Post>> response) {
+//        LOG.d(".onCompleteStream : Entrée");
+//        List<Post> result = response.getResult();
+//        boolean resultOK = true;
+//        boolean resultKO = false;
+//
+//        if (exception != null) {
+//            LOG.d(".onCompleteStream Erreur : "+exception.getMessage());
+//            exception.printStackTrace();
+//            ACRA.getErrorReporter().handleException(exception);
+//            LOG.d(".onCompleteStream : Sortie");
+//            return new ArrayList<Post>();
+//        }
+//
+////        Header[] headers = response.getHeaders().getHeaders().toHeaderArray();
+////        boolean cookieSessionFound = false;
+////        boolean cookieRememberFound = false;
+////        for(Header header:headers) {
+////            String headerName = header.getName();
+////            String headerValue = header.getValue();
+////            if (headerName != null && !headerName.isEmpty() &&
+////                    headerValue != null && !headerValue.isEmpty() &&
+////                    headerName.toLowerCase().equals("set-cookie")) {
+////                if (headerValue.startsWith("_diaspora_session=")) {
+////                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM found in " + headerValue + "\t**");
+////                    cookieSessionFound = true;
+////                    COOKIE_SESSION_STREAM = headerValue.substring("_diaspora_session=".length());
+////                    LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM set to " + COOKIE_SESSION_STREAM + "\t**");
+////                }
+////            }
+////        }
+////        if (!cookieSessionFound){
+////            LOG.d(".onCompleteStream\t**\tCOOKIE_SESSION_STREAM introuvable\t**");
+////        }
+//
+//        if (result==null || result.isEmpty()){
+//            LOG.d(".onCompleteStream\t**\tRESPONSE introuvable\t**");
+//            LOG.d(".onCompleteStream : Sortie");
+//            return new ArrayList<Post>();
+//        }
+//        LOG.d(".onCompleteStream : Sortie");
+//        return result;
+//    }
+
+
+
+
+
+
+//    public static void post(String post, String username, String password, FutureCallback<Response<String>> callback){
+//        LOG.d(".post : Entrée (username="+username+" , password="+password+", token="+TOKEN+")");
+//        try{
+//            Ion.with(DiasporaConfig.APPLICATION_CONTEXT)
+//                    .load("POST", LOGIN_URL)
+//                    .setHeader("Content-Type", "application/x-www-form-urlencoded")
+//                    .setHeader("User-Agent", USER_AGENT)
+//                    .setBodyParameter("user[username]", username)
+//                    .setBodyParameter("user[password]", password)
+//                    .setBodyParameter("status_message[fake_text]", post)
+//                    .setBodyParameter("status_message[text]", post)
+//                    .setBodyParameter("user[remember_me]", "1")
+//                    .setBodyParameter("authenticity_token",TOKEN)
+//                    .setBodyParameter("aspect_ids[]", "public")//public, all_aspects
+//                    .setBodyParameter("utf8","&#10003;")
+//                    .setBodyParameter("commit","Share")
+//                    .asString()
+//                    .withResponse()
+//                    .setCallback(callback);
+//        }catch(Throwable thr){
+//            LOG.e("Erreur : " + thr.toString(), thr);
+//            ACRA.getErrorReporter().handleException(thr);
+//        }
+//        LOG.d(".post : Sortie (post="+post+"username="+username+" , password="+password+", token="+TOKEN+")");
+//    }
+//
+//    public static void getStream(FutureCallback<Response<List<Post>>> callback){
+//        String methodName = ".getStream : ";
+//        LOG.d(methodName + "Entrée");
+//        Context context = DiasporaConfig.APPLICATION_CONTEXT;
+//        if (context == null){
+//            context = DiasporaConfig.APPLICATION;
+//        }
+//        if (context == null){
+//            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+STREAM_URL+ " (x-csrf-token="+TOKEN+")");
+//        }else {
+//            try {
+//                LOG.d(methodName + "On efface les cookies");
+//                CookieControler cookieControler = CookieControler.getInstance();
+//                cookieControler.clearCookies();
+//                URI uri = URI.create(POD_URL);
+//                if (!COOKIE_REMEMBER.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+//                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+//                }
+//                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+//                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+//                }
+//                LOG.d(methodName + "Construction de la requête d'appel GET à " + STREAM_URL + " (x-csrf-token=" + TOKEN + ")");
+//                Ion.with(context)
+//                        .load("GET", STREAM_URL)
+//                        .setHeader("User-Agent", USER_AGENT)
+//                        .noCache()
+//                        .setHeader("x-requested-with", "XMLHttpRequest")
+//                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+//                        .setHeader("x-csrf-token", TOKEN)
+//                        .as(new TypeToken<List<Post>>() {
+//                        })
+//                        .withResponse()
+//                        .setCallback(callback);
+//            } catch (IOException ioex) {
+//                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
+//                ACRA.getErrorReporter().handleException(ioex);
+//            } catch (Throwable thr) {
+//                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
+//                ACRA.getErrorReporter().handleException(thr);
+//                LOG.d(methodName + "Sortie");
+//                throw thr;
+//            }
+//        }
+//        LOG.d(methodName + "Sortie");
+//    }
+//    public static void getPodList(FutureCallback<Response<Pods>> callback){
+//        String methodName = ".getPodList : ";
+//        LOG.d(methodName + "Entrée");
+//        Context context = DiasporaConfig.APPLICATION_CONTEXT;
+//        if (context == null){
+//            context = DiasporaConfig.APPLICATION;
+//        }
+//        if (context == null){
+//            LOG.i(methodName + "ANNULATION Construction de la requête d'appel GET à "+PODLIST_URL+ " (x-csrf-token="+TOKEN+")");
+//        }else {
+//            try {
+//                LOG.d(methodName + "Construction de la requête d'appel GET à " + PODLIST_URL + " (x-csrf-token=" + TOKEN + ")");
+//                Ion.with(context)
+//                        .load("GET", PODLIST_URL)
+//                        .setHeader("User-Agent", USER_AGENT)
+//                        .noCache()
+//                        .setHeader("x-requested-with", "XMLHttpRequest")
+//                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+//                        .as(new TypeToken<Pods>() {
+//                        })
+//                        .withResponse()
+//                        .setCallback(callback);
+//            } catch (Throwable thr) {
+//                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
+//                ACRA.getErrorReporter().handleException(thr);
+//                LOG.d(methodName + "Sortie");
+//                throw thr;
+//            }
+//        }
+//        LOG.d(methodName + "Sortie");
+//    }
+//
+//    public static void postReshare(String rootGuid, FutureCallback<Response<String>> callback){
+//        String methodName = ".postReshare : ";
+//        LOG.d(methodName + "Entrée");
+//        Context context = DiasporaConfig.APPLICATION_CONTEXT;
+//        if (context == null){
+//            context = DiasporaConfig.APPLICATION;
+//        }
+//        if (context == null){
+//            LOG.i(methodName + "ANNULATION Construction de la requête d'appel POST à "+RESHARE_URL+ " (root_guid="+rootGuid+")");
+//        }else {
+//            try {
+//                LOG.d(methodName + "On efface les cookies");
+//                CookieControler cookieControler = CookieControler.getInstance();
+//                cookieControler.clearCookies();
+//                URI uri = URI.create(POD_URL);
+//                if (!COOKIE_REMEMBER.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+//                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+//                }
+//                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+//                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+//                }
+//                JsonObject jsonParam = new JsonObject();
+//                LOG.d(methodName + "Construction de la requête d'appel POST à " + RESHARE_URL + " (root_guid=" + rootGuid + ")");
+//                jsonParam.addProperty("root_guid", rootGuid);
+//                Ion.with(context)
+//                        .load("POST", RESHARE_URL)
+//                        .setHeader("User-Agent", USER_AGENT)
+//                        .noCache()
+//                        .setHeader("x-requested-with", "XMLHttpRequest")
+//                        .setHeader("content-type", "application/json")
+//                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+////                .setHeader("x-csrf-token", TOKEN)
+//                        .setJsonObjectBody(jsonParam)
+//                        .asString()
+//                        .withResponse()
+//                        .setCallback(callback);
+//
+//            } catch (IOException ioex) {
+//                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
+//                ACRA.getErrorReporter().handleException(ioex);
+//            } catch (Throwable thr) {
+//                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
+//                ACRA.getErrorReporter().handleException(thr);
+//                LOG.d(methodName + "Sortie");
+//                throw thr;
+//            }
+//        }
+//        LOG.d(methodName+ "Sortie");
+//    }
+//
+//    public static void postLike(int postID, FutureCallback<Response<String>> callback){
+//        String methodName = ".postLike : ";
+//        LOG.d(methodName + "Entrée");
+//        Context context = DiasporaConfig.APPLICATION_CONTEXT;
+//        if (context == null){
+//            context = DiasporaConfig.APPLICATION;
+//        }
+//        if (context == null){
+//            LOG.i(methodName + "ANNULATION Construction de la requête d'appel POST à " + POSTS_URL + "/" + postID + "/likes");
+//        }else {
+//            try {
+//                LOG.d(methodName + "On efface les cookies");
+//                CookieControler cookieControler = CookieControler.getInstance();
+//                cookieControler.clearCookies();
+//                URI uri = URI.create(POD_URL);
+//                if (!COOKIE_REMEMBER.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie remember_user_token=" + COOKIE_REMEMBER);
+//                    cookieControler.storeCookie(uri, "remember_user_token", COOKIE_REMEMBER);
+//                }
+//                if (!COOKIE_SESSION_LOGIN.isEmpty()) {
+//                    LOG.d(methodName + "On ajoute le cookie _diaspora_session=" + COOKIE_SESSION_LOGIN);
+//                    cookieControler.storeCookie(uri, "_diaspora_session", COOKIE_SESSION_LOGIN);
+//                }
+//                JsonObject jsonParam = new JsonObject();
+//                LOG.d(methodName + "Construction de la requête d'appel POST à " + POSTS_URL + "/" + postID + "/likes");
+//                Ion.with(context)
+//                        .load("POST", POSTS_URL + "/" + postID + "/likes")
+//                        .setHeader("User-Agent", USER_AGENT)
+//                        .noCache()
+//                        .setHeader("x-requested-with", "XMLHttpRequest")
+//                        .setHeader("content-type", "application/json")
+//                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+//                        .setJsonObjectBody(jsonParam)
+//                        .asString()
+//                        .withResponse()
+//                        .setCallback(callback);
+//
+//            } catch (IOException ioex) {
+//                LOG.e(methodName + "Erreur : " + ioex.toString(), ioex);
+//                ACRA.getErrorReporter().handleException(ioex);
+//            } catch (Throwable thr) {
+//                LOG.e(methodName + "Erreur : " + thr.toString(), thr);
+//                ACRA.getErrorReporter().handleException(thr);
+//                LOG.d(methodName + "Sortie");
+//                throw thr;
+//            }
+//        }
+//        LOG.d(methodName+ "Sortie");
+//    }
 }

@@ -30,6 +30,7 @@ public class PodsAdapter extends BaseAdapter {
     private static String TAG = "PodsAdapter";
 
     List<Pod> pods;
+    Pod podSelected = null;
 
     @RootContext
     Context context;
@@ -49,7 +50,7 @@ public class PodsAdapter extends BaseAdapter {
             podView = (PodView) convertView;
         }
 
-        podView.bind(getItem(position));
+        podView.bind(getItem(position), position);
 
         return podView;
     }
@@ -74,6 +75,19 @@ public class PodsAdapter extends BaseAdapter {
         super.notifyDataSetChanged();
     }
 
+    public void setPodSelected(Pod pod, int position, boolean selected){
+        this.podSelected = pod;
+        getItem(position).setSelected(selected);
+        for (int index=0; index<pods.size(); index++){
+            if (index!=position){
+                getItem(index).setSelected(false);
+            }
+        }
+        notifyDataSetChanged();
+    }
+    public Pod getPodSelected(){
+        return podSelected;
+    }
 
     public void setPods(List<Pod> pods) {
         String TAG_METHOD = TAG + ".setPods : ";

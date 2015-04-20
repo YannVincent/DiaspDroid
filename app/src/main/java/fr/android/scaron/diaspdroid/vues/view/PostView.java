@@ -3,6 +3,8 @@ package fr.android.scaron.diaspdroid.vues.view;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.View;
 import android.webkit.WebView;
@@ -21,6 +23,7 @@ import org.acra.ACRA;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +55,7 @@ public class PostView extends LinearLayout{
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostView.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+    private static String TAG = "PostView";
 
     private final ThumbnailListener thumbnailListener = new ThumbnailListener();
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap = new HashMap<YouTubeThumbnailView, YouTubeThumbnailLoader>();
@@ -103,9 +107,13 @@ public class PostView extends LinearLayout{
     @ViewById(R.id.detailComment)
     LinearLayout detailComment;
 
+    public Integer postId;
+
     Post post;
     Context context;
-
+    byte[] imageAvatarDatas = null;
+    byte[] imageDatas = null;
+    byte[] imageLinkDatas = null;
 
     public PostView(Context context) {
         super(context);
@@ -114,7 +122,8 @@ public class PostView extends LinearLayout{
 
     public void bind(final Post post) {
         this.post = post;
-        LOG.d(".getView videos from post");
+        this.postId = post.getId();
+        LOG.d(".getView videos from post "+post.getId()+"( instance id : "+this+")");
         Map<String, String> videos = getVideo(post);
         LOG.d(".getView videos found for post "+post+" : "+videos);
         View.OnClickListener youtubeclickListener = new View.OnClickListener() {
@@ -124,6 +133,7 @@ public class PostView extends LinearLayout{
                     // Launching YoutubeActivity Screen
                     Intent i = new Intent(context, YoutubeActivity.class);
                     i.putExtra("idYoutubeVideo", post.idYoutubeVideo);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(i);
                 }
             }
@@ -138,6 +148,7 @@ public class PostView extends LinearLayout{
                     // Launching Browser Screen
                     Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
                     myWebLink.setData(Uri.parse(post.webSiteUrl));
+                    myWebLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(myWebLink);
                 }
             }
@@ -149,27 +160,7 @@ public class PostView extends LinearLayout{
             @Override
             public void onClick(final View v) {
                 if (post!=null && post.getGuid()!=null){
-                    FutureCallback<Response<String>> likeCallBack = new FutureCallback<Response<String>>() {
-                        @Override
-                        public void onCompleted(Exception e, Response<String> result) {
-                            String methodName = ".getView likeCallBack onCompleted: ";
-                            boolean resultOK = DiasporaControler.onCompleteRepartager(e, result);
-                            if (!resultOK){
-                                if (context==null){
-                                    LOG.e(methodName + "Le contexte est vide et empêche un traitement");
-                                    return;
-                                }
-                                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                final AlertDialog alertDialog = alertDialogBuilder.create();
-                                alertDialog.setIcon(R.drawable.ic_launcher);
-                                alertDialog.setTitle("PB Accès");
-                                alertDialog.setMessage("Le like est impossible");
-                                alertDialog.show();
-                                return;
-                            }
-                        }
-                    };
-                    DiasporaControler.aimer(post.getId(), likeCallBack, false);
+                    aimer(post.getId());
                 }
             }
         };
@@ -182,7 +173,6 @@ public class PostView extends LinearLayout{
             public void onClick(final View v) {
                 if (post!=null && post.getGuid()!=null){
                     repartager(post.getGuid());
-//                    diasporaService.reshare(post.getGuid());
                 }
             }
         };
@@ -205,11 +195,152 @@ public class PostView extends LinearLayout{
 
     }
 
-    @Background
-    public void repartager(String rootGuid){
-        diasporaService.reshare(post.getGuid());
+
+
+    public void refresh() {
+        LOG.d(".refresh videos from post "+post.getId()+"( instance id : "+this+")");
+        Map<String, String> videos = getVideo(post);
+        LOG.d(".refresh videos found for post "+post+" : "+videos);
+        View.OnClickListener youtubeclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post.asYoutubeVideo && post.idYoutubeVideo != null && !post.idYoutubeVideo.isEmpty()) {
+                    // Launching YoutubeActivity Screen
+                    Intent i = new Intent(context, YoutubeActivity.class);
+                    i.putExtra("idYoutubeVideo", post.idYoutubeVideo);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(i);
+                }
+            }
+        };
+        thumbnail.setOnClickListener(youtubeclickListener);
+        imgplay.setOnClickListener(youtubeclickListener);
+
+        View.OnClickListener urlclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post.asWebSiteUrl && post.webSiteUrl!=null && !post.webSiteUrl.isEmpty()){
+                    // Launching Browser Screen
+                    Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
+                    myWebLink.setData(Uri.parse(post.webSiteUrl));
+                    myWebLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(myWebLink);
+                }
+            }
+        };
+        detailOpenGraph.setOnClickListener(urlclickListener);
+
+        // On crée la fonction pour le bouton like
+        View.OnClickListener likeclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post!=null && post.getGuid()!=null){
+                    aimer(post.getId());
+                }
+            }
+        };
+        // On attache la fonction au bouton like
+        detailLike.setOnClickListener(likeclickListener);
+
+        // On crée la fonction pour le bouton reshare
+        View.OnClickListener reshareclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post!=null && post.getGuid()!=null){
+                    repartager(post.getGuid());
+                }
+            }
+        };
+        // On attache la fonction au bouton reshare
+        detailRepublish.setOnClickListener(reshareclickListener);
+        setPost(post);
+
+        if (videos.containsKey("youtube")){
+            // Initialize youtubeVideo with youtube thumbnail
+            // 1) The view has not yet been created - we need to initialize the YouTubeThumbnailView.
+            post.asYoutubeVideo = true;
+            post.idYoutubeVideo = videos.get("youtube");
+            LOG.d(".refresh video youtube found ? "+post.asYoutubeVideo+" with ID ? "+post.idYoutubeVideo + " (url is '"+videos.get("youtubeurl")+"')");
+            thumbnail.setTag(videos.get("youtube"));
+            thumbnail.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+
+
+            LOG.i(".refresh video youtube found ? " + post.asYoutubeVideo + " with ID ? " + post.idYoutubeVideo + " (url is '" + videos.get("youtubeurl") + "')");
+        }
+
     }
 
+    @Background
+    public void aimer(Integer postID){
+        diasporaService.like(postID);
+    }
+
+    @Background
+    public void repartager(String rootGuid){
+        diasporaService.reshare(rootGuid);
+    }
+
+    @UiThread
+    public void setImageAvatarInView(String imagePath){
+        String TAG_METHOD = TAG + ".setImageAvatarInView : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        setImageAvatarInViewBG(imagePath);
+        if (imageAvatarDatas!=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
+            avatar.setImageBitmap(imageAvatar);
+        }
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @Background
+    public void setImageAvatarInViewBG(String imagePath){
+        String TAG_METHOD = TAG + ".setImageAvatarInViewBG : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageAvatarDatas = diasporaService.getImageFile(imagePath);
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+    @UiThread
+    public void setImageInView(String imagePath){
+        String TAG_METHOD = TAG + ".setImageInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        setImageInViewBG(imagePath);
+        if (imageDatas!=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageDatas, 0, imageDatas.length);
+            image.setImageBitmap(imageAvatar);
+        }
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+    @Background
+    public void setImageInViewBG(String imagePath){
+        String TAG_METHOD = TAG + ".setImageInViewBG : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageDatas = diasporaService.getImageFile(imagePath);
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+    @UiThread
+    public void setImageLinkInView(String imagePath){
+        String TAG_METHOD = TAG + ".setImageInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        setImageLinkInViewBG(imagePath);
+        if (imageLinkDatas!=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageLinkDatas, 0, imageLinkDatas.length);
+            detailOpenGraphImg.setImageBitmap(imageAvatar);
+        }
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+    @Background
+    public void setImageLinkInViewBG(String imagePath){
+        String TAG_METHOD = TAG + ".setImageAvatarInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageLinkDatas = diasporaService.getImageFile(imagePath);
+        LOG.d(TAG_METHOD+ "Sortie");
+    }
     public void setPost(Post post) {
         LOG.d(".setPost entree with post : "+post);
         try {
@@ -221,7 +352,9 @@ public class PostView extends LinearLayout{
                 Image iavatar = author.getAvatar();
                 // Remplissage de l'avatar
                 if (iavatar!=null){
-                    ProfilControler.putImage(avatar, iavatar.getLarge());
+
+//                    ProfilControler.putImage(avatar, iavatar.getLarge());
+                    setImageAvatarInView(iavatar.getLarge());
                 }
                 // Remplissage du nom
                 user.setText(author.getName());
@@ -236,7 +369,8 @@ public class PostView extends LinearLayout{
             // Remplissage de l'image
             String imageURL = post.getImage_url();
             if (imageURL!=null && !imageURL.isEmpty()){
-                ProfilControler.putImage(image, imageURL);
+//                ProfilControler.putImage(image, imageURL);
+                setImageInView(imageURL);
             }
             // Remplissage des contenus objets web
             Map<String, String> videoData = getVideo(post);
@@ -267,7 +401,8 @@ public class PostView extends LinearLayout{
                 // Affichage de l'image
                 String opengraphimg = opengraph.getImage();
                 if (opengraphimg!=null && !opengraphimg.isEmpty()){
-                    ProfilControler.putImage(detailOpenGraphImg, opengraphimg);
+//                    ProfilControler.putImage(detailOpenGraphImg, opengraphimg);
+                    setImageLinkInView(opengraphimg);
                 }
                 detailOpenGraphTitle.setText(opengraph.getTitle());
                 detailOpenGraphTxt.setText(opengraph.getDescription());

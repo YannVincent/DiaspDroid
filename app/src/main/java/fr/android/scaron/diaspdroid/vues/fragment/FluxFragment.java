@@ -1,6 +1,7 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
-import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -10,9 +11,6 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -24,15 +22,12 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.controler.PostsAdapter;
-import fr.android.scaron.diaspdroid.controler.ProfilControler;
+import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.Post;
 
 @EFragment(R.layout.fragment_flux_list)
@@ -52,6 +47,7 @@ public class FluxFragment extends Fragment {
     ActionBarActivity activity;
 
     List<Post> posts;
+    byte[] imageAvatarDatas = null;
 
     public void setActivityParent(ActionBarActivity activity){
         this.activity = activity;
@@ -89,7 +85,13 @@ public class FluxFragment extends Fragment {
         TextView mSecondTitleTextView = (TextView) mCustomView.findViewById(R.id.actbar_adress);
         mSecondTitleTextView.setText(userAdress);
         ImageView mTitleAvatarView = (ImageView) mCustomView.findViewById(R.id.actbar_avatar_icon);
-        ProfilControler.putImage(mTitleAvatarView, userAvatar);
+//        ProfilControler.putImage(mTitleAvatarView, userAvatar);
+        setImageAvatarInView(userAvatar);
+        if (imageAvatarDatas !=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
+            mTitleAvatarView.setImageBitmap(imageAvatar);
+        }
         actionBar.setCustomView(mCustomView);
 //        actionBar.setDisplayShowCustomEnabled(true);
 
@@ -103,6 +105,16 @@ public class FluxFragment extends Fragment {
 
         LOG.d(TAG_METHOD+ "Sortie");
     }
+
+    @Background
+    public void setImageAvatarInView(String imagePath){
+        String TAG_METHOD = TAG + ".setImageAvatarInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageAvatarDatas = diasporaBean.getImageFile(imagePath);
+        LOG.d(TAG_METHOD+ "Sortie");
+    }
+
     @AfterViews
     void bindAdapter() {
         String TAG_METHOD = TAG + ".bindAdapter : ";

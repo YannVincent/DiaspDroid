@@ -11,15 +11,20 @@ import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.rest.RestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
@@ -70,7 +75,7 @@ public class DiasporaBean {
 
 
     public List<Pod> getPods(){
-        return podsService.getPods();
+        return podsService.getPods().getPods();
     }
 
     public boolean seLogguer(){
@@ -98,10 +103,10 @@ public class DiasporaBean {
         return resultOK;
     }
 
-    public String reshare(String rootGuid){
+    public Post reshare(String rootGuid){
         String TAG_METHOD = TAG + ".reshare : ";
         LOG.d(TAG_METHOD+ "Entrée");
-        String reponseReshare="Echec";
+        Post reponseReshare=null;
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged) {
@@ -112,18 +117,35 @@ public class DiasporaBean {
                 LOG.d(TAG_METHOD + "Ajout du root_guid=" + rootGuid);
                 jsonParam.addProperty("root_guid", rootGuid);
                 reponseReshare = diasporaService.reshare(jsonParam);
+               LOG.d(TAG_METHOD + "réponse : "+reponseReshare.toString());
             }
         }
         LOG.d(TAG_METHOD+ "Sortie");
         return reponseReshare;
     }
 
-
-
-    public String callReshare(JsonObject jsonParam){
-
-        return diasporaService.reshare(jsonParam);
+    public LikeResult like(Integer postID){
+        String TAG_METHOD = TAG + ".like : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LikeResult reponseLike=null;
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged) {
+            LOG.d(TAG_METHOD + "logged successfully");
+            if (DiasporaControler.TOKEN != null && !DiasporaControler.TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+                reponseLike = diasporaService.like(postID);
+                LOG.d(TAG_METHOD + "réponse : "+reponseLike.toString());
+            }
+        }
+        LOG.d(TAG_METHOD+ "Sortie");
+        return reponseLike;
     }
+
+//    public String callReshare(JsonObject jsonParam){
+//
+//        return diasporaService.reshare(jsonParam);
+//    }
 
 
     public UploadResult uploadFile(String fileName, String localPath){
@@ -136,21 +158,30 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "logged successfully");
             if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
                 diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+                diasporaService.setHeader("authenticity_token", DiasporaControler.TOKEN);
             }
-//            diasporaService.setHeader("x-requested-with", "XMLHttpRequest");
-//            diasporaService.setHeader("x-file-name", fileName);
+            String fileNameUrlEncoded = fileName;
+            try {
+                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            diasporaService.setHeader("x-requested-with", "XMLHttpRequest");
+            diasporaService.setHeader("x-file-name", fileNameUrlEncoded);
+            diasporaService.setHeader("origin", "https://framasphere.org");
+            diasporaService.setHeader("referer", "https://framasphere.org/stream");
 //            diasporaService.setHeader("content-type", "application/octet-stream");
             MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
             LOG.d(TAG_METHOD+ "add part file");
-            mvMap.add("filename", fileName);
-//            mvMap.add("file", new FileSystemResource(localPath));
-            try {
-                mvMap.add("file", new FileInputStream(localPath));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+//            mvMap.add("filename", fileNameUrlEncoded);
+            mvMap.add("qqfile", new FileSystemResource(localPath));
+//            try {
+//                mvMap.add("file", new FileInputStream(localPath));
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
-            UploadResult uploadResult = diasporaService.uploadFile(fileName, mvMap);
+            UploadResult uploadResult = diasporaService.uploadFile(fileNameUrlEncoded, mvMap);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
                 LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
@@ -191,6 +222,15 @@ public class DiasporaBean {
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
+    }
+
+    public byte[] getImageFile(String fileUrl){
+        String TAG_METHOD = TAG + ".getImageFile : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        diasporaService.setRootUrl(fileUrl);
+        byte[] imageFile = diasporaService.getImageFile();
+        LOG.d(TAG_METHOD+ "Sortie");
+        return imageFile;
     }
 
     private boolean getToken(String response){

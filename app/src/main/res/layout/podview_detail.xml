@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
+    android:theme="@android:style/Theme.Black"
     android:orientation="vertical"
     tools:context="fr.android.scaron.diaspdroid.activity..ParamsActivity" >
 

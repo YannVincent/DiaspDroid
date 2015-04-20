@@ -81,11 +81,37 @@ public class DiasporaConfig {
         }
     }
 
-    public static void setPodAuthenticationValues(final String pPodUrl, final String pPodUser, final String pPodPassword){
+
+    public static void setPodDomainValue(final String pPodUrl, final String isSecure){
+
+        String podUrl="http";
+        if (!pPodUrl.startsWith("http"))
+        {
+            if ("true".equals(isSecure)){
+                podUrl=podUrl+"s";
+            }
+            podUrl=podUrl+"://"+pPodUrl;
+        }else{
+            podUrl=pPodUrl;
+        }
+        DB.putString("diaspora_pod", podUrl);
+        POD_URL = podUrl;
+        DiasporaControler.initParams();
+
+        Context context = APPLICATION_CONTEXT;
+        if (context==null){
+            context = APPLICATION;
+        }
+
+    }
+
+
+    public static void setPodAuthenticationValues(final String pPodUser, final String pPodPassword){
+//        public static void setPodAuthenticationValues(final String pPodUrl, final String pPodUser, final String pPodPassword){
         DB.putString("diaspora_user", pPodUser);
         DB.putString("diaspora_password", pPodPassword);
-        DB.putString("diaspora_pod", pPodUrl);
-        POD_URL = pPodUrl;
+//        DB.putString("diaspora_pod", pPodUrl);
+//        POD_URL = pPodUrl;
         POD_USER = pPodUser;
         POD_PASSWORD = pPodPassword;
         DiasporaControler.initParams();

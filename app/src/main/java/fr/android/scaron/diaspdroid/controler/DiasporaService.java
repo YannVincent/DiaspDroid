@@ -19,6 +19,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
@@ -50,11 +51,13 @@ public interface DiasporaService extends RestClientErrorHandling {
     List<fr.android.scaron.diaspdroid.model.Post> getInfo(String userName);
 
 
-    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
+//    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
+    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
+//    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-//    @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name"})
-    @RequiresHeader("x-csrf-token")
+    @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
+//    @RequiresHeader("x-csrf-token") "content-type",
     @Accept(MediaType.MULTIPART_FORM_DATA)
     UploadResult uploadFile(String fileName, MultiValueMap<String, Object> mapParts);
 
@@ -63,7 +66,21 @@ public interface DiasporaService extends RestClientErrorHandling {
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
-    String reshare(JsonObject jsonParam);
+    fr.android.scaron.diaspdroid.model.Post reshare(JsonObject jsonParam);
+
+
+    @Post("/posts/{postID}/likes")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    @RequiresHeader("x-csrf-token")
+    @Accept(MediaType.APPLICATION_JSON)
+    LikeResult like(Integer postID);
+
+
+
+    @Get("")
+    @Accept(MediaType.IMAGE_JPEG)
+    byte[] getImageFile();
 
     void setRootUrl(String rootUrl);
     void setCookie(String name, String value);
