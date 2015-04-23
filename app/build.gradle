@@ -59,6 +59,9 @@ dependencies {
 
     compile 'org.springframework.android:spring-android-core:1.0.1.RELEASE'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
+
+    compile 'org.apache.httpcomponents:httpmime:4.+'
+
 //    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.+'
 //    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.+'
 //    common 'log4j:log4j:1.2.14'

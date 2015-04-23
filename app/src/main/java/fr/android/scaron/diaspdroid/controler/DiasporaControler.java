@@ -3,12 +3,8 @@ package fr.android.scaron.diaspdroid.controler;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.widget.ProgressBar;
 
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -17,16 +13,10 @@ import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.Pods;
-import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.model.UploadResult;
 
 //import fr.android.scaron.diaspdroid.context.DiaspActivity;
 
@@ -64,11 +54,11 @@ public class DiasporaControler {
     static String COOKIE_REMEMBER_TEST = "BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368; path=/; expires=Sun, 08-Feb-2015 21:52:35 GMT; HttpOnly; secure";
 //    static String COOKIE_REMEMBER_TEST = "BAhbB1sGaQISCUkiIiQyYSQxMCRTcmhiZC9yS2JBczlqWUk5cVNZVU9PBjoGRVQ%3D--a111fa31a16b0451130d7598978cda8257466368";
 
-    static String TOKEN = TOKEN_VIDE;
-    static String COOKIE_SESSION_TOKEN = COOKIE_SESSION_LOGIN_VIDE;
-    static String COOKIE_SESSION_LOGIN = COOKIE_SESSION_STREAM_VIDE;
-    static String COOKIE_SESSION_STREAM= COOKIE_SESSION_STREAM_VIDE;
-    static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST_VIDE;
+    public static String TOKEN = TOKEN_VIDE;
+    public static String COOKIE_SESSION_TOKEN = COOKIE_SESSION_LOGIN_VIDE;
+    public static String COOKIE_SESSION_LOGIN = COOKIE_SESSION_STREAM_VIDE;
+    public static String COOKIE_SESSION_STREAM= COOKIE_SESSION_STREAM_VIDE;
+    public static String COOKIE_REMEMBER = COOKIE_REMEMBER_TEST_VIDE;
 
     static String USER_AGENT = "DiaspDroid";
 

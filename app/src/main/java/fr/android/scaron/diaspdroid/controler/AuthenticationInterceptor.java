@@ -27,6 +27,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     private static Logger LOGGEUR = LoggerFactory.getLogger(AuthenticationInterceptor.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = "AuthenticationInterceptor";
+    public static String COOKIE_AUTH = null;
 
     @Bean
     AuthenticationStore authenticationStore;
@@ -42,6 +43,13 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
             List<String> cookies = httpHeaders.get("Cookie");
             LOG.d(TAG_METHOD + "Cookie found ? " + (cookies!=null));
             LOG.d(TAG_METHOD + "Cookie : " + cookies);
+            for(String cookie:cookies){
+                if (COOKIE_AUTH!=null && cookie.contains("_diaspora_session")&& cookie.contains("remember_user_token")){
+
+                    LOG.d(TAG_METHOD + "set COOKIE_AUTH with value : " + (cookies!=null));
+                    COOKIE_AUTH = cookie;
+                }
+            }
         }
         ClientHttpResponse executionResult;
         if (request.getMethod()== HttpMethod.POST){

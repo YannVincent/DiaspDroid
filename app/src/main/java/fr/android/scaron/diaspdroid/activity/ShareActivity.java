@@ -1,62 +1,94 @@
 package fr.android.scaron.diaspdroid.activity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.VideoView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.controler.DiasporaBean;
+import fr.android.scaron.diaspdroid.controler.AuthenticationInterceptor;
+import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.AndroidMultiPartEntity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
  * Created by Sébastien on 25/03/2015.
  */
-@EActivity(R.layout.activity_share)
+@EActivity(R.layout.activity_upload)
 public class ShareActivity  extends ActionBarActivity {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ShareActivity.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static final String TAG = "ShareActivity";
 
-    @Extra
-    Uri imageUri;
 
-    @Bean
-    DiasporaBean diasporaBean;
-
-    @ViewById(R.id.share_message)
-    EditText shareMessage;
-
-    @ViewById(R.id.share_image)
-    ImageView shareImage;
-
-    @ViewById(R.id.share_text_button)
-    Button shareTextButton;
-
-    @ViewById(R.id.progress_horizontal)
+    @ViewById(R.id.progressBar)
     ProgressBar progressBar;
+    String filePath = null;
+    @ViewById(R.id.txtPercentage)
+    TextView txtPercentage;
+    @ViewById(R.id.imgPreview)
+    ImageView imgPreview;
+    @ViewById(R.id.videoPreview)
+    VideoView vidPreview;
+    @ViewById(R.id.btnUpload)
+    Button btnUpload;
+    @ViewById(R.id.upload_message)
+    EditText shareMessage;
+    long totalSize = 0;
+
+
+//    @Extra
+    Uri imageUri;
+//
+//    @Bean
+//    DiasporaBean diasporaBean;
+//
+//
+//    @ViewById(R.id.share_image)
+//    ImageView shareImage;
+//
+//    @ViewById(R.id.share_text_button)
+//    Button shareTextButton;
+//
+//    @ViewById(R.id.progress_horizontal)
+//    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +141,6 @@ public class ShareActivity  extends ActionBarActivity {
                     "(Erreur obtenue : pas d'Uri de l'image obtenue)");
             return;
         }
-        LOG.d(TAG_METHOD + "setImageURI to shareImage : "+imageUri);
-        shareImage.setImageURI(imageUri);
         LOG.d(TAG_METHOD + "getPath for imageUri : "+imageUri);
         final String imageLocalPath = getPath(imageUri);
         LOG.d(TAG_METHOD + "getPath for imageLocalPath : "+imageLocalPath);
@@ -119,6 +149,9 @@ public class ShareActivity  extends ActionBarActivity {
                     "(Erreur obtenue : pas de chemin local de l'image obtenu)");
             return;
         }
+        filePath = imageLocalPath;
+        boolean isImage = true;
+        previewMedia(isImage);
         LOG.d(TAG_METHOD + "getImageName for imageLocalPath : "+imageLocalPath);
         final String imageName = imageLocalPath.substring(imageLocalPath.lastIndexOf('/')+1);
         shareMessage.setText("Partage de la photo à faire : " + imageName + " ("+imageLocalPath+")");
@@ -126,17 +159,16 @@ public class ShareActivity  extends ActionBarActivity {
     }
 
 
-    @Click(R.id.share_text_button)
+    @Click(R.id.btnUpload)
     public void launchSharing(){
         String TAG_METHOD = TAG + ".updateScreen : ";
         LOG.d(TAG_METHOD + "Entrée");
+
         if (imageUri == null){
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : pas d'Uri de l'image obtenue)");
             return;
         }
-        LOG.d(TAG_METHOD + "setImageURI to shareImage : "+imageUri);
-        shareImage.setImageURI(imageUri);
         LOG.d(TAG_METHOD + "getPath for imageUri : "+imageUri);
         final String imageLocalPath = getPath(imageUri);
         LOG.d(TAG_METHOD + "getPath for imageLocalPath : "+imageLocalPath);
@@ -158,77 +190,155 @@ public class ShareActivity  extends ActionBarActivity {
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.uploadFile");
-        UploadResult uploadFileResult = diasporaBean.uploadFile(fileName, localPath);
-        checkSharePic(uploadFileResult);
+
+        new UploadFileToServer().execute();
+//        UploadResult uploadFileResult = diasporaBean.uploadFile(fileName, localPath);
+//        checkSharePic(uploadFileResult);
     }
 
-    @UiThread
-    public void checkSharePic(UploadResult uploadResult){
-        String TAG_METHOD = TAG + ".checkSharePic : ";
-        LOG.d(TAG_METHOD + "Entrée");
-        LOG.d(TAG_METHOD + "response body ? : "+uploadResult);
-        if (uploadResult==null){
-            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-            final AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.setIcon(R.drawable.ic_launcher);
-            alertDialog.setTitle("Echec de publication");
-            alertDialog.setMessage("Votre publication a échouée\n" +
-                    "(Erreur obtenue : pas de réponse du service)");
-            alertDialog.show();
-//                uploadProgressBar.setVisibility(View.GONE);
-            shareMessage.setText("Le partage de la photo a échouéé\n" +
-                    "(Erreur obtenue : pas de réponse du service)");
-            return;
+    /**
+     * Displaying captured image/video on the screen
+     * */
+    private void previewMedia(boolean isImage) {
+        // Checking whether captured media is image or video
+        if (isImage) {
+            imgPreview.setVisibility(View.VISIBLE);
+            vidPreview.setVisibility(View.GONE);
+            // bimatp factory
+            BitmapFactory.Options options = new BitmapFactory.Options();
+
+            // down sizing image as it throws OutOfMemory Exception for larger
+            // images
+            options.inSampleSize = 8;
+
+            final Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+
+            imgPreview.setImageBitmap(bitmap);
+        } else {
+            imgPreview.setVisibility(View.GONE);
+            vidPreview.setVisibility(View.VISIBLE);
+            vidPreview.setVideoPath(filePath);
+            // start playing
+            vidPreview.start();
+        }
+    }
+
+    /**
+     * Uploading the file to server
+     * */
+    private class UploadFileToServer extends AsyncTask<Void, Integer, String> {
+        @Override
+        protected void onPreExecute() {
+            // setting progress bar to zero
+            progressBar.setProgress(0);
+            super.onPreExecute();
         }
 
-        LOG.d(TAG_METHOD + "response body : "+uploadResult.toString());
-        if (uploadResult.getError()!=null){
-            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-            final AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.setIcon(R.drawable.ic_launcher);
-            alertDialog.setTitle("Echec de publication");
-            alertDialog.setMessage("Votre publication a échouée\n(Erreur obtenue : "+uploadResult.getError()+")");
-            alertDialog.show();
-//            uploadProgressBar.setVisibility(View.GONE);
-            shareMessage.setText("Le partage de la photo a échouéé\n" +
-                    "(Erreur obtenue : \"+uploadResult.getError()+\")\");");
-            return;
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            // Making progress bar visible
+            progressBar.setVisibility(View.VISIBLE);
+
+            // updating progress bar value
+            progressBar.setProgress(progress[0]);
+
+            // updating percentage value
+            txtPercentage.setText(String.valueOf(progress[0]) + "%");
         }
-        if (uploadResult.getData()!=null && uploadResult.getData().getPhoto()!=null){
-            String urlSharedImg = null;
-            if (uploadResult.getData().getPhoto().getUnprocessed_image()!=null){
-                urlSharedImg = uploadResult.getData().getPhoto().getUnprocessed_image().getUrl();
-            }else if  (uploadResult.getData().getPhoto().getProcessed_image()!=null){
-                urlSharedImg = uploadResult.getData().getPhoto().getProcessed_image().getUrl();
-            }
-            if (urlSharedImg==null){
-                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-                final AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setIcon(R.drawable.ic_launcher);
-                alertDialog.setTitle("Publication réussie");
-                alertDialog.setMessage("Votre publication a bien été effectuée\n--------------\nimage:"+
-                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
-                alertDialog.show();
-                LOG.d(TAG_METHOD + "publication réussie");
-//                uploadProgressBar.setVisibility(View.GONE);
-                shareMessage.setText("Votre publication a bien été effectuée\n--------------\nimage:"+
-                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
-                return;
-            }else{
-                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-                final AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setIcon(R.drawable.ic_launcher);
-                alertDialog.setTitle("Echec de publication");
-                alertDialog.setMessage("Votre publication a échouée");
-                alertDialog.show();
-//                uploadProgressBar.setVisibility(View.GONE);
-                shareMessage.setText("Le partage de la photo a échouéé");
-                return;
-            }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            return uploadFile();
         }
-        shareMessage.setText("Le partage de la photo a échouéé");
-//                            ACRA.getErrorReporter().handleException(e);
-//    uploadProgressBar.setVisibility(View.GONE);
+
+        @SuppressWarnings("deprecation")
+        private String uploadFile() {
+            String responseString = null;
+            final String fileName = filePath.substring(filePath.lastIndexOf('/')+1);
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo[pending]=true&qqfile="+fileName);
+//            @RequiresCookie({"_diaspora_session", "remember_user_token"})
+//            @SetsCookie({"_diaspora_session", "remember_user_token"})
+//            @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
+            httppost.setHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);//"_diaspora_session="+ DiasporaControler.COOKIE_SESSION_STREAM+";remember_user_token="+DiasporaControler.COOKIE_REMEMBER);
+            httppost.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            httppost.setHeader("x-requested-with", "XMLHttpRequest");
+            httppost.setHeader("x-file-name", fileName);
+            httppost.setHeader("authenticity_token", DiasporaControler.TOKEN);
+            try {
+                AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
+                        new AndroidMultiPartEntity.ProgressListener() {
+
+                            @Override
+                            public void transferred(long num) {
+                                publishProgress((int) ((num / (float) totalSize) * 100));
+                            }
+                        });
+
+                File sourceFile = new File(filePath);
+
+                // Adding file data to http body
+                entity.addPart("image", new FileBody(sourceFile));
+
+                // Extra parameters if you want to pass to server
+                entity.addPart("website",
+                        new StringBody("www.androidhive.info"));
+                entity.addPart("email", new StringBody("abc@gmail.com"));
+
+                totalSize = entity.getContentLength();
+                httppost.setEntity(entity);
+
+                // Making server call
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity r_entity = response.getEntity();
+
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    // Server response
+                    responseString = EntityUtils.toString(r_entity);
+                } else {
+                    responseString = "Error occurred! Http Status Code: "
+                            + statusCode;
+                }
+
+            } catch (ClientProtocolException e) {
+                responseString = e.toString();
+            } catch (IOException e) {
+                responseString = e.toString();
+            }
+
+            return responseString;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            final String TAG_METHOD = TAG+".UploadFileToServer.onPostExecute";
+            LOG.d(TAG_METHOD + "Response from server: " + result);
+
+            // showing the server response in an alert dialog
+            showAlert(result);
+
+            super.onPostExecute(result);
+        }
+
+    }
+
+    /**
+     * Method to show alert dialog
+     * */
+    private void showAlert(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message).setTitle("Response from Servers")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // do nothing
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
 
