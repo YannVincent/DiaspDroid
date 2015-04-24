@@ -31,7 +31,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -39,6 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.AuthenticationInterceptor;
@@ -190,7 +191,6 @@ public class ShareActivity  extends ActionBarActivity {
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.uploadFile");
-
         new UploadFileToServer().execute();
 //        UploadResult uploadFileResult = diasporaBean.uploadFile(fileName, localPath);
 //        checkSharePic(uploadFileResult);
@@ -253,20 +253,52 @@ public class ShareActivity  extends ActionBarActivity {
 
         @SuppressWarnings("deprecation")
         private String uploadFile() {
+            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
+            LOG.d(TAG_METHOD + "Entrée");
             String responseString = null;
+            LOG.d(TAG_METHOD + "Get fileName in filePath "+filePath);
             final String fileName = filePath.substring(filePath.lastIndexOf('/')+1);
+            String fileNameUrlEncoded = fileName;
+            try {
+                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
+            LOG.d(TAG_METHOD + "FileName getted  "+fileName);
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo[pending]=true&qqfile="+fileName);
+            LOG.d(TAG_METHOD + "Create httpclient");
+            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo[pending]=true&photo[aspect_id]=all&qqfile="+fileNameUrlEncoded);
+            LOG.d(TAG_METHOD + "Create httppost for url "+DiasporaConfig.POD_URL+"/photos?photo[pending]=true&qqfile="+fileNameUrlEncoded);
 //            @RequiresCookie({"_diaspora_session", "remember_user_token"})
 //            @SetsCookie({"_diaspora_session", "remember_user_token"})
 //            @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
-            httppost.setHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);//"_diaspora_session="+ DiasporaControler.COOKIE_SESSION_STREAM+";remember_user_token="+DiasporaControler.COOKIE_REMEMBER);
+
+
+            httppost.setHeader("content-type", "application/octet-stream");
+            httppost.setHeader("accept", "application/json");
+            httppost.setHeader("accept-encoding", "gzip, deflate");
+            httppost.setHeader("origin", "https://framasphere.org");
+            httppost.setHeader("referer", "https://framasphere.org/stream");
+
+            LOG.d(TAG_METHOD + "Add header Cookie to httppost with value : " + AuthenticationInterceptor.COOKIE_AUTH);
+//            httppost.setHeader("Cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTA5MDc5MTBkOWIwNDFlMmViZDk0OTgzNzc0YmMyMjlhBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxdnhhZWR6VzdoZjhPK3A2YnlkVUhuaHFhdUNpd3A4cVc3aE1PVVpKeWtpdz0GOwBG--ca1ab19823a5bb151719f96946728bf4124cc53d; _pk_id.26.270d=0045c88642cbe4c2.1427292262.2.1429879130.1429879105.; _pk_ses.26.270d=*");//AuthenticationInterceptor.COOKIE_AUTH);
+            httppost.setHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);//"remember_user_token="+DiasporaControler.COOKIE_REMEMBER + "; _diaspora_session="+ DiasporaControler.COOKIE_SESSION_STREAM);
+
+            LOG.d(TAG_METHOD + "Add header x-csrf-token to httppost with value : " + DiasporaControler.TOKEN);
+//            httppost.setHeader("x-csrf-token", "vxaedzW7hf8O+p6bydUHnhqauCiwp8qW7hMOUZJykiw=");
             httppost.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+
+            LOG.d(TAG_METHOD + "Add header x-requested-with to httppost with value : XMLHttpRequest");
             httppost.setHeader("x-requested-with", "XMLHttpRequest");
-            httppost.setHeader("x-file-name", fileName);
-            httppost.setHeader("authenticity_token", DiasporaControler.TOKEN);
+
+            LOG.d(TAG_METHOD + "Add header x-file-name to httppost with value : " + fileNameUrlEncoded);
+            httppost.setHeader("x-file-name", fileNameUrlEncoded);
+
+//            LOG.d(TAG_METHOD + "Add header authenticity_token to httppost with value : " + DiasporaControler.TOKEN);
+//            httppost.setHeader("authenticity_token", DiasporaControler.TOKEN);
             try {
+                LOG.d(TAG_METHOD + "Create AndroidMultiPartEntity");
                 AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
                         new AndroidMultiPartEntity.ProgressListener() {
 
@@ -276,21 +308,31 @@ public class ShareActivity  extends ActionBarActivity {
                             }
                         });
 
+                LOG.d(TAG_METHOD + "Create sourceFile");
                 File sourceFile = new File(filePath);
 
                 // Adding file data to http body
-                entity.addPart("image", new FileBody(sourceFile));
+                LOG.d(TAG_METHOD + "addPart image file");
+                entity.addPart("file", new FileBody(sourceFile));
+//                entity.addPart("qqFile", new StringBody(fileNameUrlEncoded));
+//                entity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
+//                entity.addPart("image", new FileBody(sourceFile));
 
-                // Extra parameters if you want to pass to server
-                entity.addPart("website",
-                        new StringBody("www.androidhive.info"));
-                entity.addPart("email", new StringBody("abc@gmail.com"));
+//                // Extra parameters if you want to pass to server
+//                entity.addPart("website",
+//                        new StringBody("www.androidhive.info"));
+//                entity.addPart("email", new StringBody("abc@gmail.com"));
 
+                LOG.d(TAG_METHOD + "get totalSize multipart");
                 totalSize = entity.getContentLength();
+                LOG.d(TAG_METHOD + "totalSize multipart getted "+totalSize);
                 httppost.setEntity(entity);
 
                 // Making server call
+                LOG.d(TAG_METHOD + "execute request");
                 HttpResponse response = httpclient.execute(httppost);
+
+                LOG.d(TAG_METHOD + "getted response : "+response.toString());
                 HttpEntity r_entity = response.getEntity();
 
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -304,8 +346,13 @@ public class ShareActivity  extends ActionBarActivity {
 
             } catch (ClientProtocolException e) {
                 responseString = e.toString();
+                LOG.e(TAG_METHOD + "ClientProtocolException obtenue : "+e.toString());
             } catch (IOException e) {
                 responseString = e.toString();
+                LOG.e(TAG_METHOD + "IOException obtenue : " + e.toString());
+            } catch (Throwable e) {
+                responseString = e.toString();
+                LOG.e(TAG_METHOD + "Throwable obtenue : "+e.toString());
             }
 
             return responseString;

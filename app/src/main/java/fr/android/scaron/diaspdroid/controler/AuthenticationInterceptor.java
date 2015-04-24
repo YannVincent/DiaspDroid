@@ -43,11 +43,13 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
             List<String> cookies = httpHeaders.get("Cookie");
             LOG.d(TAG_METHOD + "Cookie found ? " + (cookies!=null));
             LOG.d(TAG_METHOD + "Cookie : " + cookies);
-            for(String cookie:cookies){
-                if (COOKIE_AUTH!=null && cookie.contains("_diaspora_session")&& cookie.contains("remember_user_token")){
+            if (cookies!=null) {
+                for (String cookie : cookies) {
+                    if (COOKIE_AUTH == null && cookie!=null && cookie.contains("_diaspora_session") && cookie.contains("remember_user_token")) {
 
-                    LOG.d(TAG_METHOD + "set COOKIE_AUTH with value : " + (cookies!=null));
-                    COOKIE_AUTH = cookie;
+                        LOG.d(TAG_METHOD + "set COOKIE_AUTH with value : " + cookie);
+                        COOKIE_AUTH = cookie;
+                    }
                 }
             }
         }
