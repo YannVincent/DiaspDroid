@@ -52,7 +52,7 @@ public interface DiasporaService extends RestClientErrorHandling {
 
 
 //    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
-    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
+    @Post("/photos?photo[pending]=true&qqfile={fileName}")
 //    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})

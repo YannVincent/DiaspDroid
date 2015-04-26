@@ -19,27 +19,50 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+//import com.google.api.client.util.IOUtils;
+
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.zip.GZIPInputStream;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.AuthenticationInterceptor;
@@ -248,116 +271,411 @@ public class ShareActivity  extends ActionBarActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            return uploadFile();
+            return "" + uploadFile();
         }
 
-        @SuppressWarnings("deprecation")
-        private String uploadFile() {
+    private String uploadFile(){
             String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
             LOG.d(TAG_METHOD + "Entrée");
-            String responseString = null;
-            LOG.d(TAG_METHOD + "Get fileName in filePath "+filePath);
-            final String fileName = filePath.substring(filePath.lastIndexOf('/')+1);
-            String fileNameUrlEncoded = fileName;
-            try {
-                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        //File to download
+
+//            final String uploadFileName =
+//
+//            final String uploadFilePath = filePath.substring(0, indexEndOfPath);
+            int indexEndOfPath = filePath.lastIndexOf('/');
+        String fileName = filePath.substring(indexEndOfPath+1);
+        String fileDir = filePath.substring(0, indexEndOfPath);
+        Uri mSelectedImageUri = imageUri;
+        String responseText;
+        try {
+            HttpClient httpClient=new DefaultHttpClient();
+            HttpPost httpPost=new HttpPost("https://framasphere.org/photos");
+
+
+
+
+            //--------------------------------------
+
+    //            httppost.setHeader("accept", "application/json");
+    //            httppost.setHeader("accept-encoding", "gzip, deflate");
+    //            httppost.setHeader("accept-language", "fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4");
+    //
+    ////            httppost.setHeader("content-type", "application/x-www-form-urlencoded");
+    ////            httppost.setHeader("content-type", "application/octet-stream");
+    ////            httppost.setHeader("content-type", "multipart/form-data");
+    //            httppost.setHeader("user-agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36");
+    //
+
+            httpPost.setHeader("Connection", "Keep-Alive");
+            httpPost.setHeader("cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWUzYTYyODMyOGNmYTQ2MTJiODZhNGQ1ZDUzMGYyMzUyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxV0NzSXBKYjlhSFhLcjdoN1N6VVkwN1pmZEFieWNyckFTUXJDblhuQTJlTT0GOwBG--8b4e7448a125c0933d98340ae4aa0d67ac662f94; _pk_ref.26.270d=%5B%22%22%2C%22%22%2C1429998251%2C%22https%3A%2F%2Fwww.google.fr%2F%22%5D; _pk_id.26.270d=da3742c7b86218bb.1425942309.13.1429998963.1429998251.; _pk_ses.26.270d=*");
+//            httpPost.setHeader("content-type", "application/octet-stream");
+            httpPost.setHeader("accept", "application/json, text/plain, */*");
+            httpPost.setHeader("X-CSRF-Token", "WCsIpJb9aHXKr7h7SzUY07ZfdAbycrrASQrCnXnA2eM=");
+            httpPost.setHeader("X-File-Name", fileName);
+            httpPost.setHeader("X-Requested-With", "XMLHttpRequest");
+//            httpPost.setHeader("accept-encoding", "gzip, deflate");
+            //--------------------------------
+            AndroidMultiPartEntity mUploadEntity = new AndroidMultiPartEntity(
+                new AndroidMultiPartEntity.ProgressListener() {
+
+                    @Override
+                    public void transferred(long num) {
+                        publishProgress((int) ((num / (float) totalSize) * 100));
+                    }
+                });
+            if (mSelectedImageUri != null) {
+                InputStream imageStream=getContentResolver().openInputStream(mSelectedImageUri);
+                byte[] imageData= IOUtils.toByteArray(imageStream);
+                InputStreamBody imageStreamBody=new InputStreamBody(new ByteArrayInputStream(imageData),fileName);
+                mUploadEntity.addPart("qqFile",imageStreamBody);
+                mUploadEntity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
             }
 
-            LOG.d(TAG_METHOD + "FileName getted  "+fileName);
-            HttpClient httpclient = new DefaultHttpClient();
-            LOG.d(TAG_METHOD + "Create httpclient");
-            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo[pending]=true&photo[aspect_id]=all&qqfile="+fileNameUrlEncoded);
-            LOG.d(TAG_METHOD + "Create httppost for url "+DiasporaConfig.POD_URL+"/photos?photo[pending]=true&qqfile="+fileNameUrlEncoded);
-//            @RequiresCookie({"_diaspora_session", "remember_user_token"})
-//            @SetsCookie({"_diaspora_session", "remember_user_token"})
-//            @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
-
-
-            httppost.setHeader("content-type", "application/octet-stream");
-            httppost.setHeader("accept", "application/json");
-            httppost.setHeader("accept-encoding", "gzip, deflate");
-            httppost.setHeader("origin", "https://framasphere.org");
-            httppost.setHeader("referer", "https://framasphere.org/stream");
-
-            LOG.d(TAG_METHOD + "Add header Cookie to httppost with value : " + AuthenticationInterceptor.COOKIE_AUTH);
-//            httppost.setHeader("Cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTA5MDc5MTBkOWIwNDFlMmViZDk0OTgzNzc0YmMyMjlhBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxdnhhZWR6VzdoZjhPK3A2YnlkVUhuaHFhdUNpd3A4cVc3aE1PVVpKeWtpdz0GOwBG--ca1ab19823a5bb151719f96946728bf4124cc53d; _pk_id.26.270d=0045c88642cbe4c2.1427292262.2.1429879130.1429879105.; _pk_ses.26.270d=*");//AuthenticationInterceptor.COOKIE_AUTH);
-            httppost.setHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);//"remember_user_token="+DiasporaControler.COOKIE_REMEMBER + "; _diaspora_session="+ DiasporaControler.COOKIE_SESSION_STREAM);
-
-            LOG.d(TAG_METHOD + "Add header x-csrf-token to httppost with value : " + DiasporaControler.TOKEN);
-//            httppost.setHeader("x-csrf-token", "vxaedzW7hf8O+p6bydUHnhqauCiwp8qW7hMOUZJykiw=");
-            httppost.setHeader("x-csrf-token", DiasporaControler.TOKEN);
-
-            LOG.d(TAG_METHOD + "Add header x-requested-with to httppost with value : XMLHttpRequest");
-            httppost.setHeader("x-requested-with", "XMLHttpRequest");
-
-            LOG.d(TAG_METHOD + "Add header x-file-name to httppost with value : " + fileNameUrlEncoded);
-            httppost.setHeader("x-file-name", fileNameUrlEncoded);
-
-//            LOG.d(TAG_METHOD + "Add header authenticity_token to httppost with value : " + DiasporaControler.TOKEN);
-//            httppost.setHeader("authenticity_token", DiasporaControler.TOKEN);
-            try {
-                LOG.d(TAG_METHOD + "Create AndroidMultiPartEntity");
-                AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
-                        new AndroidMultiPartEntity.ProgressListener() {
-
-                            @Override
-                            public void transferred(long num) {
-                                publishProgress((int) ((num / (float) totalSize) * 100));
-                            }
-                        });
-
-                LOG.d(TAG_METHOD + "Create sourceFile");
-                File sourceFile = new File(filePath);
-
-                // Adding file data to http body
-                LOG.d(TAG_METHOD + "addPart image file");
-                entity.addPart("file", new FileBody(sourceFile));
-//                entity.addPart("qqFile", new StringBody(fileNameUrlEncoded));
-//                entity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
-//                entity.addPart("image", new FileBody(sourceFile));
-
-//                // Extra parameters if you want to pass to server
-//                entity.addPart("website",
-//                        new StringBody("www.androidhive.info"));
-//                entity.addPart("email", new StringBody("abc@gmail.com"));
-
-                LOG.d(TAG_METHOD + "get totalSize multipart");
-                totalSize = entity.getContentLength();
+            LOG.d(TAG_METHOD + "get totalSize multipart");
+                totalSize = mUploadEntity.getContentLength();
                 LOG.d(TAG_METHOD + "totalSize multipart getted "+totalSize);
-                httppost.setEntity(entity);
-
-                // Making server call
-                LOG.d(TAG_METHOD + "execute request");
-                HttpResponse response = httpclient.execute(httppost);
-
-                LOG.d(TAG_METHOD + "getted response : "+response.toString());
-                HttpEntity r_entity = response.getEntity();
-
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode == 200) {
-                    // Server response
-                    responseString = EntityUtils.toString(r_entity);
-                } else {
-                    responseString = "Error occurred! Http Status Code: "
-                            + statusCode;
-                }
-
-            } catch (ClientProtocolException e) {
-                responseString = e.toString();
-                LOG.e(TAG_METHOD + "ClientProtocolException obtenue : "+e.toString());
-            } catch (IOException e) {
-                responseString = e.toString();
-                LOG.e(TAG_METHOD + "IOException obtenue : " + e.toString());
-            } catch (Throwable e) {
-                responseString = e.toString();
-                LOG.e(TAG_METHOD + "Throwable obtenue : "+e.toString());
+            httpPost.setEntity(mUploadEntity);
+            HttpResponse response;
+            response=httpClient.execute(httpPost);
+            InputStream instream = response.getEntity().getContent();
+            Header contentEncoding = response.getFirstHeader("Content-Encoding");
+            if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+                instream = new GZIPInputStream(instream);
             }
-
-            return responseString;
-
+            responseText = convertStreamToString(instream);
+            LOG.d(TAG_METHOD + "reponse obtenue : "+responseText);
+            JSONObject responseObject=new JSONObject(responseText);
+            LOG.d(TAG_METHOD + "reponse json obtenue : "+responseObject.toString());
         }
+        catch (  FileNotFoundException fileException) {
+            fileException.printStackTrace();
+            responseText = "Erreur FileNotFoundException obtenue : "+fileException.getMessage();
+        }
+        catch (  IOException ioException) {
+            ioException.printStackTrace();
+            responseText = "Erreur IOException obtenue : "+ioException.getMessage();
+        }
+        catch (  JSONException jsonException) {
+            jsonException.printStackTrace();
+            responseText = "Erreur JSONException obtenue : "+jsonException.getMessage();
+        }
+        return responseText;
+    }
+
+        public byte[] decompress(byte[] compressed) throws IOException
+        {
+            GZIPInputStream gzipInputStream;
+            if (compressed.length > 4)
+            {
+                gzipInputStream = new GZIPInputStream(
+                        new ByteArrayInputStream(compressed, 4,
+                                compressed.length - 4));
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                for (int value = 0; value != -1;)
+                {
+                    value = gzipInputStream.read();
+                    if (value != -1)
+                    {
+                        baos.write(value);
+                    }
+                }
+                gzipInputStream.close();
+                baos.close();
+
+                return baos.toByteArray();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+//        public String uploadFile() {
+//            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
+//            LOG.d(TAG_METHOD + "Entrée");
+//            String responseString = null;
+//            int serverResponseCode = 0;
+//            LOG.d(TAG_METHOD + "Get fileName in filePath "+filePath);
+//            int indexEndOfPath = filePath.lastIndexOf('/');
+//            final String uploadFileName = filePath.substring(indexEndOfPath+1);
+//
+//            final String uploadFilePath = filePath.substring(0, indexEndOfPath);
+//            final String sourceFileUri = filePath;
+//            String fileNameUrlEncoded = uploadFileName;
+//            String serverResponseMessage = "";
+//            try {
+//                fileNameUrlEncoded = URLEncoder.encode(uploadFileName, "UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//            final String upLoadServerUri = "https://framasphere.org/photos?photo%5Bpending%5D=true&qqfile="+fileNameUrlEncoded;
+//
+//            LOG.d(TAG_METHOD + "FileName getted  "+fileNameUrlEncoded);
+//
+//            String fileName = sourceFileUri;
+//
+//            HttpURLConnection conn = null;
+//            DataOutputStream dos = null;
+//            String lineEnd = "\r\n";
+//            String twoHyphens = "--";
+//            String boundary = "*****";
+//            int bytesRead, bytesAvailable, bufferSize;
+//            byte[] buffer;
+//            int maxBufferSize = 1 * 1024 * 1024;
+//            File sourceFile = new File(sourceFileUri);
+//
+//            if (!sourceFile.isFile()) {
+//                return "Le fichier n'existe pas ! ("+uploadFilePath + "" + uploadFileName;
+//            }
+//            try {
+//
+//                // open a URL connection to the Servlet
+//                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+//                URL url = new URL(upLoadServerUri);
+//
+//                // Open a HTTP  connection to  the URL
+//                conn = (HttpURLConnection) url.openConnection();
+//                conn.setDoInput(true); // Allow Inputs
+//                conn.setDoOutput(true); // Allow Outputs
+//                conn.setUseCaches(false); // Don't use a Cached Copy
+//                conn.setRequestMethod("POST");
+//                conn.setRequestProperty("Connection", "Keep-Alive");
+//                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+//                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+//                conn.setRequestProperty("accept", "application/json, text/plain, */*");
+//                conn.setRequestProperty("Cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWUzYTYyODMyOGNmYTQ2MTJiODZhNGQ1ZDUzMGYyMzUyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxV0NzSXBKYjlhSFhLcjdoN1N6VVkwN1pmZEFieWNyckFTUXJDblhuQTJlTT0GOwBG--8b4e7448a125c0933d98340ae4aa0d67ac662f94; _pk_ref.26.270d=%5B%22%22%2C%22%22%2C1429998251%2C%22https%3A%2F%2Fwww.google.fr%2F%22%5D; _pk_id.26.270d=da3742c7b86218bb.1425942309.13.1429998963.1429998251.; _pk_ses.26.270d=*");
+//                conn.setRequestProperty("X-CSRF-Token", "WCsIpJb9aHXKr7h7SzUY07ZfdAbycrrASQrCnXnA2eM=");
+//                conn.setRequestProperty("X-File-Name", fileNameUrlEncoded);
+//                conn.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+////                conn.setRequestProperty("qqFile", fileNameUrlEncoded);
+//
+//                dos = new DataOutputStream(conn.getOutputStream());
+//
+//                dos.writeBytes(twoHyphens + boundary + lineEnd);
+//                dos.writeBytes("Content-Disposition: form-data; name=\"qqFile\";filename=\""
+//                                + fileNameUrlEncoded + "\"" + lineEnd);
+//                dos.writeBytes(lineEnd);
+//
+//                // create a buffer of  maximum size
+//                bytesAvailable = fileInputStream.available();
+//
+//                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//                buffer = new byte[bufferSize];
+//
+//                // read file and write it into form...
+//                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//
+//                while (bytesRead > 0) {
+//
+//                    dos.write(buffer, 0, bufferSize);
+//                    bytesAvailable = fileInputStream.available();
+//                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//
+//                }
+//
+//                // send multipart form data necesssary after file data...
+//                dos.writeBytes(lineEnd);
+//                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+//
+//                // Responses from the server (code and message)
+//                serverResponseCode = conn.getResponseCode();
+//                serverResponseMessage = conn.getResponseMessage();
+//
+//                LOG.i("uploadFile HTTP Response is : "
+//                        + serverResponseMessage + ": " + serverResponseCode);
+//
+////                if(serverResponseCode == 200){
+//                    LOG.d("File "+uploadFileName+" Upload Completed ? "+(serverResponseCode==200));
+////                }
+//                String responseMessage = "";
+//                if (serverResponseCode == 200) {
+//                    responseMessage = convertStreamToString(conn.getInputStream());
+//                }else{
+//                    responseMessage =  convertStreamToString(conn.getErrorStream());
+//                }
+//
+//                //close the streams //
+//                fileInputStream.close();
+//                dos.flush();
+//                dos.close();
+//                return responseMessage;
+//
+//            } catch (MalformedURLException ex) {
+//                ex.printStackTrace();
+//                LOG.e("Upload file to server error: " + ex.getMessage(), ex);
+//                serverResponseMessage = ex.getMessage();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                LOG.e("Upload file to server Exception : " + e.getMessage(), e);
+//                serverResponseMessage = e.getMessage();
+//            }
+//            return "Error code "+serverResponseCode+" : "+serverResponseMessage;
+//        }
+
+
+        private String convertStreamToString(InputStream is) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+
+            String line = null;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return sb.toString();
+        }
+
+
+
+//        @SuppressWarnings("deprecation")
+//        private String uploadFile() {
+//            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
+//            LOG.d(TAG_METHOD + "Entrée");
+//            String responseString = null;
+//            LOG.d(TAG_METHOD + "Get fileName in filePath "+filePath);
+//            final String fileName = filePath.substring(filePath.lastIndexOf('/')+1);
+//            String fileNameUrlEncoded = fileName;
+//            try {
+//                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//
+//            LOG.d(TAG_METHOD + "FileName getted  "+fileName);
+//            HttpClient httpclient = new DefaultHttpClient();
+//            LOG.d(TAG_METHOD + "Create httpclient");
+//            HttpPost httppost = new HttpPost("https://framasphere.org/photos?photo%5Bpending%5D=true&qqfile="+fileNameUrlEncoded);//&qqfile=uploaded.jpg");
+////            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo%5Bpending%5D=truephoto%5Baspect_ids%5D=all");//&qqfile=uploaded.jpg");
+////            HttpPost httppost = new HttpPost(DiasporaConfig.POD_URL+"/photos?photo[pending]=true&photo[aspect_id]=all&qqfile="+fileNameUrlEncoded);
+//            LOG.d(TAG_METHOD + "Create httppost for url "+httppost.getURI());//DiasporaConfig.POD_URL+"/photos?photo[pending]=true&qqfile="+fileNameUrlEncoded);
+//
+//
+//            httppost.setHeader("Connection", "Keep-Alive");
+//            httppost.setHeader("accept", "application/json");
+//            httppost.setHeader("accept-encoding", "gzip, deflate");
+//            httppost.setHeader("accept-language", "fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4");
+//
+////            httppost.setHeader("content-type", "application/x-www-form-urlencoded");
+////            httppost.setHeader("content-type", "application/octet-stream");
+////            httppost.setHeader("content-type", "multipart/form-data");
+//            httppost.setHeader("user-agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36");
+//
+//            httppost.setHeader("cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWUzYTYyODMyOGNmYTQ2MTJiODZhNGQ1ZDUzMGYyMzUyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxV0NzSXBKYjlhSFhLcjdoN1N6VVkwN1pmZEFieWNyckFTUXJDblhuQTJlTT0GOwBG--8b4e7448a125c0933d98340ae4aa0d67ac662f94; _pk_ref.26.270d=%5B%22%22%2C%22%22%2C1429998251%2C%22https%3A%2F%2Fwww.google.fr%2F%22%5D; _pk_id.26.270d=da3742c7b86218bb.1425942309.13.1429998963.1429998251.; _pk_ses.26.270d=*");
+//
+//            httppost.setHeader("X-CSRF-Token", "WCsIpJb9aHXKr7h7SzUY07ZfdAbycrrASQrCnXnA2eM=");
+//            httppost.setHeader("X-File-Name", fileNameUrlEncoded);
+//            httppost.setHeader("X-Requested-With", "XMLHttpRequest");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+////            httppost.setHeader("content-type", "application/octet-stream");
+//////            httppost.setHeader("accept", "application/json");
+//////            httppost.setHeader("accept-encoding", "gzip, deflate");
+//////            httppost.setHeader("origin", "https://framasphere.org");
+//////            httppost.setHeader("referer", "https://framasphere.org/stream");
+////
+////            LOG.d(TAG_METHOD + "Add header Cookie to httppost with value : " + AuthenticationInterceptor.COOKIE_AUTH);
+////            httppost.setHeader("Cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; path=/; expires=Sat, 09-May-2015 21:52:01 GMT; HttpOnly; secure, _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJTMzZWZiYTM2NTZhYzEyZTliZTFmNzY4MzJjY2ViOWIwBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIKZmxhc2gGOwBUbzolQWN0aW9uRGlzcGF0Y2g6OkZsYXNoOjpGbGFzaEhhc2gJOgpAdXNlZG86CFNldAY6CkBoYXNoewA6DEBjbG9zZWRGOg1AZmxhc2hlc3sGOgtub3RpY2VJIihWb3VzIMOqdGVzIMOgIHByw6lzZW50IGNvbm5lY3TDqS1lLgY7AFQ6CUBub3cw--8a4fb6a36138dc110abde04b5e29b3761dd116e7; path=/; secure");
+//////            httppost.setHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);//"remember_user_token="+DiasporaControler.COOKIE_REMEMBER + "; _diaspora_session="+ DiasporaControler.COOKIE_SESSION_STREAM);
+////
+////            LOG.d(TAG_METHOD + "Add header x-csrf-token to httppost with value : " + DiasporaControler.TOKEN);
+//////            httppost.setHeader("x-csrf-token", "M6clGALpvaV/g3VnWTxwW27E+hQSsYAFyu6MhPANmbw=");
+//////            httppost.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+////
+//////            LOG.d(TAG_METHOD + "Add header x-requested-with to httppost with value : XMLHttpRequest");
+//////            httppost.setHeader("x-requested-with", "XMLHttpRequest");
+////
+//////            LOG.d(TAG_METHOD + "Add header x-file-name to httppost with value : " + fileNameUrlEncoded);
+//////            httppost.setHeader("x-file-name", fileNameUrlEncoded);
+////
+//////            LOG.d(TAG_METHOD + "Add header authenticity_token to httppost with value : " + DiasporaControler.TOKEN);
+//////            httppost.setHeader("authenticity_token", DiasporaControler.TOKEN);
+//            try {
+//                LOG.d(TAG_METHOD + "Create AndroidMultiPartEntity");
+//                AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
+//                        new AndroidMultiPartEntity.ProgressListener() {
+//
+//                            @Override
+//                            public void transferred(long num) {
+//                                publishProgress((int) ((num / (float) totalSize) * 100));
+//                            }
+//                        });
+//
+//                LOG.d(TAG_METHOD + "Create sourceFile");
+//                File sourceFile = new File(filePath);
+//
+//                // Adding file data to http body
+//                LOG.d(TAG_METHOD + "addPart image file");
+//                entity.addPart("qqFile", new FileBody(sourceFile));
+////                entity.addPart("qqFile", new StringBody(fileNameUrlEncoded));
+////                entity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
+////                entity.addPart("image", new FileBody(sourceFile));
+//
+////                // Extra parameters if you want to pass to server
+////                entity.addPart("website",
+////                        new StringBody("www.androidhive.info"));
+////                entity.addPart("email", new StringBody("abc@gmail.com"));
+//
+//                LOG.d(TAG_METHOD + "get totalSize multipart");
+//                totalSize = entity.getContentLength();
+//                LOG.d(TAG_METHOD + "totalSize multipart getted "+totalSize);
+//                httppost.setEntity(entity);
+//
+//                // Making server call
+//                LOG.d(TAG_METHOD + "execute request");
+//                HttpResponse response = httpclient.execute(httppost);
+//                StringBuilder sb = new StringBuilder("\n-----------------\n");
+//                for (Header header:httppost.getAllHeaders()){
+//                    sb.append(header.toString()+"\n");
+//                }
+//                sb.append("-----------------");
+//                LOG.d(TAG_METHOD + "headers sended :"+sb.toString());
+//
+//                LOG.d(TAG_METHOD + "getted response : "+response.toString());
+//                HttpEntity r_entity = response.getEntity();
+//
+//                int statusCode = response.getStatusLine().getStatusCode();
+//                if (statusCode == 200) {
+//                    // Server response
+//                    responseString = EntityUtils.toString(r_entity);
+//                } else {
+//                    responseString = "Error occurred! Http Status Code: "
+//                    EntityUtils.
+//                            + statusCode + "\n"+ (response.toString()+"\n"+EntityUtils.toString(r_entity));
+//                }
+//
+//            } catch (ClientProtocolException e) {
+//                responseString = e.toString();
+//                LOG.e(TAG_METHOD + "ClientProtocolException obtenue : "+e.toString());
+//            } catch (IOException e) {
+//                responseString = e.toString();
+//                LOG.e(TAG_METHOD + "IOException obtenue : " + e.toString());
+//            } catch (Throwable e) {
+//                responseString = e.toString();
+//                LOG.e(TAG_METHOD + "Throwable obtenue : "+e.toString());
+//            }
+//
+//            return responseString;
+//
+//        }
 
         @Override
         protected void onPostExecute(String result) {

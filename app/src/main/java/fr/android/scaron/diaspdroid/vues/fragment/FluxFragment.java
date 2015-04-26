@@ -61,11 +61,13 @@ public class FluxFragment extends Fragment {
         List<Post> postsUser = diasporaBean.getInfo("tilucifer");
 //        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
         posts = diasporaBean.getStream();
-        Post first = postsUser.get(0);
-        String userName = first.getAuthor().getName();
-        String userAdress = first.getAuthor().getDiaspora_id();
-        String userAvatar = first.getAuthor().getAvatar().getLarge();
-        updateActionBar(userName, userAdress, userAvatar);
+        if (postsUser!=null && postsUser.size()>0) {
+            Post first = postsUser.get(0);
+            String userName = first.getAuthor().getName();
+            String userAdress = first.getAuthor().getDiaspora_id();
+            String userAvatar = first.getAuthor().getAvatar().getLarge();
+            updateActionBar(userName, userAdress, userAvatar);
+        }
         LOG.d(TAG_METHOD+ "Sortie");
     }
     @UiThread

@@ -3,6 +3,7 @@ package fr.android.scaron.diaspdroid.controler;
 import android.content.Context;
 
 import com.google.gson.JsonObject;
+import com.koushikdutta.async.http.body.FileBody;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
@@ -15,6 +16,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -174,12 +176,16 @@ public class DiasporaBean {
             MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
             LOG.d(TAG_METHOD+ "add part file");
 //            mvMap.add("filename", fileNameUrlEncoded);
-            mvMap.add("qqfile", new FileSystemResource(localPath));
-//            try {
-//                mvMap.add("file", new FileInputStream(localPath));
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
+            File file = new File(localPath);
+            FileBody fb = new FileBody(file);
+//            builder.addPart("file", fb);
+            mvMap.add("file", fb);
+//            mvMap.add("qqfile", new FileSystemResource(localPath));
+////            try {
+////                mvMap.add("file", new FileInputStream(localPath));
+////            } catch (FileNotFoundException e) {
+////                e.printStackTrace();
+////            }
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
             UploadResult uploadResult = diasporaService.uploadFile(fileNameUrlEncoded, mvMap);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
