@@ -1,6 +1,7 @@
 package fr.android.scaron.diaspdroid.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,13 +32,17 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +75,8 @@ import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.AndroidMultiPartEntity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.ProgressByteArrayEntity;
+import fr.android.scaron.diaspdroid.model.ProgressListener;
 
 /**
  * Created by Sébastien on 25/03/2015.
@@ -274,93 +281,163 @@ public class ShareActivity  extends ActionBarActivity {
             return "" + uploadFile();
         }
 
-    private String uploadFile(){
+
+        public String uploadFile(){
+
             String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
             LOG.d(TAG_METHOD + "Entrée");
-        //File to download
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpClientParams.setRedirecting(httpParams, false);
+            HttpClient session = new DefaultHttpClient(httpParams);
+            final byte[] photoBytes = getImageBytes(filePath);
+            final ProgressListener listener;
 
-//            final String uploadFileName =
-//
-//            final String uploadFilePath = filePath.substring(0, indexEndOfPath);
-            int indexEndOfPath = filePath.lastIndexOf('/');
-        String fileName = filePath.substring(indexEndOfPath+1);
-        String fileDir = filePath.substring(0, indexEndOfPath);
-        Uri mSelectedImageUri = imageUri;
-        String responseText;
-        try {
-            HttpClient httpClient=new DefaultHttpClient();
-            HttpPost httpPost=new HttpPost("https://framasphere.org/photos");
+            final HttpPost photoRequest = new HttpPost(DiasporaConfig.POD_URL + "/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg");
 
-
-
-
-            //--------------------------------------
-
-    //            httppost.setHeader("accept", "application/json");
-    //            httppost.setHeader("accept-encoding", "gzip, deflate");
-    //            httppost.setHeader("accept-language", "fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4");
-    //
-    ////            httppost.setHeader("content-type", "application/x-www-form-urlencoded");
-    ////            httppost.setHeader("content-type", "application/octet-stream");
-    ////            httppost.setHeader("content-type", "multipart/form-data");
-    //            httppost.setHeader("user-agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36");
-    //
-
-            httpPost.setHeader("Connection", "Keep-Alive");
-            httpPost.setHeader("cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWUzYTYyODMyOGNmYTQ2MTJiODZhNGQ1ZDUzMGYyMzUyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxV0NzSXBKYjlhSFhLcjdoN1N6VVkwN1pmZEFieWNyckFTUXJDblhuQTJlTT0GOwBG--8b4e7448a125c0933d98340ae4aa0d67ac662f94; _pk_ref.26.270d=%5B%22%22%2C%22%22%2C1429998251%2C%22https%3A%2F%2Fwww.google.fr%2F%22%5D; _pk_id.26.270d=da3742c7b86218bb.1425942309.13.1429998963.1429998251.; _pk_ses.26.270d=*");
-//            httpPost.setHeader("content-type", "application/octet-stream");
-            httpPost.setHeader("accept", "application/json, text/plain, */*");
-            httpPost.setHeader("X-CSRF-Token", "WCsIpJb9aHXKr7h7SzUY07ZfdAbycrrASQrCnXnA2eM=");
-            httpPost.setHeader("X-File-Name", fileName);
-            httpPost.setHeader("X-Requested-With", "XMLHttpRequest");
-//            httpPost.setHeader("accept-encoding", "gzip, deflate");
-            //--------------------------------
-            AndroidMultiPartEntity mUploadEntity = new AndroidMultiPartEntity(
-                new AndroidMultiPartEntity.ProgressListener() {
-
+            try {
+                // add header
+                photoRequest.addHeader("content-type", "application/octet-stream");
+                photoRequest.addHeader("accept", "application/json");
+                photoRequest.addHeader("X-Requested-With", "XMLHttpRequest");
+                photoRequest.addHeader("X-CSRF-Token", DiasporaControler.TOKEN);
+                photoRequest.addHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);
+                listener = new ProgressListener() {
                     @Override
                     public void transferred(long num) {
                         publishProgress((int) ((num / (float) totalSize) * 100));
                     }
-                });
-            if (mSelectedImageUri != null) {
-                InputStream imageStream=getContentResolver().openInputStream(mSelectedImageUri);
-                byte[] imageData= IOUtils.toByteArray(imageStream);
-                InputStreamBody imageStreamBody=new InputStreamBody(new ByteArrayInputStream(imageData),fileName);
-                mUploadEntity.addPart("qqFile",imageStreamBody);
-                mUploadEntity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
-            }
+                };
+                final HttpEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
+                totalSize = photoEntity.getContentLength();
+                photoRequest.setEntity(photoEntity);
 
-            LOG.d(TAG_METHOD + "get totalSize multipart");
-                totalSize = mUploadEntity.getContentLength();
-                LOG.d(TAG_METHOD + "totalSize multipart getted "+totalSize);
-            httpPost.setEntity(mUploadEntity);
-            HttpResponse response;
-            response=httpClient.execute(httpPost);
-            InputStream instream = response.getEntity().getContent();
-            Header contentEncoding = response.getFirstHeader("Content-Encoding");
-            if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
-                instream = new GZIPInputStream(instream);
+                // send request
+                final HttpResponse response = session.execute(photoRequest);
+
+                StringBuilder sb = new StringBuilder("\n-----------------\n");
+                for (Header header:photoRequest.getAllHeaders()){
+                    sb.append(header.toString()+"\n");
+                }
+                sb.append("-----------------");
+                LOG.d(TAG_METHOD + "headers sended :"+sb.toString());
+
+
+                if (response.getStatusLine().getStatusCode() == 200) { // successful
+                    // get guid
+                    final JSONObject photoJson = new JSONObject(EntityUtils.toString(response.getEntity()));
+                    final JSONObject photoData = photoJson.getJSONObject("data").getJSONObject("photo");
+                    LOG.d(TAG_METHOD + photoData.getJSONObject("unprocessed_image").getString("url"));
+                    LOG.d(TAG_METHOD + photoData.getString("guid"));
+                    return photoData.getJSONObject("unprocessed_image").getString("url");
+                }
+                // ignore content if not successful
+                // response.getEntity().consumeContent();
+                LOG.d(EntityUtils.toString(response.getEntity()));
+                return "Error "+response.getStatusLine().getStatusCode()+" while creating the post! Probably the diaspora behavior has changed. (reason : "+response.getStatusLine().getReasonPhrase()+")";
+            } catch (final IOException e) {
+                // reset http connection
+                photoRequest.abort();
+                return "IOException : "+e.getMessage();
+            } catch (final ParseException e) {
+                // reset http connection
+                photoRequest.abort();
+                return "ParseException : "+e.getMessage();
+            } catch (final JSONException e) {
+                // reset http connection
+                photoRequest.abort();
+                return "JSONException : "+e.getMessage();
             }
-            responseText = convertStreamToString(instream);
-            LOG.d(TAG_METHOD + "reponse obtenue : "+responseText);
-            JSONObject responseObject=new JSONObject(responseText);
-            LOG.d(TAG_METHOD + "reponse json obtenue : "+responseObject.toString());
         }
-        catch (  FileNotFoundException fileException) {
-            fileException.printStackTrace();
-            responseText = "Erreur FileNotFoundException obtenue : "+fileException.getMessage();
-        }
-        catch (  IOException ioException) {
-            ioException.printStackTrace();
-            responseText = "Erreur IOException obtenue : "+ioException.getMessage();
-        }
-        catch (  JSONException jsonException) {
-            jsonException.printStackTrace();
-            responseText = "Erreur JSONException obtenue : "+jsonException.getMessage();
-        }
-        return responseText;
-    }
+
+
+
+//    private String uploadFile(){
+//            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
+//            LOG.d(TAG_METHOD + "Entrée");
+//        //File to download
+//
+////            final String uploadFileName =
+////
+////            final String uploadFilePath = filePath.substring(0, indexEndOfPath);
+//            int indexEndOfPath = filePath.lastIndexOf('/');
+//        String fileName = filePath.substring(indexEndOfPath+1);
+//        String fileDir = filePath.substring(0, indexEndOfPath);
+//        Uri mSelectedImageUri = imageUri;
+//        String responseText;
+//        try {
+//            HttpClient httpClient=new DefaultHttpClient();
+//            HttpPost httpPost=new HttpPost("https://framasphere.org/photos");
+//
+//
+//
+//
+//            //--------------------------------------
+//
+//    //            httppost.setHeader("accept", "application/json");
+//    //            httppost.setHeader("accept-encoding", "gzip, deflate");
+//    //            httppost.setHeader("accept-language", "fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4");
+//    //
+//    ////            httppost.setHeader("content-type", "application/x-www-form-urlencoded");
+//    ////            httppost.setHeader("content-type", "application/octet-stream");
+//    ////            httppost.setHeader("content-type", "multipart/form-data");
+//    //            httppost.setHeader("user-agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36");
+//    //
+//
+//            httpPost.setHeader("Connection", "Keep-Alive");
+//            httpPost.setHeader("cookie", "remember_user_token=BAhbB1sGaQISCUkiIiQyYSQxMCRhRkt5Zm1zNzQ5Mjc1UkpqL2NnMVYuBjoGRVQ%3D--f4d3bf8cffd10524e0bae308c1afeed9de766c26; _diaspora_session=BAh7CEkiD3Nlc3Npb25faWQGOgZFVEkiJWUzYTYyODMyOGNmYTQ2MTJiODZhNGQ1ZDUzMGYyMzUyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsHWwZpAhIJSSIiJDJhJDEwJGFGS3lmbXM3NDkyNzVSSmovY2cxVi4GOwBUSSIQX2NzcmZfdG9rZW4GOwBGSSIxV0NzSXBKYjlhSFhLcjdoN1N6VVkwN1pmZEFieWNyckFTUXJDblhuQTJlTT0GOwBG--8b4e7448a125c0933d98340ae4aa0d67ac662f94; _pk_ref.26.270d=%5B%22%22%2C%22%22%2C1429998251%2C%22https%3A%2F%2Fwww.google.fr%2F%22%5D; _pk_id.26.270d=da3742c7b86218bb.1425942309.13.1429998963.1429998251.; _pk_ses.26.270d=*");
+////            httpPost.setHeader("content-type", "application/octet-stream");
+//            httpPost.setHeader("accept", "application/json, text/plain, */*");
+//            httpPost.setHeader("X-CSRF-Token", "WCsIpJb9aHXKr7h7SzUY07ZfdAbycrrASQrCnXnA2eM=");
+//            httpPost.setHeader("X-File-Name", fileName);
+//            httpPost.setHeader("X-Requested-With", "XMLHttpRequest");
+////            httpPost.setHeader("accept-encoding", "gzip, deflate");
+//            //--------------------------------
+//            AndroidMultiPartEntity mUploadEntity = new AndroidMultiPartEntity(
+//                new AndroidMultiPartEntity.ProgressListener() {
+//
+//                    @Override
+//                    public void transferred(long num) {
+//                        publishProgress((int) ((num / (float) totalSize) * 100));
+//                    }
+//                });
+//            if (mSelectedImageUri != null) {
+//                InputStream imageStream=getContentResolver().openInputStream(mSelectedImageUri);
+//                byte[] imageData= IOUtils.toByteArray(imageStream);
+//                InputStreamBody imageStreamBody=new InputStreamBody(new ByteArrayInputStream(imageData),fileName);
+//                mUploadEntity.addPart("qqFile",imageStreamBody);
+//                mUploadEntity.addPart("json", new StringBody("{ \"photo\": { \"pending\": true, \"aspect_id\": \"all\" }}"));
+//            }
+//
+//            LOG.d(TAG_METHOD + "get totalSize multipart");
+//                totalSize = mUploadEntity.getContentLength();
+//                LOG.d(TAG_METHOD + "totalSize multipart getted "+totalSize);
+//            httpPost.setEntity(mUploadEntity);
+//            HttpResponse response;
+//            response=httpClient.execute(httpPost);
+//            InputStream instream = response.getEntity().getContent();
+//            Header contentEncoding = response.getFirstHeader("Content-Encoding");
+//            if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+//                instream = new GZIPInputStream(instream);
+//            }
+//            responseText = convertStreamToString(instream);
+//            LOG.d(TAG_METHOD + "reponse obtenue : "+responseText);
+//            JSONObject responseObject=new JSONObject(responseText);
+//            LOG.d(TAG_METHOD + "reponse json obtenue : "+responseObject.toString());
+//        }
+//        catch (  FileNotFoundException fileException) {
+//            fileException.printStackTrace();
+//            responseText = "Erreur FileNotFoundException obtenue : "+fileException.getMessage();
+//        }
+//        catch (  IOException ioException) {
+//            ioException.printStackTrace();
+//            responseText = "Erreur IOException obtenue : "+ioException.getMessage();
+//        }
+//        catch (  JSONException jsonException) {
+//            jsonException.printStackTrace();
+//            responseText = "Erreur JSONException obtenue : "+jsonException.getMessage();
+//        }
+//        return responseText;
+//    }
 
         public byte[] decompress(byte[] compressed) throws IOException
         {
@@ -391,6 +468,27 @@ public class ShareActivity  extends ActionBarActivity {
             }
         }
 
+
+        private byte[] getImageBytes(String filePath){
+            try {
+                File sourceFile = new File(filePath);
+                InputStream is = new FileInputStream(sourceFile);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] b = new byte[1024];
+//                while ((int bytesRead = is.read(b))!=-1){
+//                    bos.write(b, 0, bytesRead);
+//                }
+                while(is.available()>0){
+                    bos.write(is.read());
+                }
+                byte[] bytes = bos.toByteArray();
+                return bytes;
+            }catch(FileNotFoundException fnfe){
+                return ("FileNotFoundException : "+fnfe.getMessage()).getBytes(Charset.forName("UTF-8"));
+            }catch(IOException ioe){
+                return ("IOException : "+ioe.getMessage()).getBytes(Charset.forName("UTF-8"));
+            }
+        }
 
 //        public String uploadFile() {
 //            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
