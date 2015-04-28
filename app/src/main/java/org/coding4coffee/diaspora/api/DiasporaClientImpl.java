@@ -1,18 +1,5 @@
 package org.coding4coffee.diaspora.api;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -39,6 +26,19 @@ import org.coding4coffee.diaspora.api.upload.ProgressListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Benjamin Neff
@@ -159,8 +159,10 @@ public class DiasporaClientImpl implements DiasporaClient {
 				// get guid
 				final JSONObject photoJson = new JSONObject(EntityUtils.toString(response.getEntity()));
 				final JSONObject photoData = photoJson.getJSONObject("data").getJSONObject("photo");
-				System.out.println(photoData.getJSONObject("unprocessed_image").getString("url"));
-				return photoData.getString("guid");
+                final String photoDataUrl = photoData.getJSONObject("unprocessed_image").getString("url");
+				System.out.println("photoDataUrl : "+photoDataUrl);
+                System.out.println("photoDataGuid : "+photoData.getString("guid"));
+                return photoDataUrl;
 			}
 			// ignore content if not successful
 			// response.getEntity().consumeContent();

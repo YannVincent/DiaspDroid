@@ -1,7 +1,6 @@
 package fr.android.scaron.diaspdroid.activity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,63 +19,36 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-//import com.google.api.client.util.IOUtils;
-
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.coding4coffee.diaspora.api.DiasporaClient;
+import org.coding4coffee.diaspora.api.DiasporaClientFactory;
+import org.coding4coffee.diaspora.api.exceptions.PodFailureException;
+import org.coding4coffee.diaspora.api.upload.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.controler.AuthenticationInterceptor;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.AndroidMultiPartEntity;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.ProgressByteArrayEntity;
-import fr.android.scaron.diaspdroid.model.ProgressListener;
+
+//import com.google.api.client.util.IOUtils;
 
 /**
  * Created by Sébastien on 25/03/2015.
@@ -281,73 +253,103 @@ public class ShareActivity  extends ActionBarActivity {
             return "" + uploadFile();
         }
 
-
         public String uploadFile(){
-
             String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
             LOG.d(TAG_METHOD + "Entrée");
-            final HttpParams httpParams = new BasicHttpParams();
-            HttpClientParams.setRedirecting(httpParams, false);
-            HttpClient session = new DefaultHttpClient(httpParams);
-            final byte[] photoBytes = getImageBytes(filePath);
-            final ProgressListener listener;
-
-            final HttpPost photoRequest = new HttpPost(DiasporaConfig.POD_URL + "/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg");
-
+            String reponseUpload = "Une erreur inconnue est survenue";
+            DiasporaClient diasporaClient = DiasporaClientFactory.createDiasporaClient(DiasporaConfig.POD_URL);
             try {
-                // add header
-                photoRequest.addHeader("content-type", "application/octet-stream");
-                photoRequest.addHeader("accept", "application/json");
-                photoRequest.addHeader("X-Requested-With", "XMLHttpRequest");
-                photoRequest.addHeader("X-CSRF-Token", DiasporaControler.TOKEN);
-                photoRequest.addHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);
-                listener = new ProgressListener() {
-                    @Override
-                    public void transferred(long num) {
-                        publishProgress((int) ((num / (float) totalSize) * 100));
-                    }
-                };
-                final HttpEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
-                totalSize = photoEntity.getContentLength();
-                photoRequest.setEntity(photoEntity);
-
-                // send request
-                final HttpResponse response = session.execute(photoRequest);
-
-                StringBuilder sb = new StringBuilder("\n-----------------\n");
-                for (Header header:photoRequest.getAllHeaders()){
-                    sb.append(header.toString()+"\n");
+                boolean logged = diasporaClient.login(DiasporaConfig.POD_USER, DiasporaConfig.POD_PASSWORD);
+                if (logged){
+                    final ProgressListener listener = new ProgressListener() {
+                        @Override
+                        public void transferred(long num) {
+                            publishProgress((int) ((num / (float) totalSize) * 100));
+                        }
+                    };
+                    final byte[] photoBytes = getImageBytes(filePath);
+                    String photoUrl = diasporaClient.uploadPhoto(photoBytes, listener);
+                    LOG.d(TAG_METHOD + "url de la photo sur le POD : "+photoUrl);
+                    reponseUpload = photoUrl;
+                }else{
+                    reponseUpload="Impossible de se connecter à votre POD Diaspora, veuillez vérifier votre connexion ou vos paramètres";
                 }
-                sb.append("-----------------");
-                LOG.d(TAG_METHOD + "headers sended :"+sb.toString());
-
-
-                if (response.getStatusLine().getStatusCode() == 200) { // successful
-                    // get guid
-                    final JSONObject photoJson = new JSONObject(EntityUtils.toString(response.getEntity()));
-                    final JSONObject photoData = photoJson.getJSONObject("data").getJSONObject("photo");
-                    LOG.d(TAG_METHOD + photoData.getJSONObject("unprocessed_image").getString("url"));
-                    LOG.d(TAG_METHOD + photoData.getString("guid"));
-                    return photoData.getJSONObject("unprocessed_image").getString("url");
-                }
-                // ignore content if not successful
-                // response.getEntity().consumeContent();
-                LOG.d(EntityUtils.toString(response.getEntity()));
-                return "Error "+response.getStatusLine().getStatusCode()+" while creating the post! Probably the diaspora behavior has changed. (reason : "+response.getStatusLine().getReasonPhrase()+")";
-            } catch (final IOException e) {
-                // reset http connection
-                photoRequest.abort();
-                return "IOException : "+e.getMessage();
-            } catch (final ParseException e) {
-                // reset http connection
-                photoRequest.abort();
-                return "ParseException : "+e.getMessage();
-            } catch (final JSONException e) {
-                // reset http connection
-                photoRequest.abort();
-                return "JSONException : "+e.getMessage();
+            } catch (IOException e) {
+                e.printStackTrace();
+                reponseUpload="Erreur IOException "+e.getMessage();
+            } catch (PodFailureException e) {
+                e.printStackTrace();
+                reponseUpload="Erreur PodFailureException "+e.getMessage();
             }
+            return reponseUpload;
         }
+
+//        public String uploadFile(){
+//
+//            String TAG_METHOD = TAG + ".UploadFileToServer.uploadFile : ";
+//            LOG.d(TAG_METHOD + "Entrée");
+//            final HttpParams httpParams = new BasicHttpParams();
+//            HttpClientParams.setRedirecting(httpParams, false);
+//            HttpClient session = new DefaultHttpClient(httpParams);
+//            final byte[] photoBytes = getImageBytes(filePath);
+//            final ProgressListener listener;
+//
+//            final HttpPost photoRequest = new HttpPost(DiasporaConfig.POD_URL + "/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg");
+//
+//            try {
+//                // add header
+//                photoRequest.addHeader("content-type", "application/octet-stream");
+//                photoRequest.addHeader("accept", "application/json");
+//                photoRequest.addHeader("X-Requested-With", "XMLHttpRequest");
+//                photoRequest.addHeader("X-CSRF-Token", DiasporaControler.TOKEN);
+//                photoRequest.addHeader("Cookie", AuthenticationInterceptor.COOKIE_AUTH);
+//                listener = new ProgressListener() {
+//                    @Override
+//                    public void transferred(long num) {
+//                        publishProgress((int) ((num / (float) totalSize) * 100));
+//                    }
+//                };
+//                final HttpEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
+//                totalSize = photoEntity.getContentLength();
+//                photoRequest.setEntity(photoEntity);
+//
+//                // send request
+//                final HttpResponse response = session.execute(photoRequest);
+//
+//                StringBuilder sb = new StringBuilder("\n-----------------\n");
+//                for (Header header:photoRequest.getAllHeaders()){
+//                    sb.append(header.toString()+"\n");
+//                }
+//                sb.append("-----------------");
+//                LOG.d(TAG_METHOD + "headers sended :"+sb.toString());
+//
+//
+//                if (response.getStatusLine().getStatusCode() == 200) { // successful
+//                    // get guid
+//                    final JSONObject photoJson = new JSONObject(EntityUtils.toString(response.getEntity()));
+//                    final JSONObject photoData = photoJson.getJSONObject("data").getJSONObject("photo");
+//                    LOG.d(TAG_METHOD + photoData.getJSONObject("unprocessed_image").getString("url"));
+//                    LOG.d(TAG_METHOD + photoData.getString("guid"));
+//                    return photoData.getJSONObject("unprocessed_image").getString("url");
+//                }
+//                // ignore content if not successful
+//                // response.getEntity().consumeContent();
+//                LOG.d(EntityUtils.toString(response.getEntity()));
+//                return "Error "+response.getStatusLine().getStatusCode()+" while creating the post! Probably the diaspora behavior has changed. (reason : "+response.getStatusLine().getReasonPhrase()+")";
+//            } catch (final IOException e) {
+//                // reset http connection
+//                photoRequest.abort();
+//                return "IOException : "+e.getMessage();
+//            } catch (final ParseException e) {
+//                // reset http connection
+//                photoRequest.abort();
+//                return "ParseException : "+e.getMessage();
+//            } catch (final JSONException e) {
+//                // reset http connection
+//                photoRequest.abort();
+//                return "JSONException : "+e.getMessage();
+//            }
+//        }
 
 
 
