@@ -276,9 +276,11 @@ public class ShareActivity  extends ActionBarActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                LOG.e(TAG_METHOD + "IOException rencontrée "+e.getMessage(),e);
                 reponseUpload="Erreur IOException "+e.getMessage();
             } catch (PodFailureException e) {
                 e.printStackTrace();
+                LOG.e(TAG_METHOD + "PodFailureException rencontrée "+e.getMessage(),e);
                 reponseUpload="Erreur PodFailureException "+e.getMessage();
             }
             return reponseUpload;
