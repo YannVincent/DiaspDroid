@@ -10,15 +10,21 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.rest.RestService;
+import org.apache.http.HttpEntity;
+import org.coding4coffee.diaspora.api.upload.ProgressByteArrayEntity;
+import org.coding4coffee.diaspora.api.upload.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -150,6 +156,57 @@ public class DiasporaBean {
 //    }
 
 
+//    public UploadResult uploadFile(String fileName, String localPath){
+//        String TAG_METHOD = TAG + ".uploadFile : ";
+//        LOG.d(TAG_METHOD+ "Entrée");
+//
+//        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+//        boolean logged = seLogguer();
+//        if (logged){
+//            LOG.d(TAG_METHOD+ "logged successfully");
+//            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
+//                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+//                diasporaService.setHeader("authenticity_token", DiasporaControler.TOKEN);
+//            }
+//            String fileNameUrlEncoded = fileName;
+//            try {
+//                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//            diasporaService.setHeader("x-requested-with", "XMLHttpRequest");
+//            diasporaService.setHeader("x-file-name", fileNameUrlEncoded);
+//            diasporaService.setHeader("origin", "https://framasphere.org");
+//            diasporaService.setHeader("referer", "https://framasphere.org/stream");
+////            diasporaService.setHeader("content-type", "application/octet-stream");
+//            MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
+//            LOG.d(TAG_METHOD+ "add part file");
+////            mvMap.add("filename", fileNameUrlEncoded);
+//            File file = new File(localPath);
+//            FileBody fb = new FileBody(file);
+////            builder.addPart("file", fb);
+//            mvMap.add("file", fb);
+////            mvMap.add("qqfile", new FileSystemResource(localPath));
+//////            try {
+//////                mvMap.add("file", new FileInputStream(localPath));
+//////            } catch (FileNotFoundException e) {
+//////                e.printStackTrace();
+//////            }
+//            LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+//            UploadResult uploadResult = diasporaService.uploadFile(fileNameUrlEncoded, mvMap);
+//            LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
+//            if (uploadResult!=null){
+//                LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
+//                LOG.d(TAG_METHOD+ "uploadResult is error ? "+uploadResult.getError());
+//            }
+//            LOG.d(TAG_METHOD+ "Sortie");
+//            return uploadResult;
+//        }
+//        LOG.d(TAG_METHOD+ "logged failure");
+//        return null;
+//    }
+
+
     public UploadResult uploadFile(String fileName, String localPath){
         String TAG_METHOD = TAG + ".uploadFile : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -160,34 +217,20 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "logged successfully");
             if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
                 diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
-                diasporaService.setHeader("authenticity_token", DiasporaControler.TOKEN);
             }
-            String fileNameUrlEncoded = fileName;
-            try {
-                fileNameUrlEncoded = URLEncoder.encode(fileName, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            diasporaService.setHeader("x-requested-with", "XMLHttpRequest");
-            diasporaService.setHeader("x-file-name", fileNameUrlEncoded);
-            diasporaService.setHeader("origin", "https://framasphere.org");
-            diasporaService.setHeader("referer", "https://framasphere.org/stream");
-//            diasporaService.setHeader("content-type", "application/octet-stream");
-            MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
-            LOG.d(TAG_METHOD+ "add part file");
-//            mvMap.add("filename", fileNameUrlEncoded);
-            File file = new File(localPath);
-            FileBody fb = new FileBody(file);
-//            builder.addPart("file", fb);
-            mvMap.add("file", fb);
-//            mvMap.add("qqfile", new FileSystemResource(localPath));
-////            try {
-////                mvMap.add("file", new FileInputStream(localPath));
-////            } catch (FileNotFoundException e) {
-////                e.printStackTrace();
-////            }
+            diasporaService.setHeader("content-type", "application/octet-stream");
+            final ProgressListener listener = new ProgressListener() {
+                @Override
+                public void transferred(long num) {
+//                    publishProgress((int) ((num / (float) totalSize) * 100));
+                }
+            };
+            final byte[] photoBytes = getImageBytes(localPath);
+
+            LOG.d(TAG_METHOD + "On crée l'entité photo à partir des données brutes");
+            ProgressByteArrayEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
-            UploadResult uploadResult = diasporaService.uploadFile(fileNameUrlEncoded, mvMap);
+            UploadResult uploadResult = diasporaService.uploadFile(photoEntity);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
                 LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
@@ -198,6 +241,28 @@ public class DiasporaBean {
         }
         LOG.d(TAG_METHOD+ "logged failure");
         return null;
+    }
+
+
+    private byte[] getImageBytes(String filePath){
+        try {
+            File sourceFile = new File(filePath);
+            InputStream is = new FileInputStream(sourceFile);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] b = new byte[1024];
+//                while ((int bytesRead = is.read(b))!=-1){
+//                    bos.write(b, 0, bytesRead);
+//                }
+            while(is.available()>0){
+                bos.write(is.read());
+            }
+            byte[] bytes = bos.toByteArray();
+            return bytes;
+        }catch(FileNotFoundException fnfe){
+            return ("FileNotFoundException : "+fnfe.getMessage()).getBytes(Charset.forName("UTF-8"));
+        }catch(IOException ioe){
+            return ("IOException : "+ioe.getMessage()).getBytes(Charset.forName("UTF-8"));
+        }
     }
 
     public List<Post> getInfo(String userName){

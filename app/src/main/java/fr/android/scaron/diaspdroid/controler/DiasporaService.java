@@ -11,6 +11,7 @@ import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.annotations.rest.SetsCookie;
 import org.androidannotations.api.rest.MediaType;
 import org.androidannotations.api.rest.RestClientErrorHandling;
+import org.coding4coffee.diaspora.api.upload.ProgressByteArrayEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -51,15 +52,25 @@ public interface DiasporaService extends RestClientErrorHandling {
     List<fr.android.scaron.diaspdroid.model.Post> getInfo(String userName);
 
 
-//    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
-    @Post("/photos?photo[pending]=true&qqfile={fileName}")
+////    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
+//    @Post("/photos?photo[pending]=true&qqfile={fileName}")
+////    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
+//    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+//    @SetsCookie({"_diaspora_session", "remember_user_token"})
+//    @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
+////    @RequiresHeader("x-csrf-token") "content-type",
+//    @Accept(MediaType.MULTIPART_FORM_DATA)
+//    UploadResult uploadFile(String fileName, MultiValueMap<String, Object> mapParts);
+
+    //    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
+    @Post("/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg")
 //    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-    @RequiresHeader({"x-csrf-token", "x-requested-with", "x-file-name", "origin", "referer", "authenticity_token"})
+    @RequiresHeader({"x-csrf-token"})
 //    @RequiresHeader("x-csrf-token") "content-type",
-    @Accept(MediaType.MULTIPART_FORM_DATA)
-    UploadResult uploadFile(String fileName, MultiValueMap<String, Object> mapParts);
+    @Accept(MediaType.APPLICATION_JSON)
+    UploadResult uploadFile(ProgressByteArrayEntity file);
 
     @Post("/reshares")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
