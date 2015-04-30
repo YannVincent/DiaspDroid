@@ -219,18 +219,19 @@ public class DiasporaBean {
                 diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
             }
             diasporaService.setHeader("content-type", "application/octet-stream");
-            final ProgressListener listener = new ProgressListener() {
-                @Override
-                public void transferred(long num) {
-//                    publishProgress((int) ((num / (float) totalSize) * 100));
-                }
-            };
+//            final ProgressListener listener = new ProgressListener() {
+//                @Override
+//                public void transferred(long num) {
+////                    publishProgress((int) ((num / (float) totalSize) * 100));
+//                }
+//            };
+            LOG.d(TAG_METHOD + "On crée l'entité photo à partir des données brutes");
             final byte[] photoBytes = getImageBytes(localPath);
 
-            LOG.d(TAG_METHOD + "On crée l'entité photo à partir des données brutes");
-            ProgressByteArrayEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
+//            ProgressByteArrayEntity photoEntity = new ProgressByteArrayEntity(photoBytes, listener);
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
-            UploadResult uploadResult = diasporaService.uploadFile(photoEntity);
+//            UploadResult uploadResult = diasporaService.uploadFile(photoEntity);
+            UploadResult uploadResult = diasporaService.uploadFile(photoBytes);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
                 LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());

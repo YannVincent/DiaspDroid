@@ -63,14 +63,17 @@ public interface DiasporaService extends RestClientErrorHandling {
 //    UploadResult uploadFile(String fileName, MultiValueMap<String, Object> mapParts);
 
     //    @Post("/photos?photo%5Bpending%5D=true&set_profile_image=&qqfile={fileName}")
-    @Post("/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg")
+//    @Post("/photos?photo%5Baspect_ids%5D=all&qqfile=uploaded.jpg")
+    @Post("/photos?photo[aspect_ids]=all&qqfile=uploaded.jpg")
 //    @Post("/photos?photo%5Bpending%5D=true&qqfile={fileName}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-    @RequiresHeader({"x-csrf-token"})
+    @RequiresHeader({"x-csrf-token", "content-type"})
 //    @RequiresHeader("x-csrf-token") "content-type",
     @Accept(MediaType.APPLICATION_JSON)
-    UploadResult uploadFile(ProgressByteArrayEntity file);
+    UploadResult uploadFile(byte[] file);
+//    @Accept(MediaType.APPLICATION_JSON)
+//    UploadResult uploadFile(ProgressByteArrayEntity file);
 
     @Post("/reshares")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
