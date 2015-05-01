@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.LikeResult;
+import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
@@ -89,6 +90,14 @@ public interface DiasporaService extends RestClientErrorHandling {
     @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
     LikeResult like(Integer postID);
+
+
+    @Post("/status_messages")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    @RequiresHeader({"x-csrf-token", "content-type"})
+    @Accept(MediaType.APPLICATION_JSON)
+    fr.android.scaron.diaspdroid.model.Post post(NewPost post);
 
 
 

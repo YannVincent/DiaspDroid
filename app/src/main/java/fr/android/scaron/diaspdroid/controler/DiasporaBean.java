@@ -10,6 +10,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.rest.RestService;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.coding4coffee.diaspora.api.upload.ProgressByteArrayEntity;
 import org.coding4coffee.diaspora.api.upload.ProgressListener;
@@ -33,6 +34,7 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.LikeResult;
+import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
@@ -206,8 +208,32 @@ public class DiasporaBean {
 //        return null;
 //    }
 
+    public Post sendPost(NewPost newPost){
+        String TAG_METHOD = TAG + ".sendPost : ";
+        LOG.d(TAG_METHOD+ "Entrée");
 
-    public UploadResult uploadFile(String fileName, String localPath){
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "logged successfully");
+            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            }
+            diasporaService.setHeader("content-type", "application/json");
+
+            LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+            Post postResult = diasporaService.post(newPost);
+            LOG.d(TAG_METHOD+ "postResult is null ? "+(postResult==null));
+            LOG.d(TAG_METHOD+ "Sortie");
+            return postResult;
+        }
+        LOG.d(TAG_METHOD+ "logged failure");
+        return null;
+    }
+
+
+
+    public UploadResult uploadFile(String localPath){
         String TAG_METHOD = TAG + ".uploadFile : ";
         LOG.d(TAG_METHOD+ "Entrée");
 
@@ -247,17 +273,19 @@ public class DiasporaBean {
 
     private byte[] getImageBytes(String filePath){
         try {
-            File sourceFile = new File(filePath);
-            InputStream is = new FileInputStream(sourceFile);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] b = new byte[1024];
-//                while ((int bytesRead = is.read(b))!=-1){
-//                    bos.write(b, 0, bytesRead);
-//                }
-            while(is.available()>0){
-                bos.write(is.read());
-            }
-            byte[] bytes = bos.toByteArray();
+            InputStream is = new FileInputStream(filePath);
+            byte[] bytes = IOUtils.toByteArray(is);
+//            File sourceFile = new File(filePath);
+//            InputStream is = new FileInputStream(sourceFile);
+//            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//            byte[] b = new byte[1024];
+////                while ((int bytesRead = is.read(b))!=-1){
+////                    bos.write(b, 0, bytesRead);
+////                }
+//            while(is.available()>0){
+//                bos.write(is.read());
+//            }
+//            byte[] bytes = bos.toByteArray();
             return bytes;
         }catch(FileNotFoundException fnfe){
             return ("FileNotFoundException : "+fnfe.getMessage()).getBytes(Charset.forName("UTF-8"));

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,6 +29,9 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.NewPost;
+import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.StatusMessage;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
 /**
@@ -38,13 +42,20 @@ public class ShareActivity extends ActionBarActivity {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ShareActivity.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static final String TAG = "ShareActivityOldSchool";
+    private static final String TAG = "ShareActivity";
 
     @Extra
     Uri imageUri;
 
+    String uploadedFilePath;
+    String uploadedFileGuid;
+    Integer uploadedFileId;
+
     @Bean
     DiasporaBean diasporaBean;
+
+    @ViewById(R.id.share_text_entry)
+    EditText shareTextEntry;
 
     @ViewById(R.id.share_message)
     EditText shareMessage;
@@ -128,6 +139,7 @@ public class ShareActivity extends ActionBarActivity {
 
     @Click(R.id.share_text_button)
     public void launchSharing(){
+        progressBar.setVisibility(View.VISIBLE);
         String TAG_METHOD = TAG + ".updateScreen : ";
         LOG.d(TAG_METHOD + "Entrée");
         if (imageUri == null){
@@ -146,20 +158,45 @@ public class ShareActivity extends ActionBarActivity {
             return;
         }
         LOG.d(TAG_METHOD + "getImageName for imageLocalPath : "+imageLocalPath);
-        final String imageName = imageLocalPath.substring(imageLocalPath.lastIndexOf('/')+1);
-        shareMessage.setText("Partage de la photo en cours: " + imageName + " ("+imageLocalPath+")");
+//        final String imageName = imageLocalPath.substring(imageLocalPath.lastIndexOf('/')+1);
+//        shareMessage.setText("Partage de la photo en cours: " + imageName + " ("+imageLocalPath+")");
         LOG.d(TAG_METHOD + "appel de shareImage");
-        shareImage(imageName, imageLocalPath);
+        shareImage(imageLocalPath);
         LOG.d(TAG_METHOD + "Sortie");
+        progressBar.setVisibility(View.GONE);
     }
 
     @Background
-    public void shareImage(String fileName, String localPath){
+    public void shareImage(String localPath){
+        publishProgress(0);
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.uploadFile");
-        UploadResult uploadFileResult = diasporaBean.uploadFile(fileName, localPath);
+        UploadResult uploadFileResult = diasporaBean.uploadFile(localPath);
         checkSharePic(uploadFileResult);
+        LOG.d(TAG_METHOD + "uploadedFilePath = "+uploadedFilePath);
+        LOG.d(TAG_METHOD + "uploadedFileGuid = "+uploadedFileGuid);
+        LOG.d(TAG_METHOD + "uploadedFileId = "+uploadedFileId);
+        if (uploadFileResult!=null){
+        LOG.d(TAG_METHOD + "photoID = "+
+                uploadFileResult.getData().getPhoto().getId());
+//        if (uploadedFilePath!=null){
+            NewPost newPost = new NewPost();
+            StatusMessage statusMessage=new StatusMessage();
+            statusMessage.setText(shareTextEntry.getText().toString());
+            newPost.setStatus_message(statusMessage);
+            newPost.setPhotos(""+uploadFileResult.getData().getPhoto().getId());
+            Post newPosted = diasporaBean.sendPost(newPost);
+            LOG.d(TAG_METHOD + "newPosted is null ? "+(newPosted==null));
+        }
+        publishProgress(100);
+//        progressBar.setVisibility(View.GONE);
+    }
+
+    @UiThread
+    void publishProgress(int progress) { // will run on the UI thread
+        // Update progress views
+        progressBar.setProgress(progress);
     }
 
     @UiThread
@@ -202,17 +239,23 @@ public class ShareActivity extends ActionBarActivity {
                 urlSharedImg = uploadResult.getData().getPhoto().getProcessed_image().getUrl();
             }
             if (urlSharedImg!=null){
-                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
-                final AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setIcon(R.drawable.ic_launcher);
-                alertDialog.setTitle("Publication réussie");
-                alertDialog.setMessage("Votre publication a bien été effectuée\n--------------\nimage:"+
-                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
-                alertDialog.show();
-                LOG.d(TAG_METHOD + "publication réussie");
-//                uploadProgressBar.setVisibility(View.GONE);
-                shareMessage.setText("Votre publication a bien été effectuée\n--------------\nimage:"+
-                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
+//                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
+//                final AlertDialog alertDialog = alertDialogBuilder.create();
+//                alertDialog.setIcon(R.drawable.ic_launcher);
+//                alertDialog.setTitle("Publication réussie");
+//                alertDialog.setMessage("Votre publication a bien été effectuée\n--------------\nimage:"+
+//                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
+//                alertDialog.show();
+//                LOG.d(TAG_METHOD + "publication réussie");
+////                uploadProgressBar.setVisibility(View.GONE);
+//                shareMessage.setText("Votre publication a bien été effectuée\n--------------\nimage:"+
+//                        urlSharedImg+"\n-------\nteste:"+shareMessage.getText().toString());
+                uploadedFilePath = urlSharedImg;
+                uploadedFileGuid = uploadResult.getData().getPhoto().getGuid();
+                uploadedFileId = uploadResult.getData().getPhoto().getId();
+
+
+
                 return;
             }else{
                 final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DiasporaConfig.APPLICATION_CONTEXT);
