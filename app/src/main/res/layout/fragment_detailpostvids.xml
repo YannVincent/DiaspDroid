@@ -55,13 +55,44 @@ Vestibulum commodo. Ut rhoncus gravida arcu."
         android:layout_below="@id/detailPostText"
         android:layout_marginTop="@dimen/margin_small"
         android:paddingTop="6dp" />
+    <ImageView android:id="@+id/detailPostImageB"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@id/detailPostImage"
+               android:layout_marginTop="@dimen/margin_small"
+               android:paddingTop="6dp" />
+    <ImageView android:id="@+id/detailPostImageC"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@id/detailPostImageB"
+               android:layout_marginTop="@dimen/margin_small"
+               android:paddingTop="6dp" />
+    <ImageView android:id="@+id/detailPostImageD"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@id/detailPostImageC"
+               android:layout_marginTop="@dimen/margin_small"
+               android:paddingTop="6dp" />
+    <ImageView android:id="@+id/detailPostImageE"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@id/detailPostImageD"
+               android:layout_marginTop="@dimen/margin_small"
+               android:paddingTop="6dp" />
+    <ImageView android:id="@+id/detailPostImageF"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@id/detailPostImageE"
+               android:layout_marginTop="@dimen/margin_small"
+               android:paddingTop="6dp" />
     <WebView
         android:id="@+id/webvideo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/detailPostImage"
+        android:layout_below="@id/detailPostImageF"
         android:layout_marginTop="@dimen/margin_small"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:paddingTop="6dp"/>
 
     <com.google.android.youtube.player.YouTubeThumbnailView android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -69,7 +100,8 @@ Vestibulum commodo. Ut rhoncus gravida arcu."
         android:adjustViewBounds="true"
         android:src="@drawable/no_thumbnail"
         android:layout_below="@id/webvideo"
-        android:id="@+id/ytb_thumbnail"/>
+        android:id="@+id/ytb_thumbnail"
+        android:paddingTop="6dp"/>
     <ImageView
         android:id="@+id/imgplay"
         android:layout_width="100sp"
@@ -78,7 +110,7 @@ Vestibulum commodo. Ut rhoncus gravida arcu."
         android:scaleType="fitXY"
         android:layout_alignTop="@+id/ytb_thumbnail"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp"/>
+        android:layout_marginTop="61dp"/>
 
     <RelativeLayout  android:id="@+id/detailOpenGraph"
                     android:layout_width="match_parent"

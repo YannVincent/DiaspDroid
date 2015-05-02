@@ -28,6 +28,7 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,6 +44,7 @@ import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Image;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.People;
+import fr.android.scaron.diaspdroid.model.Photo;
 import fr.android.scaron.diaspdroid.model.Post;
 //import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
 
@@ -77,6 +79,16 @@ public class PostView extends LinearLayout{
     TextView texte;
     @ViewById(R.id.detailPostImage)
     ImageView image;
+    @ViewById(R.id.detailPostImageB)
+    ImageView imageB;
+    @ViewById(R.id.detailPostImageC)
+    ImageView imageC;
+    @ViewById(R.id.detailPostImageD)
+    ImageView imageD;
+    @ViewById(R.id.detailPostImageE)
+    ImageView imageE;
+    @ViewById(R.id.detailPostImageF)
+    ImageView imageF;
     @ViewById(R.id.webvideo)
     WebView webvideo;
     @ViewById(R.id.ytb_thumbnail)
@@ -280,11 +292,22 @@ public class PostView extends LinearLayout{
         diasporaService.reshare(rootGuid);
     }
 
-    @UiThread
+
+
+    @Background
     public void setImageAvatarInView(String imagePath){
         String TAG_METHOD = TAG + ".setImageAvatarInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageAvatarDatas = diasporaService.getImageFile(imagePath);
+        setImageAvatarInViewUIT();
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @UiThread
+    public void setImageAvatarInViewUIT(){
+        String TAG_METHOD = TAG + ".setImageAvatarInViewUIT : ";
         LOG.d(TAG_METHOD + "Entrée");
-        setImageAvatarInViewBG(imagePath);
         if (imageAvatarDatas!=null) {
             LOG.d(TAG_METHOD + "converting datas to bitmap");
             Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
@@ -293,39 +316,90 @@ public class PostView extends LinearLayout{
         LOG.d(TAG_METHOD + "Sortie");
     }
 
-    @Background
-    public void setImageAvatarInViewBG(String imagePath){
-        String TAG_METHOD = TAG + ".setImageAvatarInViewBG : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
-        imageAvatarDatas = diasporaService.getImageFile(imagePath);
-        LOG.d(TAG_METHOD + "Sortie");
+@UiThread
+public void hideLastImageInView(int sizePhotos){
+    switch(sizePhotos) {
+        case 0 : image.setVisibility(GONE);
+            imageB.setVisibility(GONE);
+            imageC.setVisibility(GONE);
+            imageD.setVisibility(GONE);
+            imageE.setVisibility(GONE);
+            imageF.setVisibility(GONE);
+            break;
+        case 1 : imageB.setVisibility(GONE);
+            imageC.setVisibility(GONE);
+            imageD.setVisibility(GONE);
+            imageE.setVisibility(GONE);
+            imageF.setVisibility(GONE);
+            break;
+        case 2 : imageC.setVisibility(GONE);
+            imageD.setVisibility(GONE);
+            imageE.setVisibility(GONE);
+            imageF.setVisibility(GONE);
+            break;
+        case 3 : imageD.setVisibility(GONE);
+            imageE.setVisibility(GONE);
+            imageF.setVisibility(GONE);
+            break;
+        case 4 : imageE.setVisibility(GONE);
+            imageF.setVisibility(GONE);
+            break;
+        case 5 :imageF.setVisibility(GONE);
+            break;
+        default : break;
     }
-    @UiThread
-    public void setImageInView(String imagePath){
+}
+
+    @Background
+    public void setImageInView(String imagePath, int id){
         String TAG_METHOD = TAG + ".setImageInView : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        setImageInViewBG(imagePath);
-        if (imageDatas!=null) {
-            LOG.d(TAG_METHOD + "converting datas to bitmap");
-            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageDatas, 0, imageDatas.length);
-            image.setImageBitmap(imageAvatar);
-        }
-        LOG.d(TAG_METHOD + "Sortie");
-    }
-    @Background
-    public void setImageInViewBG(String imagePath){
-        String TAG_METHOD = TAG + ".setImageInViewBG : ";
         LOG.d(TAG_METHOD+ "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
         imageDatas = diasporaService.getImageFile(imagePath);
+        setImageInViewUIT(id);
         LOG.d(TAG_METHOD + "Sortie");
     }
     @UiThread
-    public void setImageLinkInView(String imagePath){
-        String TAG_METHOD = TAG + ".setImageInView : ";
+    public void setImageInViewUIT(int id){
+        String TAG_METHOD = TAG + ".setImageInViewUIT : ";
         LOG.d(TAG_METHOD+ "Entrée");
-        setImageLinkInViewBG(imagePath);
+        if (imageDatas!=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageDatas, 0, imageDatas.length);
+            switch(id) {
+                case 0 : image.setImageBitmap(imageAvatar);
+                    break;
+                case 1 : imageB.setImageBitmap(imageAvatar);
+                    break;
+                case 2 : imageC.setImageBitmap(imageAvatar);
+                    break;
+                case 3 : imageD.setImageBitmap(imageAvatar);
+                    break;
+                case 4 : imageE.setImageBitmap(imageAvatar);
+                    break;
+                case 5 : imageF.setImageBitmap(imageAvatar);
+                    break;
+                default : LOG.d(TAG_METHOD + "Il manque une vue image detail pour l'affichage de la photo n°"+id);
+                    break;
+            }
+        }
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @Background
+    public void setImageLinkInView(String imagePath){
+        String TAG_METHOD = TAG + ".setImageLinkInView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        imageLinkDatas = diasporaService.getImageFile(imagePath);
+        setImageLinkInViewUIT();
+        LOG.d(TAG_METHOD+ "Sortie");
+    }
+
+    @UiThread
+    public void setImageLinkInViewUIT(){
+        String TAG_METHOD = TAG + ".setImageLinkInViewUIT : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         if (imageLinkDatas!=null) {
             LOG.d(TAG_METHOD + "converting datas to bitmap");
             Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageLinkDatas, 0, imageLinkDatas.length);
@@ -333,14 +407,8 @@ public class PostView extends LinearLayout{
         }
         LOG.d(TAG_METHOD + "Sortie");
     }
-    @Background
-    public void setImageLinkInViewBG(String imagePath){
-        String TAG_METHOD = TAG + ".setImageAvatarInView : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
-        imageLinkDatas = diasporaService.getImageFile(imagePath);
-        LOG.d(TAG_METHOD+ "Sortie");
-    }
+
+
     public void setPost(Post post) {
         LOG.d(".setPost entree with post : "+post);
         try {
@@ -370,7 +438,18 @@ public class PostView extends LinearLayout{
             String imageURL = post.getImage_url();
             if (imageURL!=null && !imageURL.isEmpty()){
 //                ProfilControler.putImage(image, imageURL);
-                setImageInView(imageURL);
+                setImageInView(imageURL,0);
+            }else{
+                ArrayList<Photo> photos = post.getPhotos();
+                if (photos!=null && photos.size()>0) {
+                    for (int index=0; index < photos.size(); index++) {
+                        imageURL = photos.get(index).getSizes().getLarge();
+                        if (imageURL != null && !imageURL.isEmpty()) {
+                            setImageInView(imageURL, index);
+                        }
+                    }
+                }
+                hideLastImageInView(photos.size());
             }
             // Remplissage des contenus objets web
             Map<String, String> videoData = getVideo(post);

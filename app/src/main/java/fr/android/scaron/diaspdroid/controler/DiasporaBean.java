@@ -66,6 +66,10 @@ public class DiasporaBean {
         return DiasporaBean.instance;
     }
 
+    public void setRootUrl(final String rootUrl){
+        diasporaService.setRootUrl(rootUrl);
+    }
+
     @AfterInject
     public void init(){
         setInstance(this);

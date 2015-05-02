@@ -26,6 +26,7 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
+import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.Post;
@@ -58,6 +59,7 @@ public class FluxFragment extends Fragment {
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getInfo");
+        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
         List<Post> postsUser = diasporaBean.getInfo("tilucifer");
 //        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
         posts = diasporaBean.getStream();
@@ -88,12 +90,7 @@ public class FluxFragment extends Fragment {
         mSecondTitleTextView.setText(userAdress);
         ImageView mTitleAvatarView = (ImageView) mCustomView.findViewById(R.id.actbar_avatar_icon);
 //        ProfilControler.putImage(mTitleAvatarView, userAvatar);
-        setImageAvatarInView(userAvatar);
-        if (imageAvatarDatas !=null) {
-            LOG.d(TAG_METHOD + "converting datas to bitmap");
-            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
-            mTitleAvatarView.setImageBitmap(imageAvatar);
-        }
+        setImageAvatarInView(userAvatar, mTitleAvatarView);
         actionBar.setCustomView(mCustomView);
 //        actionBar.setDisplayShowCustomEnabled(true);
 
@@ -109,11 +106,17 @@ public class FluxFragment extends Fragment {
     }
 
     @Background
-    public void setImageAvatarInView(String imagePath){
+    public void setImageAvatarInView(String imagePath, ImageView mTitleAvatarView){
         String TAG_METHOD = TAG + ".setImageAvatarInView : ";
         LOG.d(TAG_METHOD+ "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
+        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
         imageAvatarDatas = diasporaBean.getImageFile(imagePath);
+        if (imageAvatarDatas !=null) {
+            LOG.d(TAG_METHOD + "converting datas to bitmap");
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
+            mTitleAvatarView.setImageBitmap(imageAvatar);
+        }
         LOG.d(TAG_METHOD+ "Sortie");
     }
 
