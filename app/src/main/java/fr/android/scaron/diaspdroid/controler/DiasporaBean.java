@@ -336,6 +336,7 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getStream");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Post> posts = diasporaService.getStream();
             LOG.d(TAG_METHOD+ "Sortie");
             return posts;
@@ -355,6 +356,7 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getTagSuivis");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Post> posts = diasporaService.getTagSuivis();
             LOG.d(TAG_METHOD+ "Sortie");
             return posts;
@@ -374,6 +376,7 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getActivity");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Post> posts = diasporaService.getActivity();
             LOG.d(TAG_METHOD+ "Sortie");
             return posts;

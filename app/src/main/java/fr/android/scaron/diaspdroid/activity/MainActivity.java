@@ -80,13 +80,9 @@ public class MainActivity extends ActionBarActivity {
             DiasporaConfig.addActivity(this);
             LOG.d(TAG + TAG_METHOD + "Init Config with application and context");
             DiasporaConfig.init(this.getApplication(), this);
-
             drawerArray = getResources().getStringArray(R.array.drawer_array);
             drawerItems = Arrays.asList(drawerArray);
-
             setUpDrawer();
-
-
             if (DiasporaConfig.ParamsOK) {
                 HeaderView headerView = HeaderView_.build(this.getBaseContext());
                 headerView.bind();

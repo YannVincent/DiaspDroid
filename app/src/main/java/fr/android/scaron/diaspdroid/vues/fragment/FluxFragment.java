@@ -50,7 +50,7 @@ public class FluxFragment extends Fragment {
         String TAG_METHOD = TAG + ".getInfos : ";
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
-        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
+//        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
         posts = diasporaBean.getStream();
         bindDatas();
         LOG.d(TAG_METHOD+ "Sortie");
