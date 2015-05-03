@@ -14,7 +14,6 @@ import android.widget.ListView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.Trace;
@@ -28,8 +27,13 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.vues.fragment.ContactsFragment_;
+import fr.android.scaron.diaspdroid.vues.fragment.FluxActivityFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ParamsFragment_;
+import fr.android.scaron.diaspdroid.vues.fragment.TagSuivisFragment_;
+import fr.android.scaron.diaspdroid.vues.view.HeaderView;
+import fr.android.scaron.diaspdroid.vues.view.HeaderView_;
 
 /**
  * Created by Sébastien on 25/02/2015.
@@ -84,11 +88,14 @@ public class MainActivity extends ActionBarActivity {
 
 
             if (DiasporaConfig.ParamsOK) {
+                HeaderView headerView = HeaderView_.build(this.getBaseContext());
+                headerView.bind();
+                diasporaMainDrawer.addHeaderView(headerView);
                 //On selectionne la vue Flux par défaut
                 listItemClicked(drawerItems.get(0));
             }else{
-                //On selectionne la vue Paramètres par défaut
-                listItemClicked(drawerItems.get(3));
+                //On selectionne la vue Paramètres par défaut (la derniere)
+                listItemClicked(drawerItems.get(drawerItems.size()-1));
             }
         }catch(Throwable thr) {
             LOG.e(TAG + TAG_METHOD + "Erreur : " + thr.toString(), thr);
@@ -109,19 +116,26 @@ public class MainActivity extends ActionBarActivity {
         LOG.d(TAG + TAG_METHOD + "list item clicked ? "+itemClicked);
         listItemClicked  = true;
         int itemPosition = drawerItems.indexOf(itemClicked);
-        diasporaMainDrawer.setItemChecked(itemPosition, true);
+        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
+        diasporaMainDrawer.setSelection(itemPosition+1);
         setTitle(itemClicked);
         switch (itemPosition){
             case 0 : //Flux
                 setFluxFragment(itemClicked, itemPosition);
                 break;
-            case 1 : //Mes Amis
+            case 1 : //Mon activité
+                setFluxActivityFragment(itemClicked, itemPosition);
+                break;
+            case 2 : //Tags suivis
+                setTagSuivisFragment(itemClicked, itemPosition);
+                break;
+            case 3 : //Mes Amis
                 setAmisFragment(itemClicked, itemPosition);
                 break;
-            case 2 : //Mon Profil
+            case 4 : //Mon Profil
                 setProfilFragment(itemClicked, itemPosition);
                 break;
-            case 3 : //Paramètres
+            case 5 : //Paramètres
                 setParamsFragment(itemClicked, itemPosition);
                 break;
             default :
@@ -138,13 +152,36 @@ public class MainActivity extends ActionBarActivity {
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, fluxFragment)
                 .commit();
-//        setActionBarMain();
+        resetActionBarMain(title);
+    }
+
+    void setFluxActivityFragment(String title, int position){
+        // update the main content by replacing fragments
+        FluxActivityFragment_ fluxActivityFragment = new FluxActivityFragment_();
+        fluxActivityFragment.setActivityParent(this);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, fluxActivityFragment)
+                .commit();
+        resetActionBarMain(title);
     }
     void setAmisFragment(String title, int position){
         // update the main content by replacing fragments
+        ContactsFragment_ contactsFragment = new ContactsFragment_();
+        contactsFragment.setActivityParent(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, new ParamsFragment_())
+                .replace(R.id.diaspora_main_content, contactsFragment)
+                .commit();
+        resetActionBarMain(title);
+    }
+    void setTagSuivisFragment(String title, int position){
+        // update the main content by replacing fragments
+        TagSuivisFragment_ tagSuivisFragment = new TagSuivisFragment_();
+        tagSuivisFragment.setActivityParent(this);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, tagSuivisFragment)
                 .commit();
         resetActionBarMain(title);
     }
@@ -199,14 +236,12 @@ public class MainActivity extends ActionBarActivity {
 
     void resetActionBarMain(String title){
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+////        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowCustomEnabled(false);
-
-
 
 //        ActionBar actionBar = getSupportActionBar();
 //        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);

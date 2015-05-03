@@ -19,17 +19,16 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 
 @EFragment(R.layout.fragment_flux_list)
-public class FluxFragment extends Fragment {
+public class FluxActivityFragment extends Fragment {
 
-    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
+    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxActivityFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = FluxFragment.class.getSimpleName();
+    private static String TAG = FluxActivityFragment.class.getSimpleName();
     @Bean
     DiasporaBean diasporaBean;
 
@@ -45,13 +44,13 @@ public class FluxFragment extends Fragment {
     public void setActivityParent(ActionBarActivity activity){
         this.activity = activity;
     }
+
     @Background
     void getInfos(){
         String TAG_METHOD = TAG + ".getInfos : ";
         LOG.d(TAG_METHOD + "Entrée");
-        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
-        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
-        posts = diasporaBean.getStream();
+        LOG.d(TAG_METHOD+ "call diasporaBean.getActivity");
+        posts = diasporaBean.getActivity();
         bindDatas();
         LOG.d(TAG_METHOD+ "Sortie");
     }
@@ -85,6 +84,7 @@ public class FluxFragment extends Fragment {
             super.onCreate(savedInstanceState);
             LOG.d(TAG_METHOD+ "call getInfos");
             getInfos();
+
             LOG.d(TAG_METHOD+ "Sortie");
         } catch (Throwable thr) {
             LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());

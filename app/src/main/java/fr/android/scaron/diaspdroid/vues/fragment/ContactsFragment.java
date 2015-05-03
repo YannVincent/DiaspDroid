@@ -19,39 +19,38 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
-import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.Contact;
+import fr.android.scaron.diaspdroid.vues.adapter.ContactsAdapter;
 
 @EFragment(R.layout.fragment_flux_list)
-public class FluxFragment extends Fragment {
+public class ContactsFragment extends Fragment {
 
-    private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
+    private static Logger LOGGEUR = LoggerFactory.getLogger(ContactsFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = FluxFragment.class.getSimpleName();
+    private static String TAG = ContactsFragment.class.getSimpleName();
     @Bean
     DiasporaBean diasporaBean;
 
     @Bean
-    PostsAdapter adapter;
+    ContactsAdapter adapter;
 
     @ViewById(R.id.fragment_flux_list)
     AbsListView mListView;
     ActionBarActivity activity;
 
-    List<Post> posts;
+    List<Contact> contacts;
 
     public void setActivityParent(ActionBarActivity activity){
         this.activity = activity;
     }
+
     @Background
     void getInfos(){
         String TAG_METHOD = TAG + ".getInfos : ";
         LOG.d(TAG_METHOD + "Entrée");
-        LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
-        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
-        posts = diasporaBean.getStream();
+        LOG.d(TAG_METHOD+ "call diasporaBean.getContacts");
+        contacts = diasporaBean.getContacts();
         bindDatas();
         LOG.d(TAG_METHOD+ "Sortie");
     }
@@ -59,10 +58,10 @@ public class FluxFragment extends Fragment {
     void bindDatas(){
         String TAG_METHOD = TAG + ".bindDatas : ";
         LOG.d(TAG_METHOD + "Entrée");
-        if (posts != null) {
-            LOG.d(TAG_METHOD + "adapter.setPosts(posts) with " + posts);
+        if (contacts != null) {
+            LOG.d(TAG_METHOD + "adapter.setContacts(contacts) with " + contacts);
             if (adapter!=null) {
-                adapter.setPosts(posts);
+                adapter.setContacts(contacts);
             }
         }
         LOG.d(TAG_METHOD+ "Sortie");
@@ -85,6 +84,7 @@ public class FluxFragment extends Fragment {
             super.onCreate(savedInstanceState);
             LOG.d(TAG_METHOD+ "call getInfos");
             getInfos();
+
             LOG.d(TAG_METHOD+ "Sortie");
         } catch (Throwable thr) {
             LOG.e(TAG_METHOD+ "Erreur : " + thr.toString());

@@ -18,7 +18,10 @@ import java.util.Collections;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.view.ContactView;
+import fr.android.scaron.diaspdroid.vues.view.ContactView_;
 import fr.android.scaron.diaspdroid.vues.view.PostView;
 import fr.android.scaron.diaspdroid.vues.view.PostView_;
 
@@ -26,34 +29,29 @@ import fr.android.scaron.diaspdroid.vues.view.PostView_;
  * Created by Sébastien on 29/03/2015.
  */
 @EBean(scope = EBean.Scope.Singleton)
-public class PostsAdapter extends BaseAdapter {
-    private static Logger LOGGEUR = LoggerFactory.getLogger(PostsAdapter.class);
+public class ContactsAdapter extends BaseAdapter {
+    private static Logger LOGGEUR = LoggerFactory.getLogger(ContactsAdapter.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = "PostsAdapter";
+    private static String TAG = "ContactsAdapter";
     private SparseArray<View> viewHolder = new SparseArray<View>();
-    List<Post> posts;
+    List<Contact> contacts;
 
     @RootContext
     Context context;
 
     @AfterInject
     void initAdapter() {
-        posts = new ArrayList<Post>();
+        contacts = new ArrayList<Contact>();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView==null){
-//            convertView  = PostView_.build(context);
-//        }
-//        ((PostView)convertView).bind(getItem(position));
-//        return convertView;
-        Post post = getItem(position);
-        int id = post.getId();
+        Contact contact = getItem(position);
+        int id = contact.getId();
         View childView = viewHolder.get(id);
         if (childView == null) {
-            childView  = PostView_.build(context);
-            ((PostView)childView).bind(post);
+            childView  = ContactView_.build(context);
+            ((ContactView)childView).bind(contact);
             viewHolder.put(id, childView);
         }
         return childView;
@@ -63,12 +61,12 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return posts.size();
+        return contacts.size();
     }
 
     @Override
-    public Post getItem(int position) {
-        return posts.get(position);
+    public Contact getItem(int position) {
+        return contacts.get(position);
     }
 
     @Override
@@ -82,16 +80,16 @@ public class PostsAdapter extends BaseAdapter {
     }
 
 
-    public void setPosts(List<Post> posts){
+    public void setContacts(List<Contact> contacts){
         String TAG_METHOD = TAG + ".setContacts : ";
         try{
             LOG.d(TAG_METHOD + "Entrée");
-            if (posts==null) {
-                LOG.d(".setContacts initialize this.posts");
-                this.posts = new ArrayList<Post>();
+            if (contacts==null) {
+                LOG.d(".setContacts initialize this.contacts");
+                this.contacts = new ArrayList<Contact>();
             }else{
-                LOG.d(TAG_METHOD + "set this.posts with"+posts);
-                this.posts = Collections.checkedList(posts, Post.class);
+                LOG.d(TAG_METHOD + "set this.contacts with"+contacts);
+                this.contacts = Collections.checkedList(contacts, Contact.class);
             }
             LOG.d(TAG_METHOD + "notifyDataSetChanged");
             super.notifyDataSetChanged();

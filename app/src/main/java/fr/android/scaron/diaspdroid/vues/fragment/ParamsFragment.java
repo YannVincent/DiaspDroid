@@ -39,6 +39,7 @@ public class ParamsFragment extends Fragment {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ParamsFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+    private static String TAG = ParamsFragment.class.getSimpleName();
 
     @ViewById(R.id.poduser)
     TextView poduser;

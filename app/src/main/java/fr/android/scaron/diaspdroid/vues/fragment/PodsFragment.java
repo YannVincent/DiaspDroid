@@ -46,7 +46,7 @@ public class PodsFragment extends DialogFragment {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(PodsFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = "PodsFragment";
+    private static String TAG = PodsFragment.class.getSimpleName();
 
 
     @ViewById(R.id.fragment_pod_list)

@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.NewPost;
@@ -309,6 +310,25 @@ public class DiasporaBean {
         return infos;
     }
 
+    public List<Contact> getContacts(){
+        String TAG_METHOD = TAG + ".getContacts : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "appel de diasporaService.getContacts");
+            List<Contact> contacts = diasporaService.getContacts();
+            LOG.d(TAG_METHOD+ "Sortie");
+            return contacts;
+        }
+        List<Contact> emptyError =  new ArrayList<Contact>();
+        Contact empty = new Contact();
+        empty.setName("Aucune réponse n'a été trouvée");
+        emptyError.add(empty);
+        LOG.d(TAG_METHOD + "Sortie en erreur de login");
+        return emptyError;
+    }
+
     public List<Post> getStream(){
         String TAG_METHOD = TAG + ".getStream : ";
         LOG.d(TAG_METHOD+ "Entrée");
@@ -318,7 +338,45 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "appel de diasporaService.getStream");
             List<Post> posts = diasporaService.getStream();
             LOG.d(TAG_METHOD+ "Sortie");
-            return posts;//streamPostsService.getStream();
+            return posts;
+        }
+        List<Post> emptyError =  new ArrayList<Post>();
+        Post empty = new Post();
+        empty.setText("Aucune réponse n'a été trouvée");
+        emptyError.add(empty);
+        LOG.d(TAG_METHOD + "Sortie en erreur de login");
+        return emptyError;
+    }
+
+    public List<Post> getTagSuivis(){
+        String TAG_METHOD = TAG + ".getTagSuivis : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "appel de diasporaService.getTagSuivis");
+            List<Post> posts = diasporaService.getTagSuivis();
+            LOG.d(TAG_METHOD+ "Sortie");
+            return posts;
+        }
+        List<Post> emptyError =  new ArrayList<Post>();
+        Post empty = new Post();
+        empty.setText("Aucune réponse n'a été trouvée");
+        emptyError.add(empty);
+        LOG.d(TAG_METHOD + "Sortie en erreur de login");
+        return emptyError;
+    }
+
+    public List<Post> getActivity(){
+        String TAG_METHOD = TAG + ".getActivity : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "appel de diasporaService.getActivity");
+            List<Post> posts = diasporaService.getActivity();
+            LOG.d(TAG_METHOD+ "Sortie");
+            return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
         Post empty = new Post();

@@ -20,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.UploadResult;
@@ -43,10 +44,25 @@ public interface DiasporaService extends RestClientErrorHandling {
     String postLogin();
 
 
+    @Get("/contacts")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    List<Contact> getContacts();
+
     @Get("/stream")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     List<fr.android.scaron.diaspdroid.model.Post> getStream();
+
+    @Get("/followed_tags")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    List<fr.android.scaron.diaspdroid.model.Post> getTagSuivis();
+
+    @Get("/activity")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    List<fr.android.scaron.diaspdroid.model.Post> getActivity();
 
 
     @Get("/u/{userName}")

@@ -3,9 +3,11 @@
 
     <string name="app_name">DiaspDroid</string>
     <string name="title_section1">Flux</string>
-    <string name="title_section2">Mes Amis</string>
-    <string name="title_section3">Mon Profil</string>
-    <string name="title_section4">Paramètres</string>
+    <string name="title_section2">Mon activité</string>
+    <string name="title_section3">#Tags suivis</string>
+    <string name="title_section4">Mes contacts</string>
+    <string name="title_section5">Mon profil</string>
+    <string name="title_section6">Paramètres</string>
     <string name="navigation_drawer_open">Menu</string>
     <string name="navigation_drawer_close">Fermer</string>
     <string name="action_example">Poster</string>
@@ -14,8 +16,10 @@
 
     <string-array name="drawer_array">
         <item>Flux</item>
-        <item>Mes Amis</item>
-        <item>Mon Profil</item>
+        <item>Mon activité</item>
+        <item>#Tags suivis</item>
+        <item>Mes contacts</item>
+        <item>Mon profil</item>
         <item>Paramètres</item>
     </string-array>
 
