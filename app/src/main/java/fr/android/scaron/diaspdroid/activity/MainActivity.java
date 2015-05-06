@@ -8,9 +8,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -57,6 +59,9 @@ public class MainActivity extends ActionBarActivity {
 
     @ViewById(R.id.diaspora_main_content)
     FrameLayout diaporaMainContent;
+
+    @ViewById(R.id.progress_loading)
+    RelativeLayout progressLoading;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,7 +118,8 @@ public class MainActivity extends ActionBarActivity {
         listItemClicked  = true;
         int itemPosition = drawerItems.indexOf(itemClicked);
         diasporaMainDrawer.setItemChecked(itemPosition+1, true);
-        diasporaMainDrawer.setSelection(itemPosition+1);
+        diasporaMainDrawer.setSelection(itemPosition + 1);
+        progressLoading.setVisibility(View.VISIBLE);
         setTitle(itemClicked);
         switch (itemPosition){
             case 0 : //Flux
@@ -137,6 +143,7 @@ public class MainActivity extends ActionBarActivity {
             default :
                 break;
         }
+        progressLoading.setVisibility(View.GONE);
         diasporaMain.closeDrawer(diasporaMainDrawer);
     }
 

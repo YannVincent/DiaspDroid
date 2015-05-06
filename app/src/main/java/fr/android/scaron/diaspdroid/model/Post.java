@@ -2,10 +2,15 @@ package fr.android.scaron.diaspdroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import fr.android.scaron.diaspdroid.controler.LogControler;
 
 /**
  * Created by Maison on 11/01/2015.
@@ -85,6 +90,11 @@ import java.util.Date;
 }
  */
 public class Post {
+
+    private static Logger LOGGEUR = LoggerFactory.getLogger(Post.class);
+    private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
+    private static String TAG = Post.class.getSimpleName();
+
     public boolean asYoutubeVideo;
     public String idYoutubeVideo;
     public boolean asWebSiteUrl;
@@ -527,5 +537,19 @@ public class Post {
 
     public void setInteractions(Interaction interactions) {
         this.interactions = interactions;
+    }
+
+
+    @Override
+    public boolean equals(Object object){
+//        String TAG_METHOD = TAG + ".equals : ";
+//        LOG.d(TAG_METHOD + "Entrée");
+        boolean sameId = false;
+        if (object != null && object instanceof Post){
+//            LOG.d(TAG_METHOD + "Compare this.guid="+this.id+" with object.guid="+((Post) object).id);
+            sameId = this.guid.equals(((Post) object).guid);
+        }
+//        LOG.d(TAG_METHOD + "Sortie with value "+sameId);
+        return sameId;
     }
 }

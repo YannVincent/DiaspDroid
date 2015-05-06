@@ -43,11 +43,6 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView==null){
-//            convertView  = PostView_.build(context);
-//        }
-//        ((PostView)convertView).bind(getItem(position));
-//        return convertView;
         Post post = getItem(position);
         int id = post.getId();
         View childView = viewHolder.get(id);
@@ -83,7 +78,7 @@ public class PostsAdapter extends BaseAdapter {
 
 
     public void setPosts(List<Post> posts){
-        String TAG_METHOD = TAG + ".setContacts : ";
+        String TAG_METHOD = TAG + ".setPosts : ";
         try{
             LOG.d(TAG_METHOD + "Entrée");
             if (posts==null) {
@@ -101,5 +96,33 @@ public class PostsAdapter extends BaseAdapter {
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
+    }
+
+
+    public int addPosts(List<Post> posts){
+        String TAG_METHOD = TAG + ".addPosts : ";
+        int nbNewPostAdded = 0;
+        try{
+            LOG.d(TAG_METHOD + "Entrée");
+            if (posts!=null && posts.size()>0) {
+                LOG.d(TAG_METHOD + "set this.posts with" + posts);
+                for(Post newPost:posts){
+                    if (!this.posts.contains(newPost)){
+                        this.posts.add(this.posts.size(), newPost);
+                        nbNewPostAdded++;
+                    }
+                }
+                if (nbNewPostAdded>0) {
+                    LOG.d(TAG_METHOD + "notifyDataSetChanged");
+                    super.notifyDataSetChanged();
+                }
+            }
+            LOG.d(TAG_METHOD + "sortie");
+        } catch (Throwable thr) {
+            LOG.e(TAG_METHOD + "Erreur : "+thr.toString(), thr);
+            ACRA.getErrorReporter().handleException(thr);
+            throw thr;
+        }
+        return nbNewPostAdded;
     }
 }

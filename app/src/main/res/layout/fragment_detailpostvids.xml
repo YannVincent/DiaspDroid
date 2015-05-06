@@ -118,6 +118,7 @@ Vestibulum commodo. Ut rhoncus gravida arcu."
                     android:layout_below="@id/ytb_thumbnail"
                     android:background="@drawable/borderbgbtns"
                     android:padding="6dip"
+                     android:paddingTop="6dip"
                     android:clickable="true"
                     android:orientation="vertical">
         <ImageView android:id="@+id/detailOpenGraphImg"

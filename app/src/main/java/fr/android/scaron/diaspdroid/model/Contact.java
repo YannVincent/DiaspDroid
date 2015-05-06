@@ -1,8 +1,7 @@
 package fr.android.scaron.diaspdroid.model;
 
 /**
- * Created by S
- * ébastien on 03/05/2015.
+ * Created by Sébastien on 03/05/2015.
  * [
  {
  "id": 1,

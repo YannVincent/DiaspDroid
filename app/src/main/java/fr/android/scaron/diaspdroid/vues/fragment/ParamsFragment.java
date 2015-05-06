@@ -64,7 +64,7 @@ public class ParamsFragment extends Fragment {
     @Click(R.id.podBtnSelect)
     void showDialogSelectPod(){
         PodsFragment dialogFragment = new PodsFragment_();
-        dialogFragment.show(getFragmentManager(),"podSelection");
+        dialogFragment.show(getFragmentManager(), "podSelection");
     }
 
     @AfterViews
@@ -79,5 +79,12 @@ public class ParamsFragment extends Fragment {
             actionBar.setTitle("Paramètres");
         }
         LOG.d(methodName + "Entrée");
+    }
+
+    @AfterViews
+    void updateViewValues(){
+        poduser.setText(DiasporaConfig.POD_USER);
+        podpassword.setText(DiasporaConfig.POD_PASSWORD);
+        podselected.setText(DiasporaConfig.POD_URL);
     }
 }
