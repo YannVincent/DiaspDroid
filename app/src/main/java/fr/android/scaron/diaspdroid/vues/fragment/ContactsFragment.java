@@ -1,9 +1,12 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
-import android.widget.AbsListView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ListView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -36,8 +39,9 @@ public class ContactsFragment extends Fragment {
     ContactsAdapter adapter;
 
     @ViewById(R.id.fragment_flux_list)
-    AbsListView mListView;
+    ListView mListView;
     ActionBarActivity activity;
+    View footerView;
 
     List<Contact> contacts;
 
@@ -49,6 +53,7 @@ public class ContactsFragment extends Fragment {
     void getInfos(){
         String TAG_METHOD = TAG + ".getInfos : ";
         LOG.d(TAG_METHOD + "Entrée");
+        addFooterView();
         LOG.d(TAG_METHOD+ "call diasporaBean.getContacts");
         contacts = diasporaBean.getContacts();
         bindDatas();
@@ -58,6 +63,9 @@ public class ContactsFragment extends Fragment {
     void bindDatas(){
         String TAG_METHOD = TAG + ".bindDatas : ";
         LOG.d(TAG_METHOD + "Entrée");
+        if (footerView != null) {
+            mListView.removeFooterView(footerView);
+        }
         if (contacts != null) {
             LOG.d(TAG_METHOD + "adapter.setContacts(contacts) with " + contacts);
             if (adapter!=null) {
@@ -67,6 +75,10 @@ public class ContactsFragment extends Fragment {
         LOG.d(TAG_METHOD+ "Sortie");
     }
 
+    @UiThread
+    void addFooterView(){
+        mListView.addFooterView(footerView);
+    }
     @AfterViews
     void bindAdapter() {
         String TAG_METHOD = TAG + ".bindAdapter : ";
@@ -82,6 +94,7 @@ public class ContactsFragment extends Fragment {
         LOG.d(TAG_METHOD+ "Entrée");
         try{
             super.onCreate(savedInstanceState);
+            footerView = ((LayoutInflater) getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.base_list_item_loading_footer, null, false);
             LOG.d(TAG_METHOD+ "call getInfos");
             getInfos();
 

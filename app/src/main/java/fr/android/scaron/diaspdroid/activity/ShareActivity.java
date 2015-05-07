@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -58,7 +59,7 @@ public class ShareActivity extends ActionBarActivity {
     EditText shareTextEntry;
 
     @ViewById(R.id.share_message)
-    EditText shareMessage;
+    TextView shareMessage;
 
     @ViewById(R.id.share_image)
     ImageView shareImage;
@@ -118,6 +119,7 @@ public class ShareActivity extends ActionBarActivity {
         if (imageUri == null){
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : pas d'Uri de l'image obtenue)");
+            shareImage.setVisibility(View.GONE);
             return;
         }
         LOG.d(TAG_METHOD + "setImageURI to shareImage : "+imageUri);
@@ -128,6 +130,7 @@ public class ShareActivity extends ActionBarActivity {
         if (imageLocalPath == null){
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : pas de chemin local de l'image obtenu)");
+            shareImage.setVisibility(View.GONE);
             return;
         }
         LOG.d(TAG_METHOD + "getImageName for imageLocalPath : "+imageLocalPath);

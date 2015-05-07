@@ -1,13 +1,19 @@
 package fr.android.scaron.diaspdroid.vues.fragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -22,8 +28,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.activity.ShareActivity;
+import fr.android.scaron.diaspdroid.activity.ShareActivity_;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.Post;
 
@@ -48,7 +57,11 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
     int currentScrollState = 0;
     boolean loadingMore = false;
     Long startIndex = 0L;
+    View headerView;
     View footerView;
+    ImageView imageViewAvatar;
+    TextView headerText;
+    ImageView imageViewAddPhoto;
 
     ActionBarActivity activity;
 
@@ -75,6 +88,10 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         if (footerView != null) {
             mListView.removeFooterView(footerView);
         }
+        if (DiasporaConfig.avatarDatas!=null) {
+            Bitmap imageAvatar = BitmapFactory.decodeByteArray(DiasporaConfig.avatarDatas, 0, DiasporaConfig.avatarDatas.length);
+            imageViewAvatar.setImageBitmap(imageAvatar);
+        }
         if (posts != null) {
             LOG.d(TAG_METHOD + "adapter.setPosts(posts) with " + posts);
             if (adapter!=null) {
@@ -87,7 +104,29 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
     @AfterViews
     void bindAdapter() {
         String TAG_METHOD = TAG + ".bindAdapter : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
+        imageViewAvatar = (ImageView)headerView.findViewById(R.id.header_comment_avatar);
+        headerText = (TextView)headerView.findViewById(R.id.header_comment_text);
+        headerText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Intent i = new Intent(getActivity(),
+                        ShareActivity_.class);
+                i.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+                startActivity(i);
+            }
+        });
+        imageViewAddPhoto = (ImageView)headerView.findViewById(R.id.header_comment_photo);
+        imageViewAddPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                        "content://media/internal/images/media"));
+                intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+                startActivity(intent);
+            }
+        });
+        mListView.addHeaderView(headerView);
         LOG.d(TAG_METHOD + "mListView.setAdapter");
         mListView.setAdapter(adapter);
         mListView.setOnScrollListener(this);
@@ -100,6 +139,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         LOG.d(TAG_METHOD+ "Entrée");
         try{
             super.onCreate(savedInstanceState);
+            headerView = ((LayoutInflater) getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.base_list_item_loading_header, null, false);
             footerView = ((LayoutInflater) getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.base_list_item_loading_footer, null, false);
             LOG.d(TAG_METHOD+ "call getInfos");
             getInfos();

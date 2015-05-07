@@ -21,6 +21,7 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Post;
 
 /**
@@ -89,6 +90,7 @@ public class HeaderView extends LinearLayout {
         LOG.d(TAG_METHOD+ "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
         imageAvatarDatas = diasporaService.getImageFile(imagePath);
+        DiasporaConfig.setAvatarDatas(imageAvatarDatas);
         setImageAvatarInViewUIT();
         LOG.d(TAG_METHOD + "Sortie");
     }

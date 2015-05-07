@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ public class DiasporaConfig {
     public static Context APPLICATION_CONTEXT;
     public static TinyDB DB;
 
+    public static byte[] avatarDatas;
+
     public static boolean ParamsOK;
     private static final List<Activity> activities = new ArrayList<Activity>();
 
@@ -48,6 +51,7 @@ public class DiasporaConfig {
         final String password=DiasporaConfig.DB.getString("diaspora_password");
         final String url=DiasporaConfig.DB.getString("diaspora_pod");
         final String podlistJson=DiasporaConfig.DB.getString("diaspora_podlist");
+        final String avatarDatasString=DiasporaConfig.DB.getString("diaspora_avatardata");
         final Boolean configOK = DiasporaConfig.DB.getBoolean("configOK");
 
         if (user!=null && !user.isEmpty()){
@@ -64,6 +68,13 @@ public class DiasporaConfig {
             POD_LIST = new Gson().fromJson(podlistJson, type);
             POD_LIST_JSON = podlistJson;
         }
+        if (avatarDatasString!=null && !avatarDatasString.isEmpty()){
+            try {
+                avatarDatas = avatarDatasString.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         if (configOK!=null){
             ParamsOK = configOK.booleanValue();
         }
@@ -78,6 +89,15 @@ public class DiasporaConfig {
             POD_LIST_JSON = new Gson().toJson(pPods);
             DB.putString("diaspora_podlist", POD_LIST_JSON);
             LOG.d("diasporta_podlist = " + POD_LIST_JSON);
+        }
+    }
+
+    public static void setAvatarDatas(byte[] pAvatarDatas){
+        avatarDatas = pAvatarDatas;
+        try {
+            DiasporaConfig.DB.putString("diaspora_avatardata", new String(avatarDatas, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 

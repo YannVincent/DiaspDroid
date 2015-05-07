@@ -12,14 +12,14 @@
                     android:clickable="true"
                     android:orientation="vertical">
         <ImageView android:id="@+id/detailContactImg"
-                   android:layout_width="100sp"
-                   android:layout_height="100sp"
+                   android:layout_width="64sp"
+                   android:layout_height="64sp"
                    android:layout_marginRight="6dip"
                    android:contentDescription="Image Avatar de mon amis"
                    android:scaleType="centerCrop"
                    android:src="@drawable/ic_launcher" />
         <TextView android:id="@+id/detailContactTitle"
-                  android:layout_marginTop="@dimen/margin_large"
+                  android:layout_marginTop="@dimen/margin_small"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@id/detailContactImg"
@@ -29,7 +29,6 @@
                   android:textColor="#000000"
                   android:textSize="16sp" />
         <TextView android:id="@+id/detailContactTxt"
-                  android:layout_marginTop="@dimen/margin_small"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@id/detailContactImg"
