@@ -298,9 +298,11 @@ public class PostView extends LinearLayout{
     public void setImageAvatarInView(String imagePath){
         String TAG_METHOD = TAG + ".setImageAvatarInView : ";
         LOG.d(TAG_METHOD+ "Entrée");
-        LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
-        imageAvatarDatas = diasporaService.getImageFile(imagePath);
-        setImageAvatarInViewUIT();
+        if (imagePath!=null) {
+            LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : " + imagePath);
+            imageAvatarDatas = diasporaService.getImageFile(imagePath);
+            setImageAvatarInViewUIT();
+        }
         LOG.d(TAG_METHOD + "Sortie");
     }
 
@@ -393,7 +395,7 @@ public void hideLastImageInView(int sizePhotos){
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
         imageLinkDatas = diasporaService.getImageFile(imagePath);
         setImageLinkInViewUIT();
-        LOG.d(TAG_METHOD+ "Sortie");
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
     @UiThread

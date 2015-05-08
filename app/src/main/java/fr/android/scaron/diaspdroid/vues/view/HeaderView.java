@@ -89,9 +89,11 @@ public class HeaderView extends LinearLayout {
         String TAG_METHOD = TAG + ".setImageAvatarInView : ";
         LOG.d(TAG_METHOD+ "Entrée");
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
-        imageAvatarDatas = diasporaService.getImageFile(imagePath);
-        DiasporaConfig.setAvatarDatas(imageAvatarDatas);
-        setImageAvatarInViewUIT();
+        if(imagePath!=null) {
+            imageAvatarDatas = diasporaService.getImageFile(imagePath);
+            DiasporaConfig.setAvatarDatas(imageAvatarDatas);
+            setImageAvatarInViewUIT();
+        }
         LOG.d(TAG_METHOD + "Sortie");
     }
 
