@@ -95,6 +95,12 @@ public class Post {
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = Post.class.getSimpleName();
 
+    public static Post createPostErreur(String pTextErreur){
+        Post postError = new Post();
+        postError.setId(0);
+        postError.setText(pTextErreur);
+        return postError;
+    }
     public boolean asYoutubeVideo;
     public String idYoutubeVideo;
     public boolean asWebSiteUrl;
@@ -110,6 +116,8 @@ public class Post {
     Boolean isPublic;
     //"created_at": "2015-01-11T13:33:23Z",
     //use Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+    //"created_at": "2015-05-13T12:33:30.521Z", evolution diaspora code 0.5
+    //
     Date created_at;
 
     //"interacted_at": "2015-01-11T13:36:32Z",

@@ -4,7 +4,22 @@
                   android:orientation="vertical"
                   android:background="@drawable/borderbg"
                   android:layout_height="fill_parent">
-
+    <LinearLayout  android:id="@+id/detailErreurContact"
+                   android:layout_width="match_parent"
+                   android:orientation="vertical"
+                   android:background="@drawable/borderbg"
+                   android:visibility="gone"
+                   android:layout_height="wrap_content">
+        <TextView android:id="@+id/detailErreurContactText"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_vertical"
+                  android:padding="10dip"
+                  android:text="Erreur inatendue !"
+                  android:textColor="#3f8fba"
+                  android:textStyle="bold"
+                  android:textSize="16sp" />
+    </LinearLayout>
     <RelativeLayout  android:id="@+id/detailContact"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -44,15 +44,17 @@ public class PostsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Post post = getItem(position);
-        int id = post.getId();
-        View childView = viewHolder.get(id);
-        if (childView == null) {
-            childView  = PostView_.build(context);
-            ((PostView)childView).bind(post);
-            viewHolder.put(id, childView);
+        if (post!=null && post.getId()!=null) {
+            int id = post.getId();
+            View childView = viewHolder.get(id);
+            if (childView == null) {
+                childView = PostView_.build(context);
+                ((PostView) childView).bind(post);
+                viewHolder.put(id, childView);
+            }
+            return childView;
         }
-        return childView;
-
+        return null;
 
     }
 

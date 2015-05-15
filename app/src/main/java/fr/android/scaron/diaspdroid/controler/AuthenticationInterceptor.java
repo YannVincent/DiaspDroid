@@ -70,23 +70,8 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
                 if (executionResult != null) {
                     LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "])), result code " + executionResult.getStatusCode());
                 }
-//            }else if (request.getURI().toString().startsWith(DiasporaConfig.POD_URL+"/photos")) {
-////                byte[] bodyEmpty = sbBody.toString().getBytes(Charset.forName("UTF-8"));
-////                LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "]))");
-////                executionResult = execution.execute(request, bodyEmpty);
-//                sbBody.append(ulrEncode("user[username]") + "=" + ulrEncode(authenticationStore.getUsername()));
-//                sbBody.append("&" + ulrEncode("user[password]") + "=" + ulrEncode(authenticationStore.getPassword()));
-//                sbBody.append("&" + ulrEncode("authenticity_token") + "=" + ulrEncode(authenticationStore.getToken()));
-//                sbBody.append("&" + ulrEncode("user[remember_me]") + "=1");
-//                LOG.d(TAG_METHOD + "sbBody urlencoded : " + sbBody.toString());
-//                byte[] bodyEncoded = sbBody.toString().getBytes(Charset.forName("UTF-8"));
-//                LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "]))");
-//                executionResult = execution.execute(request, bodyEncoded);
-//                if (executionResult != null) {
-//                    LOG.d(TAG_METHOD + "execution.execute (" + request.getURI() + " [" + request.getMethod() + "])), result code " + executionResult.getStatusCode());
-//                }
             }else {
-                LOG.d(TAG_METHOD + "sbBody : " + new String(body, Charset.forName("UTF-8")));
+//                LOG.d(TAG_METHOD + "sbBody : " + new String(body, Charset.forName("UTF-8")));
                 LOG.d(TAG_METHOD+ "execution.execute ("+request.getURI()+" ["+request.getMethod()+"]))");
                 executionResult = execution.execute(request, body);
                 if (executionResult!=null) {

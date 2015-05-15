@@ -2,6 +2,7 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.content.Context;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import org.androidannotations.annotations.AfterInject;
@@ -18,10 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Contact;
@@ -42,6 +41,7 @@ public class DiasporaBean {
     private static String TAG = "DiasporaBean";
 
     private static DiasporaBean instance;
+    private static String ERREUR_LOGIN = "L'authentification sur votre POD a échouée.\nVeuillez vérifier vos paramètres ou que votre POD n'est pas en opération de maintenace !";
     @RootContext
     Context context;
 
@@ -51,9 +51,6 @@ public class DiasporaBean {
     PodsService podsService;
     @Bean
     DiasporaErrorHandlerBean diasporaErrorHandlerBean;
-
-    Long timestampStreamMax;
-    Long timestampStreamInit;
 
     private static void setInstance(DiasporaBean instance){
         DiasporaBean.instance = instance;
@@ -86,7 +83,12 @@ public class DiasporaBean {
         boolean resultOK = true;
         boolean resultKO = false;
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
-        boolean getTokenOK = getToken(diasporaService.getLoginHTML());
+        boolean getTokenOK = false;
+        try {
+            getTokenOK = getToken(diasporaService.getLoginHTML());
+        }catch(Throwable thr){
+            LOG.e(TAG_METHOD + "Token crsf non obtenu, pour cause d'erreur " + thr.getMessage());
+        }
         LOG.d(TAG_METHOD+ "Token crsf obtenu ? "+getTokenOK);
         if (!getTokenOK){
             LOG.d(TAG_METHOD+ "Sortie en erreur");
@@ -158,11 +160,35 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie");
             return postResult;
         }
-        LOG.d(TAG_METHOD+ "logged failure");
+        LOG.d(TAG_METHOD + "logged failure");
         return null;
     }
 
+    public UploadResult uploadFile(byte[] photoBytes){
+        String TAG_METHOD = TAG + ".uploadFile : ";
+        LOG.d(TAG_METHOD+ "Entrée");
 
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "logged successfully");
+            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            }
+            diasporaService.setHeader("content-type", "application/octet-stream");
+            LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+            UploadResult uploadResult = diasporaService.uploadFile(photoBytes);
+            LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
+            if (uploadResult!=null){
+                LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
+                LOG.d(TAG_METHOD+ "uploadResult is error ? "+uploadResult.getError());
+            }
+            LOG.d(TAG_METHOD+ "Sortie");
+            return uploadResult;
+        }
+        LOG.d(TAG_METHOD + "logged failure");
+        return null;
+    }
 
     public UploadResult uploadFile(String localPath){
         String TAG_METHOD = TAG + ".uploadFile : ";
@@ -188,7 +214,7 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie");
             return uploadResult;
         }
-        LOG.d(TAG_METHOD+ "logged failure");
+        LOG.d(TAG_METHOD + "logged failure");
         return null;
     }
 
@@ -228,8 +254,7 @@ public class DiasporaBean {
             return contacts;
         }
         List<Contact> emptyError =  new ArrayList<Contact>();
-        Contact empty = new Contact();
-        empty.setName("Aucune réponse n'a été trouvée");
+        Contact empty = Contact.createContactErreur("L'authentification sur votre POD a échouée.\nVeuillez vérifier vos paramètres ou que votre POD n'est pas en opération de maintenace !");
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -237,7 +262,7 @@ public class DiasporaBean {
 
     public List<Post> getStream(){
         String TAG_METHOD = TAG + ".getStream : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
@@ -248,8 +273,7 @@ public class DiasporaBean {
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -261,15 +285,14 @@ public class DiasporaBean {
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
-            LOG.d(TAG_METHOD+ "appel de diasporaService.getMoreStream");
+            LOG.d(TAG_METHOD + "appel de diasporaService.getMoreStream");
             diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Post> posts = diasporaService.getMoreStream(timestampStreamMax, timestampStreamInit);
             LOG.d(TAG_METHOD+ "Sortie");
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -288,8 +311,7 @@ public class DiasporaBean {
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -308,8 +330,7 @@ public class DiasporaBean {
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -328,8 +349,7 @@ public class DiasporaBean {
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -348,8 +368,7 @@ public class DiasporaBean {
             return posts;
         }
         List<Post> emptyError =  new ArrayList<Post>();
-        Post empty = new Post();
-        empty.setText("Aucune réponse n'a été trouvée");
+        Post empty = Post.createPostErreur(ERREUR_LOGIN);
         emptyError.add(empty);
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
@@ -376,16 +395,27 @@ public class DiasporaBean {
             return resultKO;
         }
 
-        int indexTokenName = response.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />",0);
-        if (indexTokenName<=0) {
-            LOG.d(TAG_METHOD+ "\t**\tIMPOSSIBLE de trouver le token");
-            LOG.d(TAG_METHOD+ "Sortie");
-            return resultKO;
+        //Evolution Diaspora Code 0.5.0.1-p6a5597e2
+        int indexToken = -1;
+        int indexEndToken = -1;
+        //<input type="hidden" name="authenticity_token" value="UQxFDSvaZcTB6357CiajoZRN9/bKFM+tQNyBX+MiUNw93o84z426aHyxzgn+9nv3IHkVMRsTdotC3h1HJEnWjQ==">
+        int indexTokenName = response.indexOf("<input type=\"hidden\" name=\"authenticity_token\" value=\"",0);
+        if (indexTokenName>0) {
+            indexToken = indexTokenName + "<input type=\"hidden\" name=\"authenticity_token\" value=\"".length();
+            indexEndToken = response.indexOf("\"", indexToken + 1);
+        }else {
+            //Fonctionne pour Diaspora Code 0.4.1.3-p36ecd9c7
+            indexTokenName = response.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />", 0);
+            if (indexTokenName <= 0) {
+                LOG.d(TAG_METHOD + "\t**\tIMPOSSIBLE de trouver le token");
+                LOG.d(TAG_METHOD + "Sortie");
+                return resultKO;
+            }
+            indexToken = response.indexOf("<meta content=\"", indexTokenName + 1);
+            LOG.d(TAG_METHOD + "**	token found in " + response.substring(indexToken, response.indexOf("/>", indexToken)));
+            indexToken = indexToken + "<meta content=\"".length();
+            indexEndToken = response.indexOf("\" name=\"csrf-token\"", indexToken + 1);
         }
-        int indexToken = response.indexOf("<meta content=\"", indexTokenName + 1);
-        LOG.d(TAG_METHOD+ "**	token found in "+response.substring(indexToken, response.indexOf("/>", indexToken)));
-        indexToken = indexToken+"<meta content=\"".length();
-        int indexEndToken = response.indexOf("\" name=\"csrf-token\"", indexToken + 1);
         if (DiasporaControler.TOKEN.isEmpty()) {
             DiasporaControler.TOKEN = response.substring(indexToken, indexEndToken);
             LOG.d(TAG_METHOD+ "\t**\ttoken récolté '" + DiasporaControler.TOKEN + "'");
@@ -394,35 +424,6 @@ public class DiasporaBean {
         }
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
-    }
-
-    private void calcTimestampStreamInit(){
-        String TAG_METHOD = TAG + ".calcTimestampStreamInit : ";
-        LOG.d(TAG_METHOD + "Entrée");
-        if (timestampStreamInit ==null) {
-            Calendar cal = GregorianCalendar.getInstance();
-//          cal.set(Calendar.DAY_OF_MONTH, 23);// I might have the wrong Calendar constant...
-//          cal.set(Calendar.MONTH, 8);// -1 as month is zero-based
-//          cal.set(Calendar.YEAR, 2009);
-            Timestamp tstamp = new Timestamp(cal.getTimeInMillis());
-            timestampStreamInit = Long.valueOf(""+tstamp.getTime()/1000);
-            LOG.d(TAG_METHOD + "timestampStreamInit calculated : "+ timestampStreamInit);
-        }else{
-            LOG.d(TAG_METHOD + "timestampStreamInit stored : "+ timestampStreamInit);
-        }
-        LOG.d(TAG_METHOD + "Sortie");
-    }
-
-    private void calcTimestampStreamMax(){
-        String TAG_METHOD = TAG + ".calcTimestampStreamMax : ";
-        LOG.d(TAG_METHOD + "Entrée");
-        if (timestampStreamMax ==null){
-            timestampStreamMax = timestampStreamInit - 3600 * 10;
-        }else{
-            timestampStreamMax = timestampStreamMax - 3600 * 10;
-        }
-        LOG.d(TAG_METHOD + "timestampStreamMax calculated : "+ timestampStreamMax);
-        LOG.d(TAG_METHOD + "Sortie");
     }
 
 }

@@ -62,6 +62,13 @@ public class Contact {
     String handle;
     String url;
 
+    public static Contact createContactErreur(String pTextErreur){
+        Contact contactError = new Contact();
+        contactError.setId(0);
+        contactError.setName(pTextErreur);
+        return contactError;
+    }
+
     public Integer getId() {
         return id;
     }

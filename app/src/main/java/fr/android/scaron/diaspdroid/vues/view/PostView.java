@@ -69,6 +69,14 @@ public class PostView extends LinearLayout{
     @Bean
     DiasporaBean diasporaService;
 
+    @ViewById(R.id.detailErreurPost)
+    LinearLayout detailErreurPost;
+    @ViewById(R.id.detailErreurPostText)
+    TextView detailErreurPostText;
+
+    @ViewById(R.id.detailPost)
+    LinearLayout detailPost;
+
     @ViewById(R.id.detailPostAvatar)
     ImageView avatar;
     @ViewById(R.id.detailPostUser)
@@ -135,9 +143,20 @@ public class PostView extends LinearLayout{
     public void bind(final Post post) {
         this.post = post;
         this.postId = post.getId();
-        LOG.d(".getView videos from post "+post.getId()+"( instance id : "+this+")");
+        if (this.postId == 0){
+            // *** Detail de post en erreur
+            // Remplissage de la partie texte
+            detailErreurPostText.setText(post.getText());
+            detailPost.setVisibility(GONE);
+            detailErreurPost.setVisibility(VISIBLE);
+            return;
+        }
+
+        detailErreurPost.setVisibility(GONE);
+
+        LOG.d(".getView videos from post " + post.getId() + "( instance id : " + this + ")");
         Map<String, String> videos = getVideo(post);
-        LOG.d(".getView videos found for post "+post+" : "+videos);
+        LOG.d(".getView videos found for post " + post + " : " + videos);
         View.OnClickListener youtubeclickListener = new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -156,7 +175,7 @@ public class PostView extends LinearLayout{
         View.OnClickListener urlclickListener = new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (post.asWebSiteUrl && post.webSiteUrl!=null && !post.webSiteUrl.isEmpty()){
+                if (post.asWebSiteUrl && post.webSiteUrl != null && !post.webSiteUrl.isEmpty()) {
                     // Launching Browser Screen
                     Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
                     myWebLink.setData(Uri.parse(post.webSiteUrl));
@@ -171,7 +190,7 @@ public class PostView extends LinearLayout{
         View.OnClickListener likeclickListener = new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (post!=null && post.getGuid()!=null){
+                if (post != null && post.getGuid() != null) {
                     aimer(post.getId());
                 }
             }
@@ -183,7 +202,7 @@ public class PostView extends LinearLayout{
         View.OnClickListener reshareclickListener = new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (post!=null && post.getGuid()!=null){
+                if (post != null && post.getGuid() != null) {
                     repartager(post.getGuid());
                 }
             }

@@ -1,5 +1,6 @@
 package fr.android.scaron.diaspdroid.activity;
 
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
@@ -45,6 +47,10 @@ public class MainActivity extends ActionBarActivity {
     private static Logger LOGGEUR = LoggerFactory.getLogger(MainActivity.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static final String TAG = "MainActivity";
+
+    int itemPositionCurrent = 0;
+    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+    private long mBackPressed;
 
     boolean listItemClicked=false;
     String[] drawerArray;
@@ -111,6 +117,27 @@ public class MainActivity extends ActionBarActivity {
         LOG.d(TAG + TAG_METHOD + "Test @Trace with Tag and Level");
     }
 
+    @Override
+    public void onBackPressed() {
+        if (itemPositionCurrent>0) {
+            itemPositionCurrent = 0;
+            setFluxFragment(drawerItems.get(0), 0);
+        }else{
+            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
+            {
+                super.onBackPressed();
+                finish();
+                return;
+            }
+            else {
+                Toast.makeText(getBaseContext(), "Cliquez deux fois sur 'retour' pour quitter l'application", Toast.LENGTH_LONG).show();
+            }
+            mBackPressed = System.currentTimeMillis();
+        }
+    }
+
+
+
     @ItemClick(R.id.diaspora_main_drawer)
     void listItemClicked(String itemClicked) {
         String TAG_METHOD = ".listItemClicked -> ";
@@ -121,6 +148,7 @@ public class MainActivity extends ActionBarActivity {
         diasporaMainDrawer.setSelection(itemPosition + 1);
         progressLoading.setVisibility(View.VISIBLE);
         setTitle(itemClicked);
+        itemPositionCurrent = itemPosition;
         switch (itemPosition){
             case 0 : //Flux
                 setFluxFragment(itemClicked, itemPosition);

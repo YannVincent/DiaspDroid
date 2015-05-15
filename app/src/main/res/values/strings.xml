@@ -10,6 +10,7 @@
     <string name="title_section6">Paramètres</string>
     <string name="navigation_drawer_open">Menu</string>
     <string name="navigation_drawer_close">Fermer</string>
+    <string name="action_share">Partager</string>
     <string name="action_example">Poster</string>
     <string name="action_settings">Paramètres</string>
     <string name="title_activity_diasp">DiaspActivity</string>

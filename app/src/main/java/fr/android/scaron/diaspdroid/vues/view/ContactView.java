@@ -44,6 +44,11 @@ public class ContactView extends LinearLayout{
     @Bean
     DiasporaBean diasporaService;
 
+    @ViewById(R.id.detailErreurContact)
+    LinearLayout detailErreurContact;
+    @ViewById(R.id.detailErreurContactText)
+    TextView detailErreurContactText;
+
     @ViewById(R.id.detailContact)
     RelativeLayout detailContact;
     @ViewById(R.id.detailContactImg)
@@ -69,6 +74,14 @@ public class ContactView extends LinearLayout{
     public void bind(final Contact contact) {
         this.contact = contact;
         this.contactId = contact.getId();
+        if (this.contactId == 0){
+            // *** Detail de post en erreur
+            // Remplissage de la partie texte
+            detailErreurContactText.setText(contact.getName());
+            detailContact.setVisibility(GONE);
+            detailErreurContact.setVisibility(VISIBLE);
+            return;
+        }
         LOG.d(".getView videos from post " + contact.getId() + "( instance id : " + this + ")");
 
 

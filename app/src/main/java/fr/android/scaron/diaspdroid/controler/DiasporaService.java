@@ -11,16 +11,15 @@ import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.annotations.rest.SetsCookie;
 import org.androidannotations.api.rest.MediaType;
 import org.androidannotations.api.rest.RestClientErrorHandling;
-import org.coding4coffee.diaspora.api.upload.ProgressByteArrayEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
-import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Contact;
+import fr.android.scaron.diaspdroid.model.CustGsonHttpMessageConverter;
 import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.UploadResult;
@@ -28,7 +27,7 @@ import fr.android.scaron.diaspdroid.model.UploadResult;
 /**
  * Created by Sébastien on 11/03/2015.
  */
-@Rest(converters={GsonHttpMessageConverter.class, StringHttpMessageConverter.class,  ByteArrayHttpMessageConverter.class, FormHttpMessageConverter.class}, interceptors = { AuthenticationInterceptor.class })
+@Rest(converters={CustGsonHttpMessageConverter.class, StringHttpMessageConverter.class,  ByteArrayHttpMessageConverter.class, FormHttpMessageConverter.class}, interceptors = { AuthenticationInterceptor.class })
 public interface DiasporaService extends RestClientErrorHandling {
 
     @Get("/users/sign_in")
@@ -85,6 +84,7 @@ public interface DiasporaService extends RestClientErrorHandling {
 
 
     @Post("/photos?photo[aspect_ids]=all&qqfile=uploaded.jpg")
+//    @Post("/photos?photo[pending]=true&qqfile=uploaded.jpg")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     @RequiresHeader({"x-csrf-token", "content-type"})

@@ -42,6 +42,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
     private static Logger LOGGEUR = LoggerFactory.getLogger(FluxFragment.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = FluxFragment.class.getSimpleName();
+    final static int SELECT_PICTURE = 1;
     @Bean
     DiasporaBean diasporaBean;
 
@@ -76,10 +77,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         LOG.d(TAG_METHOD + "Entrée");
         addFooterView();
         LOG.d(TAG_METHOD+ "call diasporaBean.getStream");
-//        diasporaBean.setRootUrl(DiasporaControler.POD_URL);
         posts = diasporaBean.getStream();
         bindDatas();
-        LOG.d(TAG_METHOD+ "Sortie");
+        LOG.d(TAG_METHOD + "Sortie");
     }
     @UiThread
     void bindDatas(){
@@ -112,6 +112,7 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
             public void onClick(final View v) {
                 Intent i = new Intent(getActivity(),
                         ShareActivity_.class);
+                i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
                 i.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                 startActivity(i);
             }
@@ -120,10 +121,10 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         imageViewAddPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                        "content://media/internal/images/media"));
-                intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-                startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, ""), SELECT_PICTURE);
             }
         });
         mListView.addHeaderView(headerView);
@@ -132,7 +133,26 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         mListView.setOnScrollListener(this);
         LOG.d(TAG_METHOD + "Sortie");
     }
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data!=null) {
+            switch (requestCode) {
+                case SELECT_PICTURE:
+                    Intent i = new Intent(getActivity(),
+                            ShareActivity_.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.setAction(Intent.ACTION_SEND);
+                    i.setType("image/");
+                    i.putExtra(Intent.EXTRA_STREAM, data.getData());
+                    i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
+                    startActivity(i);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         String TAG_METHOD = TAG + ".onCreate : ";
