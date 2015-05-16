@@ -32,6 +32,10 @@ public class DiasporaConfig {
     public static String POD_URL;
     public static String POD_LIST_JSON;
     public static Pods POD_LIST;
+    public static String TOKEN_VIDE = "";
+    public static String COOKIE_AUTH = "";
+    public static String AUTHENTICITY_TOKEN = TOKEN_VIDE;
+    public static String X_CSRF_TOKEN = TOKEN_VIDE;
 
     public static Application APPLICATION;
     public static Context APPLICATION_CONTEXT;

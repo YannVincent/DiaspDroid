@@ -35,6 +35,12 @@ public interface DiasporaService extends RestClientErrorHandling {
     @SetsCookie("_diaspora_session")
     String getLoginHTML();
 
+    @Get("/bookmarklet")
+    @Accept(MediaType.TEXT_HTML)
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+    String getBookmarkletHTML();
+
 
     @Post("/users/sign_in")
     @Accept(MediaType.TEXT_HTML)

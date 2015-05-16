@@ -2,6 +2,8 @@ package fr.android.scaron.diaspdroid.controler;
 
 import org.androidannotations.annotations.EBean;
 
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+
 /**
  * Created by Sébastien on 11/03/2015.
  */
@@ -14,6 +16,6 @@ public class AuthenticationStore {
         return DiasporaControler.POD_PASSWORD;
     }
     public String getToken(){
-        return DiasporaControler.TOKEN;
+        return DiasporaConfig.AUTHENTICITY_TOKEN;
     }
 }

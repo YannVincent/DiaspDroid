@@ -2,7 +2,6 @@ package fr.android.scaron.diaspdroid.controler;
 
 import android.content.Context;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import org.androidannotations.annotations.AfterInject;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Contact;
@@ -82,10 +80,42 @@ public class DiasporaBean {
         LOG.d(TAG_METHOD+ "Entrée");
         boolean resultOK = true;
         boolean resultKO = false;
+        if (!DiasporaConfig.COOKIE_AUTH.isEmpty()){
+            LOG.d(TAG_METHOD + "Vous vous êtes déjà authentifié...");
+            LOG.d(TAG_METHOD + "------- Rappel des paramètres -----------");
+            LOG.d(TAG_METHOD + "\tDiasporaConfig.COOKIE_AUTH : "+DiasporaConfig.COOKIE_AUTH);
+            LOG.d(TAG_METHOD + "\tDiasporaConfig.AUTHENTICITY_TOKEN : "+DiasporaConfig.AUTHENTICITY_TOKEN);
+            LOG.d(TAG_METHOD + "\tDiasporaConfig.X_CSRF_TOKEN : "+DiasporaConfig.X_CSRF_TOKEN);
+            LOG.d(TAG_METHOD + "-----------------------------------------");
+            LOG.d(TAG_METHOD+ "Sortie");
+            return resultOK;
+        }
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean getTokenOK = false;
         try {
             getTokenOK = getToken(diasporaService.getLoginHTML());
+        }catch(Throwable thr){
+            LOG.e(TAG_METHOD + "Token authenticity non obtenu, pour cause d'erreur " + thr.getMessage());
+        }
+        LOG.d(TAG_METHOD+ "Token authenticity obtenu ? "+getTokenOK);
+        if (!getTokenOK){
+            LOG.d(TAG_METHOD+ "Sortie en erreur");
+            return resultKO;
+        }
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        String loggued = diasporaService.postLogin();
+
+        boolean loginOK = "<html><body>You are being <a href=\"https://framasphere.org/stream\">redirected</a>.</body></html>".equals(loggued);
+        LOG.d(TAG_METHOD + "Login obtenu ? " + loginOK);
+
+        if (!loginOK){
+            LOG.d(TAG_METHOD + "Sortie en erreur");
+            return resultKO;
+        }
+
+        getTokenOK = false;
+        try {
+            getTokenOK = getCsrfToken(diasporaService.getBookmarkletHTML());
         }catch(Throwable thr){
             LOG.e(TAG_METHOD + "Token crsf non obtenu, pour cause d'erreur " + thr.getMessage());
         }
@@ -94,10 +124,6 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie en erreur");
             return resultKO;
         }
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
-        String loggued = diasporaService.postLogin();
-
-        LOG.d(TAG_METHOD+ "Login obtenu ? "+loggued);
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
     }
@@ -110,8 +136,8 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged) {
             LOG.d(TAG_METHOD + "logged successfully");
-            if (DiasporaControler.TOKEN != null && !DiasporaControler.TOKEN.isEmpty()) {
-                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
                 JsonObject jsonParam = new JsonObject();
                 LOG.d(TAG_METHOD + "Ajout du root_guid=" + rootGuid);
                 jsonParam.addProperty("root_guid", rootGuid);
@@ -131,8 +157,8 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged) {
             LOG.d(TAG_METHOD + "logged successfully");
-            if (DiasporaControler.TOKEN != null && !DiasporaControler.TOKEN.isEmpty()) {
-                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
                 reponseLike = diasporaService.like(postID);
                 LOG.d(TAG_METHOD + "réponse : " + reponseLike.toString());
             }
@@ -149,8 +175,8 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "logged successfully");
-            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
-                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            if (DiasporaConfig.X_CSRF_TOKEN!=null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
             }
             diasporaService.setHeader("content-type", "application/json");
 
@@ -171,9 +197,9 @@ public class DiasporaBean {
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
-            LOG.d(TAG_METHOD+ "logged successfully");
-            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
-                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            LOG.d(TAG_METHOD + "logged successfully");
+            if (DiasporaConfig.X_CSRF_TOKEN!=null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
             }
             diasporaService.setHeader("content-type", "application/octet-stream");
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
@@ -198,8 +224,8 @@ public class DiasporaBean {
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "logged successfully");
-            if (DiasporaControler.TOKEN!=null && !DiasporaControler.TOKEN.isEmpty()){
-                diasporaService.setHeader("x-csrf-token", DiasporaControler.TOKEN);
+            if (DiasporaConfig.X_CSRF_TOKEN!=null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()){
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
             }
             diasporaService.setHeader("content-type", "application/octet-stream");
             LOG.d(TAG_METHOD + "On crée l'entité photo à partir des données brutes");
@@ -398,29 +424,42 @@ public class DiasporaBean {
         //Evolution Diaspora Code 0.5.0.1-p6a5597e2
         int indexToken = -1;
         int indexEndToken = -1;
-        //<input type="hidden" name="authenticity_token" value="UQxFDSvaZcTB6357CiajoZRN9/bKFM+tQNyBX+MiUNw93o84z426aHyxzgn+9nv3IHkVMRsTdotC3h1HJEnWjQ==">
-        int indexTokenName = response.indexOf("<input type=\"hidden\" name=\"authenticity_token\" value=\"",0);
+//        //<input type="hidden" name="authenticity_token" value="UQxFDSvaZcTB6357CiajoZRN9/bKFM+tQNyBX+MiUNw93o84z426aHyxzgn+9nv3IHkVMRsTdotC3h1HJEnWjQ==">
+        String tagBegin = "<input type=\"hidden\" name=\"authenticity_token\" value=\"";
+        int indexTokenName = response.indexOf(tagBegin,0);
         if (indexTokenName>0) {
-            indexToken = indexTokenName + "<input type=\"hidden\" name=\"authenticity_token\" value=\"".length();
+            indexToken = indexTokenName + tagBegin.length();
             indexEndToken = response.indexOf("\"", indexToken + 1);
-        }else {
-            //Fonctionne pour Diaspora Code 0.4.1.3-p36ecd9c7
-            indexTokenName = response.indexOf("<meta content=\"authenticity_token\" name=\"csrf-param\" />", 0);
-            if (indexTokenName <= 0) {
-                LOG.d(TAG_METHOD + "\t**\tIMPOSSIBLE de trouver le token");
-                LOG.d(TAG_METHOD + "Sortie");
-                return resultKO;
-            }
-            indexToken = response.indexOf("<meta content=\"", indexTokenName + 1);
-            LOG.d(TAG_METHOD + "**	token found in " + response.substring(indexToken, response.indexOf("/>", indexToken)));
-            indexToken = indexToken + "<meta content=\"".length();
-            indexEndToken = response.indexOf("\" name=\"csrf-token\"", indexToken + 1);
+                DiasporaConfig.AUTHENTICITY_TOKEN = response.substring(indexToken, indexEndToken);
+                LOG.d(TAG_METHOD+ "\t**\tAUTHENTICITY_TOKEN récolté '" + DiasporaConfig.AUTHENTICITY_TOKEN + "'");
         }
-        if (DiasporaControler.TOKEN.isEmpty()) {
-            DiasporaControler.TOKEN = response.substring(indexToken, indexEndToken);
-            LOG.d(TAG_METHOD+ "\t**\ttoken récolté '" + DiasporaControler.TOKEN + "'");
-        }else{
-            LOG.d(TAG_METHOD+ "\t**\ttoken déjà récolté '" + DiasporaControler.TOKEN + "'");
+        LOG.d(TAG_METHOD+ "Sortie");
+        return resultOK;
+    }
+
+
+
+
+    private boolean getCsrfToken(String response){
+        String TAG_METHOD = TAG + ".getCsrfToken : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        boolean resultOK = true;
+        boolean resultKO = false;
+        if (response==null || response.isEmpty()){
+            return resultKO;
+        }
+
+        //Evolution Diaspora Code 0.5.0.1-p6a5597e2
+        int indexToken = -1;
+        int indexEndToken = -1;
+//        //<input type="hidden" name="authenticity_token" value="UQxFDSvaZcTB6357CiajoZRN9/bKFM+tQNyBX+MiUNw93o84z426aHyxzgn+9nv3IHkVMRsTdotC3h1HJEnWjQ==">
+        String tagBegin = "<input type=\"hidden\" name=\"authenticity_token\" value=\"";
+        int indexTokenName = response.indexOf(tagBegin,0);
+        if (indexTokenName>0) {
+            indexToken = indexTokenName + tagBegin.length();
+            indexEndToken = response.indexOf("\"", indexToken + 1);
+                DiasporaConfig.X_CSRF_TOKEN = response.substring(indexToken, indexEndToken);
+                LOG.d(TAG_METHOD+ "\t**\tX_CSRF_TOKEN récolté '" + DiasporaConfig.X_CSRF_TOKEN + "'");
         }
         LOG.d(TAG_METHOD+ "Sortie");
         return resultOK;
