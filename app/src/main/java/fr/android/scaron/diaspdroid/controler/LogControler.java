@@ -23,9 +23,9 @@ public class LogControler {
 
 
     public static LogControler getLoggeur(Logger log) {
-        if (Loggeur==null){
+//        if (Loggeur==null){
             Loggeur= new LogControler(log);
-        }
+//        }
         return Loggeur;
     }
 

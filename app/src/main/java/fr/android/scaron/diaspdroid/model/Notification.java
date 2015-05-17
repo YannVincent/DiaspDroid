@@ -1,7 +1,7 @@
 package fr.android.scaron.diaspdroid.model;
 
 /**
- * Created by Sébastien on 03/05/2015.
+ * Created by Sebastien on 03/05/2015.
  */
 public class Notification {
     NotificationContent liked;

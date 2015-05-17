@@ -19,13 +19,12 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Post;
 
 /**
- * Created by Sébastien on 03/05/2015.
+ * Created by Sebastien on 03/05/2015.
  */
 @EViewGroup(R.layout.actionbar_main)
 public class HeaderView extends LinearLayout {
@@ -60,9 +59,9 @@ public class HeaderView extends LinearLayout {
     @Background
     void getInfosUserForBar(){
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
-        LOG.d(TAG_METHOD + "Entrée");
+        LOG.d(TAG_METHOD + "Entree");
         LOG.d(TAG_METHOD + "call diasporaBean.getInfo");
-        diasporaService.setRootUrl(DiasporaControler.POD_URL);
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         List<Post> postsUser = diasporaService.getInfo("tilucifer");
         if (postsUser!=null && postsUser.size()>0) {
             Post first = postsUser.get(0);
@@ -76,7 +75,7 @@ public class HeaderView extends LinearLayout {
     @UiThread
     void updateActionBar(String userName, String userAdress, String userAvatar){
         String TAG_METHOD = TAG + ".updateActionBar : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD+ "Entree");
         mTitleTextView.setText(userName);
         mSecondTitleTextView.setText(userAdress);
         setImageAvatarInView(userAvatar);
@@ -87,7 +86,7 @@ public class HeaderView extends LinearLayout {
     @Background
     public void setImageAvatarInView(String imagePath){
         String TAG_METHOD = TAG + ".setImageAvatarInView : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD+ "Entree");
         LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : "+imagePath);
         if(imagePath!=null) {
             imageAvatarDatas = diasporaService.getImageFile(imagePath);
@@ -100,7 +99,7 @@ public class HeaderView extends LinearLayout {
     @UiThread
     public void setImageAvatarInViewUIT(){
         String TAG_METHOD = TAG + ".setImageAvatarInViewUIT : ";
-        LOG.d(TAG_METHOD + "Entrée");
+        LOG.d(TAG_METHOD + "Entree");
         if (imageAvatarDatas!=null) {
             LOG.d(TAG_METHOD + "converting datas to bitmap");
             Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageAvatarDatas, 0, imageAvatarDatas.length);
@@ -112,7 +111,7 @@ public class HeaderView extends LinearLayout {
 //    @Background
 //    public void setImageAvatarInView(String imagePath){
 //        String TAG_METHOD = TAG + ".setImageAvatarInView : ";
-//        LOG.d(TAG_METHOD + "Entrée");
+//        LOG.d(TAG_METHOD + "Entree");
 //        try {
 //            LOG.d(TAG_METHOD + "call diasporaBean.getImageFile with : " + imagePath);
 //            diasporaService.setRootUrl(DiasporaControler.POD_URL);

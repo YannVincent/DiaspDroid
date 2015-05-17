@@ -1,6 +1,5 @@
 package fr.android.scaron.diaspdroid.activity;
 
-import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -117,11 +116,21 @@ public class MainActivity extends ActionBarActivity {
         LOG.d(TAG + TAG_METHOD + "Test @Trace with Tag and Level");
     }
 
+    public void setDefaultView(){
+        String TAG_METHOD = TAG + ".setDefaultView : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        //On selectionne la vue Flux par défaut
+        LOG.d(TAG_METHOD+"On sélectionne la vue par défaut : "+drawerItems.get(0));
+        listItemClicked(drawerItems.get(0));
+//            setFluxFragment(drawerItems.get(0), 0);
+        LOG.d(TAG_METHOD+ "Sortie");
+    }
+
     @Override
     public void onBackPressed() {
         if (itemPositionCurrent>0) {
             itemPositionCurrent = 0;
-            setFluxFragment(drawerItems.get(0), 0);
+            setDefaultView();
         }else{
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
             {
@@ -137,15 +146,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-
     @ItemClick(R.id.diaspora_main_drawer)
     void listItemClicked(String itemClicked) {
         String TAG_METHOD = ".listItemClicked -> ";
         LOG.d(TAG + TAG_METHOD + "list item clicked ? "+itemClicked);
         listItemClicked  = true;
         int itemPosition = drawerItems.indexOf(itemClicked);
-        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
-        diasporaMainDrawer.setSelection(itemPosition + 1);
+
+//        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
+//        diasporaMainDrawer.setSelection(itemPosition + 1);
+
+        diasporaMainDrawer.setItemChecked(itemPosition, true);
+        diasporaMainDrawer.setSelection(itemPosition);
+
         progressLoading.setVisibility(View.VISIBLE);
         setTitle(itemClicked);
         itemPositionCurrent = itemPosition;
@@ -218,17 +231,21 @@ public class MainActivity extends ActionBarActivity {
     }
     void setProfilFragment(String title, int position){
         // update the main content by replacing fragments
+        ParamsFragment_ paramsFragment = new ParamsFragment_();
+        paramsFragment.setActivityParent(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, new ParamsFragment_())
+                .replace(R.id.diaspora_main_content, paramsFragment)
                 .commit();
         resetActionBarMain(title);
     }
     void setParamsFragment(String title, int position){
         // update the main content by replacing fragments
+        ParamsFragment_ paramsFragment = new ParamsFragment_();
+        paramsFragment.setActivityParent(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, new ParamsFragment_())
+                .replace(R.id.diaspora_main_content, paramsFragment)
                 .commit();
         resetActionBarMain(title);
     }
@@ -244,17 +261,6 @@ public class MainActivity extends ActionBarActivity {
                 R.string.navigation_drawer_open,  /* "open drawer" description */
                 R.string.navigation_drawer_close  /* "close drawer" description */
         );
-//        {
-//
-//            public void onDrawerClosed(View view) {
-//                super.onDrawerClosed(view);
-////                    getActionBar().setTitle(mTitle);
-//            }
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);
-////                    getActionBar().setTitle(mDrawerTitle);
-//            }
-//        };
         diasporaMain.setDrawerListener(mDrawerToggle);
         diasporaMain.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         diasporaMain.post(new Runnable() {
@@ -267,47 +273,10 @@ public class MainActivity extends ActionBarActivity {
 
     void resetActionBarMain(String title){
         ActionBar actionBar = getSupportActionBar();
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-////        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowCustomEnabled(false);
-
-//        ActionBar actionBar = getSupportActionBar();
-//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
-////        actionBar.setDisplayShowCustomEnabled(false);
-////        actionBar.setDisplayShowHomeEnabled(true);
-////        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(title);
     }
-
-//    void setActionBarMain(){
-//        ActionBar actionBar = getSupportActionBar();
-//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
-//////        actionBar.setDisplayShowHomeEnabled(false);
-////        actionBar.setDisplayShowTitleEnabled(false);
-//        LayoutInflater mInflater = LayoutInflater.from(this);
-//
-//        View mCustomView = mInflater.inflate(R.layout.actionbar_main, null);
-//        TextView mTitleTextView = (TextView) mCustomView.findViewById(R.id.actbar_name);
-//        mTitleTextView.setText("My Own Title");
-//
-//        LinearLayout actbarDrawerBtn = (LinearLayout) mCustomView
-//                .findViewById(R.id.actbar_drawer_btn);
-//        actbarDrawerBtn.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View view) {
-//                if (diasporaMain.isDrawerOpen(diasporaMainDrawer)) {
-//                    diasporaMain.closeDrawer(diasporaMainDrawer);
-//                }else{
-//                    diasporaMain.openDrawer(diasporaMainDrawer);
-//                }
-//            }
-//        });
-//
-//        actionBar.setCustomView(mCustomView);
-////        actionBar.setDisplayShowCustomEnabled(true);
-//    }
 }

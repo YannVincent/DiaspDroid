@@ -1,6 +1,5 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,8 +15,6 @@ import android.widget.TextView;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Response;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.Background;
@@ -36,17 +33,15 @@ import java.util.regex.Pattern;
 
 import fr.android.scaron.diaspdroid.DeveloperKey;
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.activity.ShareActivity_;
 import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.controler.ProfilControler;
 import fr.android.scaron.diaspdroid.model.Image;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Photo;
 import fr.android.scaron.diaspdroid.model.Post;
-//import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
 
 /**
  * Created by Sébastien on 28/03/2015.
@@ -209,6 +204,23 @@ public class PostView extends LinearLayout{
         };
         // On attache la fonction au bouton reshare
         detailRepublish.setOnClickListener(reshareclickListener);
+
+
+
+        // On crée la fonction pour le bouton commenter
+        View.OnClickListener commentclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post != null && post.getGuid() != null) {
+                    commenter(post.getId());
+                }
+            }
+        };
+        // On attache la fonction au bouton commenter
+        detailComment.setOnClickListener(commentclickListener);
+
+
+
         setPost(post);
 
         if (videos.containsKey("youtube")){
@@ -309,6 +321,15 @@ public class PostView extends LinearLayout{
     @Background
     public void repartager(String rootGuid){
         diasporaService.reshare(rootGuid);
+    }
+
+    public void commenter(Integer postID){
+        Intent i = new Intent(context,
+                ShareActivity_.class);
+        i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
+        i.putExtra(Intent.EXTRA_REFERRER, postID);
+        i.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+        context.startActivity(i);
     }
 
 

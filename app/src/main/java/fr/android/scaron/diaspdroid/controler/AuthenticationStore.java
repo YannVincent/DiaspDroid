@@ -10,10 +10,10 @@ import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthenticationStore {
     public String getUsername(){
-        return DiasporaControler.POD_USER;
+        return DiasporaConfig.POD_USER;
     }
     public String getPassword(){
-        return DiasporaControler.POD_PASSWORD;
+        return DiasporaConfig.POD_PASSWORD;
     }
     public String getToken(){
         return DiasporaConfig.AUTHENTICITY_TOKEN;

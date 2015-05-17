@@ -50,12 +50,12 @@ public class DiasporaBean {
     @Bean
     DiasporaErrorHandlerBean diasporaErrorHandlerBean;
 
-    private static void setInstance(DiasporaBean instance){
-        DiasporaBean.instance = instance;
-    }
-    public static DiasporaBean getInstance(){
-        return DiasporaBean.instance;
-    }
+//    private static void setInstance(DiasporaBean instance){
+//        DiasporaBean.instance = instance;
+//    }
+//    public static DiasporaBean getInstance(){
+//        return DiasporaBean.instance;
+//    }
 
     public void setRootUrl(final String rootUrl){
         diasporaService.setRootUrl(rootUrl);
@@ -63,7 +63,7 @@ public class DiasporaBean {
 
     @AfterInject
     public void init(){
-        setInstance(this);
+//        setInstance(this);
         diasporaService.setRestErrorHandler(diasporaErrorHandlerBean);
     }
 
@@ -95,7 +95,7 @@ public class DiasporaBean {
         try {
             getTokenOK = getToken(diasporaService.getLoginHTML());
         }catch(Throwable thr){
-            LOG.e(TAG_METHOD + "Token authenticity non obtenu, pour cause d'erreur " + thr.getMessage());
+            LOG.e(TAG_METHOD + "Token authenticity non obtenu, pour cause d'erreur " + thr.getMessage(),thr);
         }
         LOG.d(TAG_METHOD+ "Token authenticity obtenu ? "+getTokenOK);
         if (!getTokenOK){
@@ -149,10 +149,10 @@ public class DiasporaBean {
         return reponseReshare;
     }
 
-    public LikeResult like(Integer postID){
+    public Post like(Integer postID){
         String TAG_METHOD = TAG + ".like : ";
         LOG.d(TAG_METHOD+ "Entrée");
-        LikeResult reponseLike=null;
+        Post reponseLike=null;
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged) {
@@ -165,6 +165,26 @@ public class DiasporaBean {
         }
         LOG.d(TAG_METHOD+ "Sortie");
         return reponseLike;
+    }
+
+
+
+    public Post comment(Integer postID, NewPost newPost){
+        String TAG_METHOD = TAG + ".like : ";
+        LOG.d(TAG_METHOD+ "Entrée");
+        Post reponseComment=null;
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        boolean logged = seLogguer();
+        if (logged) {
+            LOG.d(TAG_METHOD + "logged successfully");
+            if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
+                reponseComment = diasporaService.comment(postID, newPost);
+                LOG.d(TAG_METHOD + "réponse : " + reponseComment.toString());
+            }
+        }
+        LOG.d(TAG_METHOD+ "Sortie");
+        return reponseComment;
     }
 
     public Post sendPost(NewPost newPost){

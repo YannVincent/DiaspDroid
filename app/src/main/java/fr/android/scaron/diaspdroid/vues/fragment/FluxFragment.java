@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
-import fr.android.scaron.diaspdroid.activity.ShareActivity;
 import fr.android.scaron.diaspdroid.activity.ShareActivity_;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;

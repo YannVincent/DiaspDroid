@@ -14,26 +14,6 @@
         android:layout_centerInParent="true"
         android:padding="10dp"
         >
-
-        <!--<EditText-->
-            <!--android:id="@+id/etEmail"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/edittext_top_bg"-->
-            <!--android:padding="10dp"-->
-            <!--android:hint="Email"-->
-            <!--android:textColorHint="#bbbbbb"-->
-            <!--android:drawableLeft="@drawable/email"/>-->
-        <!--<EditText-->
-            <!--android:id="@+id/etUserName"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/edittext_default_bg"-->
-            <!--android:layout_marginTop="-2dp"-->
-            <!--android:padding="10dp"-->
-            <!--android:hint="User Name"-->
-            <!--android:textColorHint="#bbbbbb"-->
-            <!--android:drawableLeft="@drawable/user"/>-->
         <EditText
             android:id="@+id/poduser"
             android:layout_width="match_parent"
@@ -84,18 +64,6 @@
                 android:background="@drawable/button_default_bg"
             />
             </LinearLayout>
-        <!--<Button-->
-            <!--android:id="@+id/btnSingIn"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:padding="10dp"-->
-            <!--android:layout_margin="4dp"-->
-            <!--android:text="Sign Up"-->
-            <!--style="@style/DefaultButtonText"-->
-            <!--android:background="@drawable/button_default_bg"-->
-            <!--/>-->
-
-
 
         <Button android:id="@+id/podConfigOK"
                 android:text="Connexion"
@@ -117,80 +85,6 @@
                   android:textSize="12dip"
                   android:textColor="#0b84aa"/>
     </LinearLayout>
-
-
-    <!--<TextView-->
-        <!--android:id="@+id/poduser_label"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Utilisateur"/>-->
-    <!--<EditText-->
-        <!--android:id="@+id/poduser"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:hint="Utilisateur sur le POD"-->
-        <!--android:layout_marginTop="5dip"-->
-        <!--android:layout_marginBottom="20dip" />-->
-    <!--<TextView-->
-        <!--android:id="@+id/podpassword_label"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Mot de passe"/>-->
-    <!--<EditText-->
-        <!--android:id="@+id/podpassword"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:hint="Password sur le POD"-->
-        <!--android:inputType="textPassword"-->
-        <!--android:layout_marginTop="5dip"-->
-        <!--android:text="toto"-->
-        <!--android:layout_marginBottom="20dip" />-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/podselected_label"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Votre POD"/>-->
-    <!--<LinearLayout android:id="@+id/podSelectedLay"-->
-                  <!--android:layout_width="fill_parent"-->
-                  <!--android:gravity="center"-->
-                  <!--android:layout_height="wrap_content"-->
-                  <!--android:orientation="horizontal">-->
-        <!--<TextView-->
-            <!--android:id="@+id/podselected"-->
-            <!--android:paddingLeft="25dp"-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="30dip"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:text="Selectionnez votre POD"-->
-            <!--android:textColor="#0a5f8c"-->
-            <!--android:textSize="16sp"-->
-            <!--android:layout_weight="0.25"-->
-            <!--android:textStyle="bold"-->
-            <!--android:paddingTop="5sp"/>-->
-
-        <!--<Button android:id="@+id/podBtnSelect"-->
-            <!--android:text="Choisir"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="@android:dimen/app_icon_size"-->
-            <!--android:layout_toRightOf="@id/podselected"/>-->
-    <!--</LinearLayout>-->
-
-    <!--<Button android:id="@+id/podConfigOK"-->
-            <!--android:text="Tester la connexion"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="@android:dimen/app_icon_size"-->
-            <!--android:layout_toRightOf="@id/podselected"/>-->
-    <!-- -->
-    <!--<TextView android:id="@+id/link_to_register"-->
-              <!--android:layout_width="fill_parent"-->
-              <!--android:layout_height="wrap_content"-->
-              <!--android:layout_marginTop="40dip"-->
-              <!--android:layout_marginBottom="40dip"-->
-              <!--android:text="Nouveau sur diaspora ? Inscrivez-vous"-->
-              <!--android:gravity="center"-->
-              <!--android:textSize="12dip"-->
-              <!--android:textColor="#0b84aa"/>-->
 
 
 </LinearLayout>

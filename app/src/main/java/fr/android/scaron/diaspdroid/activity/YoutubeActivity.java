@@ -36,10 +36,7 @@ public class YoutubeActivity extends  YouTubeFailureRecoveryActivity {
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player,
                                         boolean wasRestored) {
-//        if (!wasRestored) {
-            player.cueVideo(idYoutubeVideo);
-//            player.cueVideo("nCgQDjiotG0");
-//        }
+        player.cueVideo(idYoutubeVideo);
     }
 
     @Override
@@ -48,11 +45,7 @@ public class YoutubeActivity extends  YouTubeFailureRecoveryActivity {
     }
 
     @Override
-    public void onBackPressed()
-    {
-//        if (mDrawerLayout.isDrawerOpen()) {
-//            mDrawerLayout.closeDrawer();
-//        } else
+    public void onBackPressed() {
         if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
         } else {

@@ -9,8 +9,6 @@
     android:paddingBottom="@dimen/margin_small"
     android:background="#212121"
     tools:context="fr.android.scaron.diaspdroid.vues.fragment.PodsFragment_">
-    <!--
-    android:background="#e9eaed"-->
 
     <ListView
         android:id="@+id/fragment_pod_list"
@@ -21,7 +19,4 @@
         android:choiceMode="singleChoice"
         android:dividerHeight="@dimen/margin_medium"
         android:clickable="true"/>
-    <!--
-        android:divider="@android:color/transparent"
-        android:onClick="podListClicked"-->
 </RelativeLayout>

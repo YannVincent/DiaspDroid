@@ -15,8 +15,12 @@
  */
 package fr.android.scaron.diaspdroid.vues.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ListView;
 
 import org.acra.ACRA;
@@ -24,7 +28,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
@@ -37,6 +40,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.controler.PodsService;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.vues.adapter.PodsAdapter;
 
@@ -57,17 +61,37 @@ public class PodsFragment extends DialogFragment {
 
     @Bean
     PodsAdapter adapter;
+    View footerView;
 
     List<Pod> pods;
+
+    Fragment fragment;
+
+    public void setFragmentParent(Fragment fragment){
+        this.fragment = fragment;
+    }
+
+    public void validPod(Pod pod){
+        String TAG_METHOD = TAG + ".validPod : ";
+        LOG.d(TAG_METHOD + "Pod selectionné : " + pod.getDomain());
+        DiasporaConfig.setPodDomainValue(pod.getDomain(), pod.getSecure());
+        if (fragment instanceof ParamsFragment){
+            ((ParamsFragment) fragment).validSelectedPod(pod);
+        }else if (fragment instanceof ParamsFragment_){
+            ((ParamsFragment_) fragment).validSelectedPod(pod);
+        }
+    }
 
     @AfterViews
     void bindAdapter() {
         podList.setAdapter(adapter);
+        adapter.setFragmentParent(this);
         getDialog().setTitle("Liste de pods");
     }
 
     @Background
     void getPodsService(){
+        addFooterView();
         pods = podsService.getPods().getPods();
         if (pods!=null){
             Collections.sort(pods);
@@ -76,7 +100,15 @@ public class PodsFragment extends DialogFragment {
     }
 
     @UiThread
+    void addFooterView(){
+        podList.addFooterView(footerView);
+    }
+    @UiThread
     void updateAdapter(){
+
+        if (footerView != null) {
+            podList.removeFooterView(footerView);
+        }
         adapter.setPods(pods);
     }
 
@@ -86,6 +118,7 @@ public class PodsFragment extends DialogFragment {
         LOG.d(TAG_METHOD+ "Entrée");
         try{
             super.onCreate(savedInstanceState);
+            footerView = ((LayoutInflater) getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.base_list_item_loading_footer, null, false);
             LOG.d(TAG_METHOD+ "call getPodsService");
             getPodsService();
             LOG.d(TAG_METHOD+ "Sortie");

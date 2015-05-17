@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
 /**
- * Created by Sébastien on 13/05/2015.
+ * Created by Sebastien on 13/05/2015.
  * Ajout pour le passage en version 0.5 de diaspora
  //"created_at": "2015-05-13T12:33:30.521Z", evolution diaspora code 0.5
  */

@@ -51,24 +51,25 @@ public class PodView extends LinearLayout {
 
 
     public void bind(final Pod pod, final int position) {
+        String TAG_METHOD = TAG + ".bind : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         this.pod = pod;
-        LOG.d(".getView setText with text : statut : "+pod.getStatus()+ " | securisé : "+pod.getSecure());
+        LOG.d(TAG_METHOD + "setText with text : statut : " + pod.getStatus() + " | securisé : " + pod.getSecure());
         podDetail.setText("statut : " + pod.getStatus() + " | securisé : " + pod.getSecure());
         podName.setText(pod.getDomain());
-        LOG.d(".getView setText with text : " + pod.getDomain() + " set selected " + pod.isSelected());
+        LOG.d(TAG_METHOD + "setText with text : " + pod.getDomain() + " set selected " + pod.isSelected());
         podName.setSelected(pod.isSelected());
         this.position = position;
+        LOG.d(TAG_METHOD+ "Sortie");
     }
-
 
     @Click(R.id.podname)
     public void setPodSelected(){
-        String methodName = ".podClicked : ";
-        LOG.d(methodName+ "Entrée");
-        LOG.d(methodName + "Pod selectionné : " + pod.getDomain());
-        DiasporaConfig.setPodDomainValue(pod.getDomain(), pod.getSecure());
-        adapter.setPodSelected(pod, position, !pod.isSelected());
-//        pod.setSelected(true);
-        LOG.d(methodName+ "Sortie");
+        String TAG_METHOD = TAG + ".podClicked : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        podName.setChecked(true);
+        pod.setSelected(true);
+        adapter.setPodSelected(pod);
+        LOG.d(TAG_METHOD+ "Sortie");
     }
 }

@@ -25,7 +25,7 @@ import fr.android.scaron.diaspdroid.vues.view.PostView_;
 /**
  * Created by Sébastien on 29/03/2015.
  */
-@EBean(scope = EBean.Scope.Singleton)
+@EBean//(scope = EBean.Scope.Singleton)
 public class PostsAdapter extends BaseAdapter {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PostsAdapter.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);

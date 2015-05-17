@@ -3,7 +3,7 @@ package fr.android.scaron.diaspdroid.model;
 import java.util.Date;
 
 /**
- * Created by Sébastien on 03/05/2015.
+ * Created by Sebastien on 03/05/2015.
  */
 public class NotificationContent {
     /*
@@ -15,7 +15,7 @@ public class NotificationContent {
 "target_type": "Post",
 "unread": false,
 "updated_at": "2015-04-30T23:01:53Z",
-"note_html": "<div class='notification_element read' data-guid='307471' data-type='also_commented'>\n<div class='pull-right unread-toggle'>\n<i class='entypo eye' title='Marquer comme non lu'></i>\n</div>\n<img alt=\"Globulle Cdw\" class=\"avatar\" data-person_id=\"7199\" src=\"https://framasphere.org/uploads/images/thumb_small_8c9069c2049385d5af81.JPG\" title=\"Globulle Cdw\" />\n<div class='notification_message'>\n<a data-hovercard='/people/a90ee7102fb90132196e2a0000053625' href='/people/a90ee7102fb90132196e2a0000053625' class='hovercardable hovercardable' >Globulle Cdw</a> a également commenté sur <a href=\"/posts/627749\" class=\"hard_object_link\" data-ref=\"627749\">Il semblerait qu&#x27;...</a> de Globulle Cdw.\n<div><time class=\"timeago\" data-time-ago=\"2015-04-30T18:23:28Z\" datetime=\"2015-04-30T18:23:28Z\" title=\"2015-04-30T18:23:28Z\">30/04/2015</time></div>\n</div>\n</div>\n"
+"note_html": "<div class='notification_element read' data-guid='307471' data-type='also_commented'>\n<div class='pull-right unread-toggle'>\n<i class='entypo eye' title='Marquer comme non lu'></i>\n</div>\n<img alt=\"Globulle Cdw\" class=\"avatar\" data-person_id=\"7199\" src=\"https://framasphere.org/uploads/images/thumb_small_8c9069c2049385d5af81.JPG\" title=\"Globulle Cdw\" />\n<div class='notification_message'>\n<a data-hovercard='/people/a90ee7102fb90132196e2a0000053625' href='/people/a90ee7102fb90132196e2a0000053625' class='hovercardable hovercardable' >Globulle Cdw</a> a egalement commente sur <a href=\"/posts/627749\" class=\"hard_object_link\" data-ref=\"627749\">Il semblerait qu&#x27;...</a> de Globulle Cdw.\n<div><time class=\"timeago\" data-time-ago=\"2015-04-30T18:23:28Z\" datetime=\"2015-04-30T18:23:28Z\" title=\"2015-04-30T18:23:28Z\">30/04/2015</time></div>\n</div>\n</div>\n"
 }
      */
     Date created_at;

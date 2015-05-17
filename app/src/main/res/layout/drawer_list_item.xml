@@ -10,8 +10,3 @@
           android:minHeight="48dip"
           android:background="@drawable/list_item_bg"
     />
-<!--
-
-          android:minHeight="?android:attr/listPreferredItemHeightSmall"
-          android:textAppearance="?android:attr/textAppearanceListItemSmall"
-android:background="?android:attr/activatedBackgroundIndicator" -->

@@ -1,7 +1,7 @@
 package fr.android.scaron.diaspdroid.model;
 
 /**
- * Created by Sébastien on 03/05/2015.
+ * Created by Sebastien on 03/05/2015.
  * [
  {
  "id": 1,
@@ -22,7 +22,7 @@ package fr.android.scaron.diaspdroid.model;
  {
  "id": 7891,
  "guid": "556a82e03130013219762a0000053625",
- "name": "Martin Le Blévennec",
+ "name": "Martin Le Blevennec",
  "avatar": "https://framasphere.org/uploads/images/thumb_medium_36ab8ccad0671cc65659.jpg",
  "handle": "martinlb@framasphere.org",
  "url": "/people/556a82e03130013219762a0000053625"

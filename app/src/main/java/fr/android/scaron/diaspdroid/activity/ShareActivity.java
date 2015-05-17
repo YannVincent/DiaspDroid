@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
@@ -69,6 +68,8 @@ public class ShareActivity extends ActionBarActivity {
     byte[] photoBytes;
     @Extra
     String activityParent;
+    @Extra
+    Integer postIDParent;
     String imageLocalPath;
     String uploadedFilePath;
     String uploadedFileGuid;
@@ -89,9 +90,6 @@ public class ShareActivity extends ActionBarActivity {
     @ViewById(R.id.header_share_photo)
     ImageView headerSharePhoto;
 
-//    @ViewById(R.id.share_text_button)
-//    Button shareTextButton;
-
     @ViewById(R.id.progress_horizontal)
     ProgressBar progressBar;
 
@@ -107,8 +105,10 @@ public class ShareActivity extends ActionBarActivity {
             String type = intent.getType();
             LOG.d(TAG_METHOD + "type ? "+type);
             activityParent = intent.getStringExtra(Intent.EXTRA_TEXT);
-
             LOG.d(TAG_METHOD + "activityParent ? "+activityParent);
+            postIDParent = intent.getIntExtra(Intent.EXTRA_REFERRER, 0);
+            LOG.d(TAG_METHOD + "postIDParent ? "+ postIDParent);
+
             if (Intent.ACTION_SEND.equals(action) && type != null) {
                 if (type.startsWith("image/") && imageUri == null) {
                     imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -157,6 +157,9 @@ public class ShareActivity extends ActionBarActivity {
             DiasporaConfig.addActivity(this);
             LOG.d(TAG_METHOD + "Init Config with application and context");
             DiasporaConfig.init(this.getApplication(), this);
+            if (headerSharePhoto!=null && imageUri!=null) {
+                headerSharePhoto.setVisibility(View.GONE);
+            }
         }catch(Throwable thr) {
             LOG.e(TAG_METHOD + "Erreur : " + thr.toString(), thr);
             ACRA.getErrorReporter().handleException(thr);
@@ -334,16 +337,34 @@ public class ShareActivity extends ActionBarActivity {
         publishProgress(25);
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entrée");
+
         NewPost newPost = new NewPost();
         StatusMessage statusMessage=new StatusMessage();
         statusMessage.setText(shareTextEntry.getText().toString());
         newPost.setStatus_message(statusMessage);
-
         publishProgress(50);
-        Post newPosted = diasporaBean.sendPost(newPost);
-        LOG.d(TAG_METHOD + "newPosted is null ? "+(newPosted==null));
+        Post newPosted;
+        String message="";
+        if (postIDParent !=null && postIDParent!=0){
+            message="mis en ligne de votre commentaire";
+            newPosted = diasporaBean.comment(postIDParent, newPost);
+        }else {
+            message="mis en ligne de votre nouvel conversation";
+            newPosted = diasporaBean.sendPost(newPost);
+        }
+        LOG.d(TAG_METHOD + "newPosted is null ? " + (newPosted==null));
+        showToastResult(newPost==null, message);
         publishProgress(100);
         LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @UiThread
+    public void showToastResult(boolean resultOK, String message){
+        if (resultOK){
+            Toast.makeText(this, message,Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this, "Erreur de "+message,Toast.LENGTH_LONG).show();
+        }
     }
 
     @Background
@@ -371,8 +392,10 @@ public class ShareActivity extends ActionBarActivity {
             publishProgress(75);
             Post newPosted = diasporaBean.sendPost(newPost);
             LOG.d(TAG_METHOD + "newPosted is null ? "+(newPosted==null));
+            showToastResult(newPosted == null, "partage de votre photo");
         }
         publishProgress(100);
+        showToastResult(false, "partage de votre photo");
         LOG.d(TAG_METHOD + "Sortie");
     }
 

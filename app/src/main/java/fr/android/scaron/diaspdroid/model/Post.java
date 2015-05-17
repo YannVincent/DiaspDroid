@@ -283,7 +283,7 @@ public class Post {
 //    "address": null,
     String adress;
 //    "poll": null,
-    String poll;
+    Poll poll;
 //    "already_participated_in_poll": null,
     String already_participated_in_poll;
 
@@ -523,11 +523,11 @@ public class Post {
         this.adress = adress;
     }
 
-    public String getPoll() {
+    public Poll getPoll() {
         return poll;
     }
 
-    public void setPoll(String poll) {
+    public void setPoll(Poll poll) {
         this.poll = poll;
     }
 
@@ -551,7 +551,7 @@ public class Post {
     @Override
     public boolean equals(Object object){
 //        String TAG_METHOD = TAG + ".equals : ";
-//        LOG.d(TAG_METHOD + "Entrée");
+//        LOG.d(TAG_METHOD + "Entree");
         boolean sameId = false;
         if (object != null && object instanceof Post){
 //            LOG.d(TAG_METHOD + "Compare this.guid="+this.id+" with object.guid="+((Post) object).id);

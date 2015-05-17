@@ -36,6 +36,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String TAG_METHOD = TAG + ".intercept : ";
         LOG.d(TAG_METHOD+ "Entrée ("+request.getURI()+" ["+request.getMethod()+"])");
+        ClientHttpResponse executionResult;
         HttpHeaders httpHeaders = request.getHeaders();
         if (httpHeaders!=null) {
             LOG.d(TAG_METHOD + "httpHeaders : " + httpHeaders);
@@ -51,7 +52,6 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
                 }
             }
         }
-        ClientHttpResponse executionResult;
         if (request.getMethod()== HttpMethod.POST){
             StringBuilder sbBody = new StringBuilder();
             if (request.getURI().toString().endsWith("/users/sign_in")) {

@@ -1,6 +1,8 @@
 package fr.android.scaron.diaspdroid.vues.adapter;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -16,7 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Pod;
+import fr.android.scaron.diaspdroid.vues.fragment.PodsFragment;
+import fr.android.scaron.diaspdroid.vues.fragment.PodsFragment_;
 import fr.android.scaron.diaspdroid.vues.view.PodView;
 import fr.android.scaron.diaspdroid.vues.view.PodView_;
 
@@ -28,6 +33,7 @@ public class PodsAdapter extends BaseAdapter {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PodsAdapter.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
     private static String TAG = "PodsAdapter";
+    private SparseArray<View> viewHolder = new SparseArray<View>();
 
     List<Pod> pods;
     Pod podSelected = null;
@@ -35,24 +41,31 @@ public class PodsAdapter extends BaseAdapter {
     @RootContext
     Context context;
 
+    Fragment fragment;
+
+    public void setFragmentParent(Fragment fragment){
+        this.fragment = fragment;
+    }
+
     @AfterInject
     void initAdapter() {
         pods = new ArrayList<Pod>();
     }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        PodView podView;
-        if (convertView == null) {
-            podView = PodView_.build(context);
-        } else {
-            podView = (PodView) convertView;
+        Pod pod = getItem(position);
+        if (pod!=null && pod.getId()!=null) {
+            int id = Integer.valueOf(pod.getId());
+            View childView = viewHolder.get(id);
+            if (childView == null) {
+                childView = PodView_.build(context);
+                ((PodView) childView).bind(pod, position);
+                viewHolder.put(id, childView);
+            }
+            return childView;
         }
+        return null;
 
-        podView.bind(getItem(position), position);
-
-        return podView;
     }
 
     @Override
@@ -75,18 +88,18 @@ public class PodsAdapter extends BaseAdapter {
         super.notifyDataSetChanged();
     }
 
-    public void setPodSelected(Pod pod, int position, boolean selected){
+    public void setPodSelected(Pod pod){
+        String TAG_METHOD = TAG + ".setPodSelected : ";
+        LOG.d(TAG_METHOD + "Entrée");
         this.podSelected = pod;
-        getItem(position).setSelected(selected);
-        for (int index=0; index<pods.size(); index++){
-            if (index!=position){
-                getItem(index).setSelected(false);
-            }
+        LOG.d(TAG_METHOD + "Pod selectionné : " + pod.getDomain());
+        DiasporaConfig.setPodDomainValue(pod.getDomain(), pod.getSecure());
+        if (fragment instanceof PodsFragment){
+            ((PodsFragment) fragment).validPod(pod);
+        }else if (fragment instanceof PodsFragment_){
+            ((PodsFragment_) fragment).validPod(pod);
         }
-        notifyDataSetChanged();
-    }
-    public Pod getPodSelected(){
-        return podSelected;
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
     public void setPods(List<Pod> pods) {

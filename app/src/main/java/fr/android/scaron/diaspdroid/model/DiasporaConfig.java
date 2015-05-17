@@ -14,9 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import fr.android.scaron.diaspdroid.controler.CookieControler;
-import fr.android.scaron.diaspdroid.controler.DiasporaControler;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 
 /**
@@ -82,8 +79,8 @@ public class DiasporaConfig {
         if (configOK!=null){
             ParamsOK = configOK.booleanValue();
         }
-        DiasporaControler.initParams();
-        CookieControler.init();
+//        DiasporaControler.initParams();
+//        CookieControler.init();
     }
 
     public static void setPods(final Pods pPods){
@@ -120,38 +117,15 @@ public class DiasporaConfig {
         }
         DB.putString("diaspora_pod", podUrl);
         POD_URL = podUrl;
-        DiasporaControler.initParams();
-
-        Context context = APPLICATION_CONTEXT;
-        if (context==null){
-            context = APPLICATION;
-        }
 
     }
 
 
     public static void setPodAuthenticationValues(final String pPodUser, final String pPodPassword){
-//        public static void setPodAuthenticationValues(final String pPodUrl, final String pPodUser, final String pPodPassword){
         DB.putString("diaspora_user", pPodUser);
         DB.putString("diaspora_password", pPodPassword);
-//        DB.putString("diaspora_pod", pPodUrl);
-//        POD_URL = pPodUrl;
         POD_USER = pPodUser;
         POD_PASSWORD = pPodPassword;
-        DiasporaControler.initParams();
-
-        Context context = APPLICATION_CONTEXT;
-        if (context==null){
-            context = APPLICATION;
-        }
-//        if (context!=null){
-//            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-//            final AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.setIcon(R.drawable.ic_launcher);
-//            alertDialog.setTitle("Infos de connexion");
-//            alertDialog.setMessage("----RAPPEL ---\nurl:"+POD_URL+"\nuser:"+POD_USER+"\npass:"+POD_PASSWORD+"\n--------------");
-//            alertDialog.show();
-//        }
     }
 
     public static boolean isValid(){
