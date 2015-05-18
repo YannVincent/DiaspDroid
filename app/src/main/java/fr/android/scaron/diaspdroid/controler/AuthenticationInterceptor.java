@@ -1,5 +1,7 @@
 package fr.android.scaron.diaspdroid.controler;
 
+import android.net.Uri;
+
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -36,6 +39,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String TAG_METHOD = TAG + ".intercept : ";
         LOG.d(TAG_METHOD+ "Entrée ("+request.getURI()+" ["+request.getMethod()+"])");
+
         ClientHttpResponse executionResult;
         HttpHeaders httpHeaders = request.getHeaders();
         if (httpHeaders!=null) {

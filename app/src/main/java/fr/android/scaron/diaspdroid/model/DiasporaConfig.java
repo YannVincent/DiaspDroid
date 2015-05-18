@@ -34,6 +34,8 @@ public class DiasporaConfig {
     public static String AUTHENTICITY_TOKEN = TOKEN_VIDE;
     public static String X_CSRF_TOKEN = TOKEN_VIDE;
 
+    public static Integer MY_DIASP_ID;
+
     public static Application APPLICATION;
     public static Context APPLICATION_CONTEXT;
     public static TinyDB DB;

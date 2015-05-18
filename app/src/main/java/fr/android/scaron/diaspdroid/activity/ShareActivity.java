@@ -90,6 +90,9 @@ public class ShareActivity extends ActionBarActivity {
     @ViewById(R.id.header_share_photo)
     ImageView headerSharePhoto;
 
+    @ViewById(R.id.header_comment_avatar)
+    ImageView headerAvatar;
+
     @ViewById(R.id.progress_horizontal)
     ProgressBar progressBar;
 
@@ -112,9 +115,11 @@ public class ShareActivity extends ActionBarActivity {
             if (Intent.ACTION_SEND.equals(action) && type != null) {
                 if (type.startsWith("image/") && imageUri == null) {
                     imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-                    if (headerSharePhoto!=null) {
-                        headerSharePhoto.setVisibility(View.GONE);
-                    }
+                }
+            }
+            if (imageUri!=null || postIDParent==null){
+                if (headerSharePhoto!=null) {
+                    headerSharePhoto.setVisibility(View.GONE);
                 }
             }
         }catch(Throwable thr){
@@ -126,6 +131,14 @@ public class ShareActivity extends ActionBarActivity {
         LOG.d(TAG_METHOD + "sortie");
     }
 
+
+    public void retourMenuPrincipal() {
+        Intent i = new Intent(this,
+                MainActivity_.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+
+    }
 
     @Override
     public void onBackPressed() {
@@ -157,8 +170,14 @@ public class ShareActivity extends ActionBarActivity {
             DiasporaConfig.addActivity(this);
             LOG.d(TAG_METHOD + "Init Config with application and context");
             DiasporaConfig.init(this.getApplication(), this);
-            if (headerSharePhoto!=null && imageUri!=null) {
+            if (headerSharePhoto!=null && (imageUri!=null|| postIDParent==null)) {
                 headerSharePhoto.setVisibility(View.GONE);
+            }
+
+            if (DiasporaConfig.avatarDatas!=null) {
+                LOG.d(TAG_METHOD + "converting datas to bitmap");
+                Bitmap imageAvatar = BitmapFactory.decodeByteArray(DiasporaConfig.avatarDatas, 0, DiasporaConfig.avatarDatas.length);
+                headerAvatar.setImageBitmap(imageAvatar);
             }
         }catch(Throwable thr) {
             LOG.e(TAG_METHOD + "Erreur : " + thr.toString(), thr);
@@ -285,20 +304,31 @@ public class ShareActivity extends ActionBarActivity {
     @OptionsItem(R.id.action_share)
     public void launchSharing(){
         progressBar.setVisibility(View.VISIBLE);
-        String TAG_METHOD = TAG + ".updateScreen : ";
+        String TAG_METHOD = TAG + ".launchSharing : ";
         LOG.d(TAG_METHOD + "Entrée");
+
+        LOG.d(TAG_METHOD + "imageUri:"+imageUri+" / postIDParent:"+postIDParent+" / activityParent:"+activityParent);
         if (imageUri == null){
+            LOG.d(TAG_METHOD + "Il semble qu'il n'y ait pas de photo à partager\n" +
+                            "(Erreur obtenue : pas d'Uri de l'image obtenue)");
             shareMessage.setText("Il semble qu'il n'y ait pas de photo à partager\n" +
                     "(Erreur obtenue : pas d'Uri de l'image obtenue)");
-            if (shareTextEntry.getText()!=null && !shareTextEntry.getText().toString().isEmpty()){
-                shareComment();
-                return;
-            }
+//            if (postIDParent!=null && postIDParent>0) {
+                LOG.d(TAG_METHOD + "On va commenter un post");
+                if (shareTextEntry.getText() != null && !shareTextEntry.getText().toString().isEmpty()) {
+                    shareComment();
+                    return;
+                }
+//            }
+            LOG.d(TAG_METHOD + "Il semble qu'il n'y ait ni photo et ni commentaire à partager\n" +
+                    "(Erreur obtenue : pas d'Uri de l'image obtenue)");
             shareMessage.setText("Il semble qu'il n'y ait ni photo et ni commentaire à partager\n" +
                     "(Erreur obtenue : pas d'Uri de l'image obtenue)");
             return;
         }
         if (imageLocalPath == null){
+            LOG.d(TAG_METHOD + "Le partage de la photo a échouéé\n" +
+                    "(Erreur obtenue : pas de chemin local de l'image obtenu)");
             shareMessage.setText("Le partage de la photo a échouéé\n" +
                     "(Erreur obtenue : pas de chemin local de l'image obtenu)");
             return;
@@ -346,14 +376,14 @@ public class ShareActivity extends ActionBarActivity {
         Post newPosted;
         String message="";
         if (postIDParent !=null && postIDParent!=0){
-            message="mis en ligne de votre commentaire";
+            message="mise en ligne de votre commentaire";
             newPosted = diasporaBean.comment(postIDParent, statusMessage.getText());
         }else {
-            message="mis en ligne de votre nouvel conversation";
+            message="mise en ligne de votre nouvel conversation";
             newPosted = diasporaBean.sendPost(newPost);
         }
         LOG.d(TAG_METHOD + "newPosted is null ? " + (newPosted==null));
-        showToastResult(newPost==null, message);
+        showToastResult(newPost!=null, message);
         publishProgress(100);
         LOG.d(TAG_METHOD + "Sortie");
     }
@@ -362,6 +392,7 @@ public class ShareActivity extends ActionBarActivity {
     public void showToastResult(boolean resultOK, String message){
         if (resultOK){
             Toast.makeText(this, message,Toast.LENGTH_LONG).show();
+            retourMenuPrincipal();
         }else{
             Toast.makeText(this, "Erreur de "+message,Toast.LENGTH_LONG).show();
         }
@@ -392,7 +423,7 @@ public class ShareActivity extends ActionBarActivity {
             publishProgress(75);
             Post newPosted = diasporaBean.sendPost(newPost);
             LOG.d(TAG_METHOD + "newPosted is null ? "+(newPosted==null));
-            showToastResult(newPosted == null, "partage de votre photo");
+            showToastResult(newPosted != null, "partage de votre photo");
         }
         publishProgress(100);
         showToastResult(false, "partage de votre photo");

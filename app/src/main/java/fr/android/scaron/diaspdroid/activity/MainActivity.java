@@ -34,6 +34,7 @@ import fr.android.scaron.diaspdroid.vues.fragment.ContactsFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxActivityFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ParamsFragment_;
+import fr.android.scaron.diaspdroid.vues.fragment.ProfileFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.TagSuivisFragment_;
 import fr.android.scaron.diaspdroid.vues.view.HeaderView;
 import fr.android.scaron.diaspdroid.vues.view.HeaderView_;
@@ -156,7 +157,7 @@ public class MainActivity extends ActionBarActivity {
 //        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
 //        diasporaMainDrawer.setSelection(itemPosition + 1);
 
-        diasporaMainDrawer.setItemChecked(itemPosition, true);
+        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
         diasporaMainDrawer.setSelection(itemPosition);
 
         progressLoading.setVisibility(View.VISIBLE);
@@ -231,11 +232,11 @@ public class MainActivity extends ActionBarActivity {
     }
     void setProfilFragment(String title, int position){
         // update the main content by replacing fragments
-        ParamsFragment_ paramsFragment = new ParamsFragment_();
-        paramsFragment.setActivityParent(this);
+        ProfileFragment_ profileFragment = new ProfileFragment_();
+        profileFragment.setActivityParent(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.diaspora_main_content, paramsFragment)
+                .replace(R.id.diaspora_main_content, profileFragment)
                 .commit();
         resetActionBarMain(title);
     }

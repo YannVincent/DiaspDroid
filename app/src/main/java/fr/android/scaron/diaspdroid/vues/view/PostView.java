@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
@@ -37,11 +38,15 @@ import fr.android.scaron.diaspdroid.activity.ShareActivity_;
 import fr.android.scaron.diaspdroid.activity.YoutubeActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.Comment;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Image;
+import fr.android.scaron.diaspdroid.model.Like;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.People;
 import fr.android.scaron.diaspdroid.model.Photo;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.Share;
 
 /**
  * Created by Sébastien on 28/03/2015.
@@ -123,6 +128,8 @@ public class PostView extends LinearLayout{
     LinearLayout detailComment;
 
     public Integer postId;
+
+    long TIME_TEMPO = 3000;
 
     Post post;
     Context context;
@@ -228,108 +235,120 @@ public class PostView extends LinearLayout{
             // 1) The view has not yet been created - we need to initialize the YouTubeThumbnailView.
             post.asYoutubeVideo = true;
             post.idYoutubeVideo = videos.get("youtube");
-            LOG.d(".getView video youtube found ? "+post.asYoutubeVideo+" with ID ? "+post.idYoutubeVideo + " (url is '"+videos.get("youtubeurl")+"')");
+            LOG.d(".getView video youtube found ? " + post.asYoutubeVideo + " with ID ? " + post.idYoutubeVideo + " (url is '" + videos.get("youtubeurl") + "')");
             thumbnail.setTag(videos.get("youtube"));
-            thumbnail.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
-
+            if (thumbnailListener!=null) {
+                thumbnail.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+            }
 
             LOG.i(".getView video youtube found ? " + post.asYoutubeVideo + " with ID ? " + post.idYoutubeVideo + " (url is '" + videos.get("youtubeurl") + "')");
         }
+        refresh();
 
     }
 
 
 
+    @UiThread
     public void refresh() {
-        LOG.d(".refresh videos from post "+post.getId()+"( instance id : "+this+")");
-        Map<String, String> videos = getVideo(post);
-        LOG.d(".refresh videos found for post "+post+" : "+videos);
-        View.OnClickListener youtubeclickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (post.asYoutubeVideo && post.idYoutubeVideo != null && !post.idYoutubeVideo.isEmpty()) {
-                    // Launching YoutubeActivity Screen
-                    Intent i = new Intent(context, YoutubeActivity.class);
-                    i.putExtra("idYoutubeVideo", post.idYoutubeVideo);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(i);
+        String TAG_METHOD = TAG + ".refresh : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        LOG.d(TAG_METHOD + "DiasporaConfig.MY_DIASP_ID = "+DiasporaConfig.MY_DIASP_ID+" && post==null ? "+(post==null));
+        // Remplissage des indicateurs reshare/like/comments
+        if (post!=null) {
+            LOG.d(TAG_METHOD + "post.getInteractions()==null ? "+(post.getInteractions()==null));
+            if (post.getInteractions()!=null) {
+                detailIndicsReshareText.setText("" + post.getInteractions().getReshares_count());
+                detailIndicsLikeText.setText("" + post.getInteractions().getLikes_count());
+                detailIndicsCommentaireText.setText("" + post.getInteractions().getComments_count());
+
+                LOG.d(TAG_METHOD + "comments ? " + post.getInteractions().getComments_count());
+                for(Comment comment:post.getInteractions().getComments()){
+                    LOG.d(TAG_METHOD + "comment by "+comment.getAuthor().getId());
+                    if (comment.getAuthor().getId().intValue()== DiasporaConfig.MY_DIASP_ID.intValue()){
+                        LOG.d(TAG_METHOD + "Je sais que j'ai commenté ce post");
+                    }
+                }
+
+                LOG.d(TAG_METHOD + "likes ? " + post.getInteractions().getLikes_count());
+                for(Like like:post.getInteractions().getLikes()){
+                    LOG.d(TAG_METHOD + "liked by "+like.getAuthor().getId());
+                    if (like.getAuthor().getId().intValue()== DiasporaConfig.MY_DIASP_ID.intValue()){
+                        LOG.d(TAG_METHOD + "Je sais que j'ai aimé ce post");
+                    }
+                }
+
+                LOG.d(TAG_METHOD + "reshares ? " + post.getInteractions().getReshares_count());
+                for(Share reshare:post.getInteractions().getReshares()){
+                    LOG.d(TAG_METHOD + "reshared by "+reshare.getAuthor_id());
+                    if (reshare.getAuthor_id()== DiasporaConfig.MY_DIASP_ID.intValue()){
+                        LOG.d(TAG_METHOD + "Je sais que j'ai repartagé ce post");
+                    }
                 }
             }
-        };
-        thumbnail.setOnClickListener(youtubeclickListener);
-        imgplay.setOnClickListener(youtubeclickListener);
-
-        View.OnClickListener urlclickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (post.asWebSiteUrl && post.webSiteUrl!=null && !post.webSiteUrl.isEmpty()){
-                    // Launching Browser Screen
-                    Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
-                    myWebLink.setData(Uri.parse(post.webSiteUrl));
-                    myWebLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(myWebLink);
-                }
-            }
-        };
-        detailOpenGraph.setOnClickListener(urlclickListener);
-
-        // On crée la fonction pour le bouton like
-        View.OnClickListener likeclickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (post!=null && post.getGuid()!=null){
-                    aimer(post.getId());
-                }
-            }
-        };
-        // On attache la fonction au bouton like
-        detailLike.setOnClickListener(likeclickListener);
-
-        // On crée la fonction pour le bouton reshare
-        View.OnClickListener reshareclickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (post!=null && post.getGuid()!=null){
-                    repartager(post.getGuid());
-                }
-            }
-        };
-        // On attache la fonction au bouton reshare
-        detailRepublish.setOnClickListener(reshareclickListener);
-        setPost(post);
-
-        if (videos.containsKey("youtube")){
-            // Initialize youtubeVideo with youtube thumbnail
-            // 1) The view has not yet been created - we need to initialize the YouTubeThumbnailView.
-            post.asYoutubeVideo = true;
-            post.idYoutubeVideo = videos.get("youtube");
-            LOG.d(".refresh video youtube found ? "+post.asYoutubeVideo+" with ID ? "+post.idYoutubeVideo + " (url is '"+videos.get("youtubeurl")+"')");
-            thumbnail.setTag(videos.get("youtube"));
-            thumbnail.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
-
-
-            LOG.i(".refresh video youtube found ? " + post.asYoutubeVideo + " with ID ? " + post.idYoutubeVideo + " (url is '" + videos.get("youtubeurl") + "')");
         }
-
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
     @Background
     public void aimer(Integer postID){
-        diasporaService.like(postID);
+        String TAG_METHOD = TAG + ".aimer : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        Post result = diasporaService.like(postID);
+        showToastResult(result != null, "prise en compte de votre j'aime");
+
+        try {
+            Thread.sleep(TIME_TEMPO);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Post postUpdated = diasporaService.getPost(postID);
+        post = postUpdated;
+        refresh();
+
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+
+    @UiThread
+    public void showToastResult(boolean resultOK, String message){
+        if (resultOK){
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context, "Erreur de "+message,Toast.LENGTH_LONG).show();
+        }
     }
 
     @Background
     public void repartager(String rootGuid){
-        diasporaService.reshare(rootGuid);
+        String TAG_METHOD = TAG + ".repartager : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        Post result = diasporaService.reshare(rootGuid);
+        showToastResult(result != null, "prise en compte de votre repartage");
+
+        try {
+            Thread.sleep(TIME_TEMPO);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Post postUpdated = diasporaService.getPost(post.getId());
+        post = postUpdated;
+        refresh();
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
     public void commenter(Integer postID){
+        String TAG_METHOD = TAG + ".commenter : ";
+        LOG.d(TAG_METHOD+ "Entrée");
         Intent i = new Intent(context,
                 ShareActivity_.class);
-        i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
+        LOG.d(TAG_METHOD + "add Intent.EXTRA_TEXT : MainActivity");
+//        i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
+        LOG.d(TAG_METHOD + "add Intent.EXTRA_REFERRER : " + postID);
         i.putExtra(Intent.EXTRA_REFERRER, postID);
-        i.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
+        LOG.d(TAG_METHOD + "Sortie");
     }
 
 

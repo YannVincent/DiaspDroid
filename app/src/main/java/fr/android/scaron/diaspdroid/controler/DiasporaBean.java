@@ -27,6 +27,7 @@ import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.model.UploadResult;
+import fr.android.scaron.diaspdroid.model.User;
 
 /**
  * Created by Sébastien on 11/03/2015.
@@ -89,9 +90,9 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD+ "Sortie");
             return resultOK;
         }
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean getTokenOK = false;
         try {
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             getTokenOK = getToken(diasporaService.getLoginHTML());
         }catch(Throwable thr){
             LOG.e(TAG_METHOD + "Token authenticity non obtenu, pour cause d'erreur " + thr.getMessage(),thr);
@@ -114,6 +115,7 @@ public class DiasporaBean {
 
         getTokenOK = false;
         try {
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             getTokenOK = getCsrfToken(diasporaService.getBookmarkletHTML());
         }catch(Throwable thr){
             LOG.e(TAG_METHOD + "Token crsf non obtenu, pour cause d'erreur " + thr.getMessage());
@@ -129,9 +131,8 @@ public class DiasporaBean {
 
     public Post reshare(String rootGuid){
         String TAG_METHOD = TAG + ".reshare : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         Post reponseReshare=null;
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged) {
             LOG.d(TAG_METHOD + "logged successfully");
@@ -140,8 +141,12 @@ public class DiasporaBean {
                 JsonObject jsonParam = new JsonObject();
                 LOG.d(TAG_METHOD + "Ajout du root_guid=" + rootGuid);
                 jsonParam.addProperty("root_guid", rootGuid);
+                diasporaService.setRootUrl(DiasporaConfig.POD_URL);
                 reponseReshare = diasporaService.reshare(jsonParam);
-               LOG.d(TAG_METHOD + "réponse : "+reponseReshare.toString());
+                LOG.d(TAG_METHOD + "réponse is null ? : " + (reponseReshare==null));
+                if (reponseReshare!=null) {
+                    LOG.d(TAG_METHOD + "réponse : " + reponseReshare.toString());
+                }
             }
         }
         LOG.d(TAG_METHOD+ "Sortie");
@@ -150,29 +155,52 @@ public class DiasporaBean {
 
     public Post like(Integer postID){
         String TAG_METHOD = TAG + ".like : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         Post reponseLike=null;
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged) {
             LOG.d(TAG_METHOD + "logged successfully");
             if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
                 diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
+                diasporaService.setRootUrl(DiasporaConfig.POD_URL);
                 reponseLike = diasporaService.like(postID);
-                LOG.d(TAG_METHOD + "réponse : " + reponseLike.toString());
+                LOG.d(TAG_METHOD + "réponse is null ? : " + (reponseLike==null));
+                if (reponseLike!=null) {
+                    LOG.d(TAG_METHOD + "réponse : " + reponseLike.toString());
+                }
             }
         }
         LOG.d(TAG_METHOD+ "Sortie");
         return reponseLike;
     }
 
+    public Post getPost(Integer postID){
+        String TAG_METHOD = TAG + ".like : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        Post reponseGetPost=null;
+        boolean logged = seLogguer();
+        if (logged) {
+            LOG.d(TAG_METHOD + "logged successfully");
+            if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
+                diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
+                diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+                reponseGetPost = diasporaService.getPost(postID);
+                LOG.d(TAG_METHOD + "réponse is null ? : " + (reponseGetPost==null));
+                if (reponseGetPost!=null) {
+                    LOG.d(TAG_METHOD + "réponse : " + reponseGetPost.toString());
+                }
+            }
+        }
+        LOG.d(TAG_METHOD+ "Sortie");
+        return reponseGetPost;
+    }
+
 
 
     public Post comment(Integer postID, String text){
         String TAG_METHOD = TAG + ".like : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         Post reponseComment=null;
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged) {
             LOG.d(TAG_METHOD + "logged successfully");
@@ -180,6 +208,7 @@ public class DiasporaBean {
                 diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
                 JsonObject jsonParam = new JsonObject();
                 jsonParam.addProperty("text", text);
+                diasporaService.setRootUrl(DiasporaConfig.POD_URL);
                 reponseComment = diasporaService.comment(postID, jsonParam);
                 LOG.d(TAG_METHOD + "réponse : " + reponseComment.toString());
             }
@@ -190,9 +219,8 @@ public class DiasporaBean {
 
     public Post sendPost(NewPost newPost){
         String TAG_METHOD = TAG + ".sendPost : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
 
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "logged successfully");
@@ -201,7 +229,8 @@ public class DiasporaBean {
             }
             diasporaService.setHeader("content-type", "application/json");
 
-            LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+            LOG.d(TAG_METHOD + "call diasporaService.uploadFile");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             Post postResult = diasporaService.post(newPost);
             LOG.d(TAG_METHOD+ "postResult is null ? "+(postResult==null));
             LOG.d(TAG_METHOD+ "Sortie");
@@ -213,9 +242,8 @@ public class DiasporaBean {
 
     public UploadResult uploadFile(byte[] photoBytes){
         String TAG_METHOD = TAG + ".uploadFile : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
 
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "logged successfully");
@@ -223,7 +251,8 @@ public class DiasporaBean {
                 diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
             }
             diasporaService.setHeader("content-type", "application/octet-stream");
-            LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+            LOG.d(TAG_METHOD + "call diasporaService.uploadFile");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             UploadResult uploadResult = diasporaService.uploadFile(photoBytes);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
@@ -239,9 +268,8 @@ public class DiasporaBean {
 
     public UploadResult uploadFile(String localPath){
         String TAG_METHOD = TAG + ".uploadFile : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
 
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "logged successfully");
@@ -252,6 +280,7 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD + "On crée l'entité photo à partir des données brutes");
             final byte[] photoBytes = getImageBytes(localPath);
             LOG.d(TAG_METHOD+ "call diasporaService.uploadFile");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             UploadResult uploadResult = diasporaService.uploadFile(photoBytes);
             LOG.d(TAG_METHOD+ "uploadResult is null ? "+(uploadResult==null));
             if (uploadResult!=null){
@@ -278,24 +307,24 @@ public class DiasporaBean {
         }
     }
 
-    public List<Post> getInfo(String userName){
+    public User getInfo(String userName){
         String TAG_METHOD = TAG + ".getInfo : ";
         LOG.d(TAG_METHOD+ "Entrée");
         LOG.d(TAG_METHOD + "diasporaService.setRootUrl");
         diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         LOG.d(TAG_METHOD + "appel de diasporaService.getInfo");
-        List<Post> infos = diasporaService.getInfo(userName);
+        User infos = diasporaService.getInfo(userName);
         LOG.d(TAG_METHOD+ "Sortie");
         return infos;
     }
 
     public List<Contact> getContacts(){
         String TAG_METHOD = TAG + ".getContacts : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "appel de diasporaService.getContacts");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Contact> contacts = diasporaService.getContacts();
             LOG.d(TAG_METHOD+ "Sortie");
             return contacts;
@@ -310,7 +339,6 @@ public class DiasporaBean {
     public List<Post> getStream(){
         String TAG_METHOD = TAG + ".getStream : ";
         LOG.d(TAG_METHOD + "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "appel de diasporaService.getStream");
@@ -328,8 +356,7 @@ public class DiasporaBean {
 
     public List<Post> getMoreStream(long timestampStreamMax, long timestampStreamInit){
         String TAG_METHOD = TAG + ".getMoreStream : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD + "appel de diasporaService.getMoreStream");
@@ -347,8 +374,7 @@ public class DiasporaBean {
 
     public List<Post> getTagSuivis(){
         String TAG_METHOD = TAG + ".getTagSuivis : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getTagSuivis");
@@ -366,8 +392,7 @@ public class DiasporaBean {
 
     public List<Post> getMoreTagSuivis(long timestampStreamMax, long timestampStreamInit){
         String TAG_METHOD = TAG + ".getMoreTagSuivis : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getMoreTagSuivis");
@@ -386,7 +411,6 @@ public class DiasporaBean {
     public List<Post> getActivity(){
         String TAG_METHOD = TAG + ".getActivity : ";
         LOG.d(TAG_METHOD + "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getActivity");
@@ -404,8 +428,7 @@ public class DiasporaBean {
 
     public List<Post> getMoreActivity(long timestampStreamMax, long timestampStreamInit){
         String TAG_METHOD = TAG + ".getMoreActivity : ";
-        LOG.d(TAG_METHOD+ "Entrée");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+        LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
             LOG.d(TAG_METHOD+ "appel de diasporaService.getMoreActivity");
@@ -429,6 +452,8 @@ public class DiasporaBean {
         }
         diasporaService.setRootUrl(fileUrl);
         byte[] imageFile = diasporaService.getImageFile();
+
+        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
         LOG.d(TAG_METHOD+ "Sortie");
         return imageFile;
     }

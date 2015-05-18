@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <RelativeLayout android:id="@+id/profile_header"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="12sp"
+        android:layout_height="64sp">
+
+        <ImageView android:id="@+id/profile_avatar_icon"
+                   android:layout_width="64sp"
+                   android:layout_height="64sp"
+                   android:src="@drawable/ic_launcher"/>
+        <TextView android:id="@+id/profile_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Sebastien Caron"
+            android:layout_toRightOf="@id/profile_avatar_icon"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginLeft="@dimen/margin_medium"
+            />
+        <TextView android:id="@+id/profile_adress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="tilucifer@framasphere.org"
+            android:layout_toRightOf="@id/profile_avatar_icon"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_below="@id/profile_name"
+            />
+        </RelativeLayout>
+    <TextView android:id="@+id/rest"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="12sp"
+              android:text="Rest is Coming soon"
+              android:layout_marginLeft="@dimen/margin_medium"
+              android:layout_marginTop="@dimen/margin_small"
+              android:layout_below="@id/profile_header"
+        />
+
+    <TextView android:id="@+id/tags"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="12sp"
+              android:text="Rest is Coming soon"
+              android:layout_marginLeft="@dimen/margin_medium"
+              android:layout_marginTop="@dimen/margin_small"
+              android:layout_below="@id/rest"
+        />
+
+    <TextView android:id="@+id/location"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="12sp"
+              android:text="Rest is Coming soon"
+              android:layout_marginLeft="@dimen/margin_medium"
+              android:layout_marginTop="@dimen/margin_small"
+              android:layout_below="@id/tags"
+        />
+
+    <TextView android:id="@+id/genre"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="12sp"
+              android:text="Rest is Coming soon"
+              android:layout_marginLeft="@dimen/margin_medium"
+              android:layout_marginTop="@dimen/margin_small"
+              android:layout_below="@id/location"
+        />
+</LinearLayout>

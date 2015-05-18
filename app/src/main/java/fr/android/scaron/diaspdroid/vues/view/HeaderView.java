@@ -22,6 +22,7 @@ import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.User;
 
 /**
  * Created by Sebastien on 03/05/2015.
@@ -61,13 +62,15 @@ public class HeaderView extends LinearLayout {
         String TAG_METHOD = TAG + ".getInfosUserForBar : ";
         LOG.d(TAG_METHOD + "Entree");
         LOG.d(TAG_METHOD + "call diasporaBean.getInfo");
-        diasporaService.setRootUrl(DiasporaConfig.POD_URL);
-        List<Post> postsUser = diasporaService.getInfo("tilucifer");
-        if (postsUser!=null && postsUser.size()>0) {
-            Post first = postsUser.get(0);
-            String userName = first.getAuthor().getName();
-            String userAdress = first.getAuthor().getDiaspora_id();
-            String userAvatar = first.getAuthor().getAvatar().getLarge();
+        User userInfo = diasporaService.getInfo(DiasporaConfig.POD_USER);
+        if (userInfo!=null) {
+            DiasporaConfig.MY_DIASP_ID = userInfo.getId();
+            String userName = userInfo.getName();
+            String userAdress = userInfo.getDiaspora_id();
+            String userAvatar = null;
+            if (userInfo.getProfile()!=null) {
+                userAvatar = userInfo.getProfile().getAvatar().getLarge();
+            }
             updateActionBar(userName, userAdress, userAvatar);
         }
         LOG.d(TAG_METHOD+ "Sortie");

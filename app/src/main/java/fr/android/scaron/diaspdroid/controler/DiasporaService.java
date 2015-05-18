@@ -21,6 +21,7 @@ import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.CustGsonHttpMessageConverter;
 import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.UploadResult;
+import fr.android.scaron.diaspdroid.model.User;
 
 /**
  * Created by Sébastien on 11/03/2015.
@@ -84,11 +85,10 @@ public interface DiasporaService extends RestClientErrorHandling {
 
 
     @Get("/u/{userName}")
-    List<fr.android.scaron.diaspdroid.model.Post> getInfo(String userName);
+    User getInfo(String userName);
 
 
     @Post("/photos?photo[aspect_ids]=all&qqfile=uploaded.jpg")
-//    @Post("/photos?photo[pending]=true&qqfile=uploaded.jpg")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     @RequiresHeader({"x-csrf-token", "content-type"})
@@ -109,6 +109,13 @@ public interface DiasporaService extends RestClientErrorHandling {
     @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
     fr.android.scaron.diaspdroid.model.Post like(Integer postID);
+
+    @Post("/posts/{postID}")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+//    @RequiresHeader("x-csrf-token")
+    @Accept(MediaType.APPLICATION_JSON)
+    fr.android.scaron.diaspdroid.model.Post getPost(Integer postID);
 
 
     @Post("/posts/{postID}/comments")
