@@ -23,7 +23,6 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.Pod;
 import fr.android.scaron.diaspdroid.model.Post;
@@ -169,7 +168,7 @@ public class DiasporaBean {
 
 
 
-    public Post comment(Integer postID, NewPost newPost){
+    public Post comment(Integer postID, String text){
         String TAG_METHOD = TAG + ".like : ";
         LOG.d(TAG_METHOD+ "Entrée");
         Post reponseComment=null;
@@ -179,7 +178,9 @@ public class DiasporaBean {
             LOG.d(TAG_METHOD + "logged successfully");
             if (DiasporaConfig.X_CSRF_TOKEN != null && !DiasporaConfig.X_CSRF_TOKEN.isEmpty()) {
                 diasporaService.setHeader("x-csrf-token", DiasporaConfig.X_CSRF_TOKEN);
-                reponseComment = diasporaService.comment(postID, newPost);
+                JsonObject jsonParam = new JsonObject();
+                jsonParam.addProperty("text", text);
+                reponseComment = diasporaService.comment(postID, jsonParam);
                 LOG.d(TAG_METHOD + "réponse : " + reponseComment.toString());
             }
         }

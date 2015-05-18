@@ -14,13 +14,11 @@ import org.androidannotations.api.rest.RestClientErrorHandling;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.CustGsonHttpMessageConverter;
-import fr.android.scaron.diaspdroid.model.LikeResult;
 import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.UploadResult;
 
@@ -118,7 +116,7 @@ public interface DiasporaService extends RestClientErrorHandling {
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
-    fr.android.scaron.diaspdroid.model.Post comment(Integer postID, NewPost post);
+    fr.android.scaron.diaspdroid.model.Post comment(Integer postID, JsonObject jsonParam);
 
     @Post("/status_messages")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})

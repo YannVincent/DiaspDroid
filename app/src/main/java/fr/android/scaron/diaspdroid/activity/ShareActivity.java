@@ -347,7 +347,7 @@ public class ShareActivity extends ActionBarActivity {
         String message="";
         if (postIDParent !=null && postIDParent!=0){
             message="mis en ligne de votre commentaire";
-            newPosted = diasporaBean.comment(postIDParent, newPost);
+            newPosted = diasporaBean.comment(postIDParent, statusMessage.getText());
         }else {
             message="mis en ligne de votre nouvel conversation";
             newPosted = diasporaBean.sendPost(newPost);
