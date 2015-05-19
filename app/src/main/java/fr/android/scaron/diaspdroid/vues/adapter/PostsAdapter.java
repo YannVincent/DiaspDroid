@@ -20,6 +20,8 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.view.PostView;
+import fr.android.scaron.diaspdroid.vues.view.PostViewNextGen;
+import fr.android.scaron.diaspdroid.vues.view.PostViewNextGen_;
 import fr.android.scaron.diaspdroid.vues.view.PostView_;
 
 /**
@@ -48,8 +50,13 @@ public class PostsAdapter extends BaseAdapter {
             int id = post.getId();
             View childView = viewHolder.get(id);
             if (childView == null) {
-                childView = PostView_.build(context);
-                ((PostView) childView).bind(post);
+//                childView = PostView_.build(context);
+//                ((PostView) childView).bind(post);
+//                viewHolder.put(id, childView);
+//TODO VALIDER CE TEST DE NOUVELLE VISU PHOTOS
+
+                childView = PostViewNextGen_.build(context);
+                ((PostViewNextGen) childView).bind(post);
                 viewHolder.put(id, childView);
             }
             return childView;
