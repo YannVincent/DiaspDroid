@@ -447,6 +447,10 @@ public class DiasporaBean {
     public byte[] getImageFile(String fileUrl){
         String TAG_METHOD = TAG + ".getImageFile : ";
         LOG.d(TAG_METHOD + "Entrée");
+        if (fileUrl==null || fileUrl.isEmpty()){
+            LOG.d(TAG_METHOD+ "Sortie en erreur fileUrl is null");
+            return null;
+        }
         if (fileUrl.startsWith("/")){
             fileUrl=DiasporaConfig.POD_URL + fileUrl;
         }
