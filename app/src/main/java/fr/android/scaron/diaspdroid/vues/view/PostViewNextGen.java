@@ -162,7 +162,7 @@ public class PostViewNextGen extends LinearLayout {
                     imageView.setImageBitmap(bitmap);
                     imageView.setLayoutParams(new ViewGroup.LayoutParams(newWidth, newHeight));
                     imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    addImageViewInHScroll(imageView, (indexPhoto==photoSize-1));
+                    addImageViewInHScroll(imageView, (indexPhoto==photoSize));
                 }
             }
         }
