@@ -197,15 +197,17 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
     void getMoreInfos(){
         String TAG_METHOD = TAG + ".getInfos : ";
         LOG.d(TAG_METHOD + "Entrée");
-        addFooterView();
-        //On récupère le dernier post pour déterminer le timestamp max à précisier pour le getMoreStream
-        Post firstPost = posts.get(0);
-        Post olderPost = posts.get(posts.size()-1);
-        long timestampNewest = Long.valueOf("" + (firstPost.getCreated_at().getTime() / 1000));
-        long timestampOlder = Long.valueOf(""+(olderPost.getCreated_at().getTime()/1000));
-        LOG.d(TAG_METHOD + "call diasporaBean.getStream");
-        posts = diasporaBean.getMoreStream(timestampOlder, timestampNewest);
-        bindMoreDatas();
+        if (posts!=null && posts.size()>0) {
+            addFooterView();
+            //On récupère le dernier post pour déterminer le timestamp max à précisier pour le getMoreStream
+            Post firstPost = posts.get(0);
+            Post olderPost = posts.get(posts.size() - 1);
+            long timestampNewest = Long.valueOf("" + (firstPost.getCreated_at().getTime() / 1000));
+            long timestampOlder = Long.valueOf("" + (olderPost.getCreated_at().getTime() / 1000));
+            LOG.d(TAG_METHOD + "call diasporaBean.getStream");
+            posts = diasporaBean.getMoreStream(timestampOlder, timestampNewest);
+            bindMoreDatas();
+        }
         LOG.d(TAG_METHOD+ "Sortie");
     }
     @UiThread

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,7 @@ public class PostViewNextGen extends LinearLayout {
         LOG.d(TAG_METHOD + "Entrée");
         LOG.d(TAG_METHOD + "On récupère les données de l'image pour l'url : " + post.getAuthor().getAvatar().getLarge());
         byte[] imageDatas = diasporaService.getImageFile(post.getAuthor().getAvatar().getLarge());
-        LOG.d(TAG_METHOD + "imageData is null ? "+(imageDatas==null));
+        LOG.d(TAG_METHOD + "imageData is null ? " + (imageDatas == null));
         if (imageDatas != null) {
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageDatas, 0, imageDatas.length);
             if (bitmap==null){
@@ -109,9 +110,15 @@ public class PostViewNextGen extends LinearLayout {
             LOG.d(TAG_METHOD + post.getPhotos().size()+" photos à ajouter");
         }else{
             LOG.d(TAG_METHOD +" aucune photo à ajouter");
+            LOG.d(TAG_METHOD + "Sortie");
+            return;
         }
+
+        int photoSize = photos.size();
+        int indexPhoto = 0;
         for (Photo photo:photos) {
             LOG.d(TAG_METHOD + "On récupère les données de l'image pour l'url : " + photo.getSizes().getMedium());
+            indexPhoto++;
             byte[] imageDatas = diasporaService.getImageFile(photo.getSizes().getLarge());
             LOG.d(TAG_METHOD + "imageData is null ? "+(imageDatas==null));
             if (imageDatas != null){
@@ -136,14 +143,14 @@ public class PostViewNextGen extends LinearLayout {
                     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
                     Display display = wm.getDefaultDisplay();
                     display.getMetrics(metrics);
-                    int width = metrics.widthPixels;
+                    int width = metrics.widthPixels-(int)dipToPixels(context, 30);
 ////                    Display display = this.getDisplay();
 //                    Point size = new Point();
 //                    display.getSize(size);
 //                    int width = size.x;
 //                    //            int height = size.y;
 //                    Matrix mat = new Matrix();
-                    int imgHeight = bitmap.getHeight()-20;
+                    int imgHeight = bitmap.getHeight();
                     int imgWidth = bitmap.getWidth();
                     LOG.d(TAG_METHOD + " calcul du ratio : (long)" + imgWidth + "/(long)" + imgHeight + ";");
                     double ratio = (double) ((double) imgWidth / (double) imgHeight);
@@ -155,18 +162,26 @@ public class PostViewNextGen extends LinearLayout {
                     imageView.setImageBitmap(bitmap);
                     imageView.setLayoutParams(new ViewGroup.LayoutParams(newWidth, newHeight));
                     imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    addImageViewInHScroll(imageView);
+                    addImageViewInHScroll(imageView, (indexPhoto==photoSize-1));
                 }
             }
         }
         LOG.d(TAG_METHOD + "Sortie");
     }
-
+    public static float dipToPixels(Context context, float dipValue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
+    }
     @UiThread
-    public void addImageViewInHScroll(ImageView imageView){
+    public void addImageViewInHScroll(ImageView imageView, boolean isLast){
         String TAG_METHOD = TAG + ".addPhotos";
         LOG.d(TAG_METHOD + "Entrée");
         postnextgen_images.addView(imageView);
+        if (!isLast) {
+            LinearLayout linearLayout = new LinearLayout(context);
+            linearLayout.setMinimumWidth((int)dipToPixels(context, 30));
+            postnextgen_images.addView(linearLayout);
+        }
         LOG.d(TAG_METHOD + "Sortie");
     }
 }
