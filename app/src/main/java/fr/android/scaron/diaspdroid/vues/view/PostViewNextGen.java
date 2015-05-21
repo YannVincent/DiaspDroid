@@ -95,7 +95,7 @@ public class PostViewNextGen extends LinearLayout {
 
     @UiThread
     public void addImageViewAvatar(Bitmap bitmap){
-        String TAG_METHOD = TAG + ".addImageViewAvatar > ";
+        String TAG_METHOD = TAG + ".addLeftImageView > ";
         LOG.d(TAG_METHOD + "Entrée");
         postnextgen_avatar.setImageBitmap(bitmap);
         LOG.d(TAG_METHOD + "Sortie");

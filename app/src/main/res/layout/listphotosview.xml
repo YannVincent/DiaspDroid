@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+          android:orientation="vertical" android:layout_width="match_parent"
+          android:padding="10dip"
+          android:background="@drawable/borderbg"
+          android:layout_height="match_parent">
+    <!-- + copy of imageview_share.xml -->
+    <RelativeLayout android:id="@+id/imageview_share_g"
+        android:orientation="vertical" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_weight="1"
+                    android:visibility="invisible">
+        <ImageView android:id="@+id/imageview_share_image_g"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:scaleType="centerCrop"
+                   android:layout_marginTop="12sp"
+                   android:contentDescription="Image que je partage"
+                   android:src="@drawable/ic_launcher"/>
+
+        <ImageView android:id="@+id/imageview_share_image_remove_g"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:minWidth="24sp"
+                   android:minHeight="24sp"
+                   android:contentDescription="Image que je partage"
+                   android:src="@android:drawable/presence_offline"
+                   android:layout_alignParentTop="true"
+                   android:layout_alignRight="@+id/imageview_share_image_g"
+                   android:layout_alignEnd="@+id/imageview_share_image_g" />
+    </RelativeLayout>
+    <!-- + copy of imageview_share.xml -->
+    <RelativeLayout android:id="@+id/imageview_share_d"
+        android:orientation="vertical" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_weight="1"
+        android:visibility="invisible">
+        <ImageView android:id="@+id/imageview_share_image_d"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:scaleType="centerCrop"
+                   android:layout_marginTop="12sp"
+                   android:contentDescription="Image que je partage"
+                   android:src="@drawable/ic_launcher"/>
+
+        <ImageView android:id="@+id/imageview_share_image_remove_d"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:minWidth="24sp"
+                   android:minHeight="24sp"
+                   android:contentDescription="Image que je partage"
+                   android:src="@android:drawable/presence_offline"
+                   android:layout_alignParentTop="true"
+                   android:layout_alignRight="@+id/imageview_share_image_d"
+                   android:layout_alignEnd="@+id/imageview_share_image_d" />
+    </RelativeLayout>
+</TableRow>
