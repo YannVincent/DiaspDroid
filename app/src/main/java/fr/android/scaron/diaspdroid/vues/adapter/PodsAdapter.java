@@ -32,7 +32,7 @@ import fr.android.scaron.diaspdroid.vues.view.PodView_;
 public class PodsAdapter extends BaseAdapter {
     private static Logger LOGGEUR = LoggerFactory.getLogger(PodsAdapter.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = "PodsAdapter";
+    private static String TAG = PodsAdapter.class.getSimpleName();
     private SparseArray<View> viewHolder = new SparseArray<View>();
 
     List<Pod> pods;

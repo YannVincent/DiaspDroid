@@ -57,7 +57,7 @@ public class ShareActivity extends ActionBarActivity {
 
     private static Logger LOGGEUR = LoggerFactory.getLogger(ShareActivity.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static final String TAG = "ShareActivity";
+    private static String TAG = ShareActivity.class.getSimpleName();
     final static int SELECT_PICTURE = 1;
 
     private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.

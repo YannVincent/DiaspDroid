@@ -51,7 +51,7 @@ public class PostsAdapter extends BaseAdapter {
             View childView = viewHolder.get(id);
             if (childView == null) {
 //                childView = PostView_.build(context);
-//                ((PostView) childView).bind(post);
+//                ((PostView) childView).getBitmap(post);
 //                viewHolder.put(id, childView);
 //TODO VALIDER CE TEST DE NOUVELLE VISU PHOTOS
 

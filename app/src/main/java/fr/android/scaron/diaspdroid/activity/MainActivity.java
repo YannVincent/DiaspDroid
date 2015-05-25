@@ -1,5 +1,9 @@
 package fr.android.scaron.diaspdroid.activity;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +22,7 @@ import android.widget.Toast;
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
@@ -35,6 +40,7 @@ import fr.android.scaron.diaspdroid.vues.fragment.FluxActivityFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ParamsFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.ProfileFragment_;
+import fr.android.scaron.diaspdroid.vues.fragment.ShareFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.TagSuivisFragment_;
 import fr.android.scaron.diaspdroid.vues.view.HeaderView;
 import fr.android.scaron.diaspdroid.vues.view.HeaderView_;
@@ -46,7 +52,7 @@ import fr.android.scaron.diaspdroid.vues.view.HeaderView_;
 public class MainActivity extends ActionBarActivity {
     private static Logger LOGGEUR = LoggerFactory.getLogger(MainActivity.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static final String TAG = "MainActivity";
+    private static String TAG = MainActivity.class.getSimpleName();
 
     int itemPositionCurrent = 0;
     private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
@@ -56,6 +62,8 @@ public class MainActivity extends ActionBarActivity {
     String[] drawerArray;
     private List<String> drawerItems;
     private ActionBarDrawerToggle mDrawerToggle;
+    @Extra
+    Uri imageUri;
 
     @ViewById(R.id.diaspora_main)
     DrawerLayout diasporaMain;
@@ -95,11 +103,16 @@ public class MainActivity extends ActionBarActivity {
             drawerItems = Arrays.asList(drawerArray);
             setUpDrawer();
             if (DiasporaConfig.ParamsOK) {
-                HeaderView headerView = HeaderView_.build(this.getBaseContext());
-                headerView.bind();
-                diasporaMainDrawer.addHeaderView(headerView);
-                //On selectionne la vue Flux par défaut
-                listItemClicked(drawerItems.get(0));
+                if (imageUri!=null){
+                    //On selectionne la vue Partagez car on a recu une image
+                    listItemClicked(drawerItems.get(3));
+                }else {
+                    HeaderView headerView = HeaderView_.build(this.getBaseContext());
+                    headerView.bind();
+                    diasporaMainDrawer.addHeaderView(headerView);
+                    //On selectionne la vue Flux par défaut
+                    listItemClicked(drawerItems.get(0));
+                }
             }else{
                 //On selectionne la vue Paramètres par défaut (la derniere)
                 listItemClicked(drawerItems.get(drawerItems.size()-1));
@@ -148,17 +161,14 @@ public class MainActivity extends ActionBarActivity {
 
 
     @ItemClick(R.id.diaspora_main_drawer)
-    void listItemClicked(String itemClicked) {
+    public void listItemClicked(String itemClicked) {
         String TAG_METHOD = ".listItemClicked -> ";
         LOG.d(TAG + TAG_METHOD + "list item clicked ? "+itemClicked);
         listItemClicked  = true;
         int itemPosition = drawerItems.indexOf(itemClicked);
 
-//        diasporaMainDrawer.setItemChecked(itemPosition+1, true);
-//        diasporaMainDrawer.setSelection(itemPosition + 1);
-
         diasporaMainDrawer.setItemChecked(itemPosition+1, true);
-        diasporaMainDrawer.setSelection(itemPosition);
+        diasporaMainDrawer.setSelection(itemPosition+1);
 
         progressLoading.setVisibility(View.VISIBLE);
         setTitle(itemClicked);
@@ -173,13 +183,20 @@ public class MainActivity extends ActionBarActivity {
             case 2 : //Tags suivis
                 setTagSuivisFragment(itemClicked, itemPosition);
                 break;
-            case 3 : //Mes Amis
+            case 3 : //Partager
+                if (imageUri==null) {
+                    setShareFragment(itemClicked, itemPosition);
+                }else{
+                    setShareFragment(itemClicked, itemPosition, imageUri);
+                }
+                break;
+            case 4 : //Mes Amis
                 setAmisFragment(itemClicked, itemPosition);
                 break;
-            case 4 : //Mon Profil
+            case 5 : //Mon Profil
                 setProfilFragment(itemClicked, itemPosition);
                 break;
-            case 5 : //Paramètres
+            case 6 : //Paramètres
                 setParamsFragment(itemClicked, itemPosition);
                 break;
             default :
@@ -219,6 +236,33 @@ public class MainActivity extends ActionBarActivity {
                 .replace(R.id.diaspora_main_content, contactsFragment)
                 .commit();
         resetActionBarMain(title);
+    }
+    void setShareFragment(String title, int position){
+        // update the main content by replacing fragments
+        ShareFragment_ shareFragment = new ShareFragment_();
+        shareFragment.setActivityParent(this);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, shareFragment)
+                .commit();
+        resetActionBarMain(title);
+    }
+    void setShareFragment(String title, int position, Uri imageUri){
+        String TAG_METHOD = TAG + ".setShareFragment : ";
+        LOG.d(TAG + TAG_METHOD + "Entrée");
+        // update the main content by replacing fragments
+        ShareFragment_ shareFragment = new ShareFragment_();
+        shareFragment.setActivityParent(this);
+        Bundle bundle = new Bundle();
+        LOG.d(TAG_METHOD + "On met l'EXTRA_STREAM '"+imageUri+"' en argument au fragment de partage");
+        bundle.putParcelable(Intent.EXTRA_STREAM, imageUri);
+        shareFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, shareFragment)
+                .commit();
+        resetActionBarMain(title);
+        LOG.d(TAG + TAG_METHOD + "Sortie");
     }
     void setTagSuivisFragment(String title, int position){
         // update the main content by replacing fragments
@@ -272,7 +316,7 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    void resetActionBarMain(String title){
+    public void resetActionBarMain(String title){
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
@@ -280,4 +324,40 @@ public class MainActivity extends ActionBarActivity {
         actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setTitle(title);
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        String TAG_METHOD = TAG + ".onCreate : ";
+        LOG.d(TAG_METHOD + "entrée");
+        try {
+            super.onCreate(savedInstanceState);
+            Intent intent = getIntent();
+            String action = intent.getAction();
+            LOG.d(TAG_METHOD + "action ? "+action);
+            String type = intent.getType();
+            LOG.d(TAG_METHOD + "type ? "+type);
+
+            if (Intent.ACTION_SEND.equals(action) && type != null) {
+                if (type.startsWith("image/") && imageUri == null) {
+                    imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                    LOG.d(TAG_METHOD + "imageUri ? "+imageUri);
+                }
+            }
+        }catch(Throwable thr){
+            LOG.e(TAG_METHOD + "Erreur : " + thr.toString());
+            ACRA.getErrorReporter().handleException(thr);
+            LOG.d(TAG_METHOD + "sortie en erreur");
+            throw thr;
+        }
+        LOG.d(TAG_METHOD + "sortie");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 }

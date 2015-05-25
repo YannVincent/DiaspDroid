@@ -51,7 +51,7 @@ public class PodView extends LinearLayout {
 
 
     public void bind(final Pod pod, final int position) {
-        String TAG_METHOD = TAG + ".bind : ";
+        String TAG_METHOD = TAG + ".getBitmap : ";
         LOG.d(TAG_METHOD+ "Entrée");
         this.pod = pod;
         LOG.d(TAG_METHOD + "setText with text : statut : " + pod.getStatus() + " | securisé : " + pod.getSecure());

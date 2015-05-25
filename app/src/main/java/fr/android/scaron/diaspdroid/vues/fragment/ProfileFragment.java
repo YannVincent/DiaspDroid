@@ -28,10 +28,8 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.User;
-import fr.android.scaron.diaspdroid.vues.adapter.ContactsAdapter;
 
 @EFragment(R.layout.fragment_profile)
 public class ProfileFragment extends Fragment {

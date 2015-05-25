@@ -18,40 +18,38 @@ import java.util.Collections;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.Contact;
-import fr.android.scaron.diaspdroid.model.Post;
-import fr.android.scaron.diaspdroid.vues.view.ContactView;
-import fr.android.scaron.diaspdroid.vues.view.ContactView_;
-import fr.android.scaron.diaspdroid.vues.view.PostView;
-import fr.android.scaron.diaspdroid.vues.view.PostView_;
+import fr.android.scaron.diaspdroid.vues.view.PhotoView;
+import fr.android.scaron.diaspdroid.vues.view.PhotoView_;
 
 /**
  * Created by Sébastien on 29/03/2015.
  */
 @EBean(scope = EBean.Scope.Singleton)
-public class ContactsAdapter extends BaseAdapter {
-    private static Logger LOGGEUR = LoggerFactory.getLogger(ContactsAdapter.class);
+public class PhotosAdapter extends BaseAdapter {
+    private static Logger LOGGEUR = LoggerFactory.getLogger(PhotosAdapter.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = ContactsAdapter.class.getSimpleName();
+    private static String TAG = PhotosAdapter.class.getSimpleName();
     private SparseArray<View> viewHolder = new SparseArray<View>();
-    List<Contact> contacts;
+    List<String> photosUrls;
+    final static String FAKE_ADDPHOTO = "FAKE_ADDPHOTO";
 
     @RootContext
     Context context;
 
     @AfterInject
     void initAdapter() {
-        contacts = new ArrayList<Contact>();
+        photosUrls = new ArrayList<String>();
+        photosUrls.add(FAKE_ADDPHOTO);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Contact contact = getItem(position);
-        int id = contact.getId();
+        String photoUrl = getItem(position);
+        int id = photoUrl.hashCode();
         View childView = viewHolder.get(id);
         if (childView == null) {
-            childView  = ContactView_.build(context);
-            ((ContactView)childView).bind(contact);
+            childView  = PhotoView_.build(context);
+            ((PhotoView)childView).bind(photoUrl);
             viewHolder.put(id, childView);
         }
         return childView;
@@ -61,12 +59,12 @@ public class ContactsAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return contacts.size();
+        return photosUrls.size();
     }
 
     @Override
-    public Contact getItem(int position) {
-        return contacts.get(position);
+    public String getItem(int position) {
+        return photosUrls.get(position);
     }
 
     @Override
@@ -80,16 +78,16 @@ public class ContactsAdapter extends BaseAdapter {
     }
 
 
-    public void setContacts(List<Contact> contacts){
+    public void setPhotosUrls(List<String> photosUrls){
         String TAG_METHOD = TAG + ".setContacts : ";
         try{
             LOG.d(TAG_METHOD + "Entrée");
-            if (contacts==null) {
+            if (photosUrls==null) {
                 LOG.d(".setContacts initialize this.contacts");
-                this.contacts = new ArrayList<Contact>();
+                this.photosUrls = new ArrayList<String>();
             }else{
-                LOG.d(TAG_METHOD + "set this.contacts with"+contacts);
-                this.contacts = Collections.checkedList(contacts, Contact.class);
+                LOG.d(TAG_METHOD + "set this.contacts with"+photosUrls);
+                this.photosUrls = Collections.checkedList(photosUrls, String.class);
             }
             LOG.d(TAG_METHOD + "notifyDataSetChanged");
             super.notifyDataSetChanged();
