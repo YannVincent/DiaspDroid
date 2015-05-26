@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,12 +28,11 @@ import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.MainActivity;
-import fr.android.scaron.diaspdroid.activity.ShareActivity_;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.adapter.PostsAdapter;
 
 @EFragment(R.layout.fragment_flux_list)
 public class FluxFragment extends Fragment implements AbsListView.OnScrollListener{
@@ -117,12 +115,12 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         imageViewAddPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                ((MainActivity)activity).listItemClicked("Partagez");
+//                ((MainActivity)activity).listItemClicked("Partagez");
                 //TODO voir pour retablir ce pb
-//                Intent intent = new Intent(Intent.ACTION_PICK);
-//                intent.setType("image/*");
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                startActivityForResult(Intent.createChooser(intent, ""), SELECT_PICTURE);
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, ""), SELECT_PICTURE);
             }
         });
         mListView.addHeaderView(headerView);
@@ -137,16 +135,16 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
         if (data!=null) {
             switch (requestCode) {
                 case SELECT_PICTURE:
-
-                    ((MainActivity)activity).listItemClicked("Partagez");
-                    Intent i = new Intent(getActivity(),
-                            ShareActivity_.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    i.setAction(Intent.ACTION_SEND);
-                    i.setType("image/");
-                    i.putExtra(Intent.EXTRA_STREAM, data.getData());
-                    i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
-                    startActivity(i);
+                    ((MainActivity)activity).listItemClicked("Partagez", data.getData());
+//                    ((MainActivity)activity).listItemClicked("Partagez");
+//                    Intent i = new Intent(getActivity(),
+//                            ShareActivity_.class);
+//                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    i.setAction(Intent.ACTION_SEND);
+//                    i.setType("image/");
+//                    i.putExtra(Intent.EXTRA_STREAM, data.getData());
+//                    i.putExtra(Intent.EXTRA_TEXT, "MainActivity");
+//                    startActivity(i);
                     break;
                 default:
                     break;

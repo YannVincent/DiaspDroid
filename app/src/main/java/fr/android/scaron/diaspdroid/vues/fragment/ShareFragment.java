@@ -9,21 +9,20 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
@@ -35,10 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.activity.MainActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.NewPost;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.model.StatusMessage;
+import fr.android.scaron.diaspdroid.model.UploadResult;
 import fr.android.scaron.diaspdroid.vues.adapter.PhotosAdapter;
 
 /**
@@ -92,11 +95,96 @@ public class ShareFragment extends Fragment {
         this.activity = activity;
     }
 
+    @UiThread
+    public void showToastResult(boolean resultOK, String message){
+        if (resultOK){
+            Toast.makeText(activity, message,Toast.LENGTH_LONG).show();
+            ((MainActivity) DiasporaConfig.APPLICATION_CONTEXT).listItemClicked("Flux");
+        }else{
+            Toast.makeText(activity, "Erreur de "+message,Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    @UiThread
+    public void showToastInfo(boolean resultOK, String message){
+        if (resultOK){
+            Toast.makeText(activity, message,Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(activity, "Erreur de "+message,Toast.LENGTH_LONG).show();
+        }
+    }
+
     @OptionsItem(R.id.action_share)
     public void launchSharing(){
         String TAG_METHOD = TAG + ".launchSharing : ";
         LOG.d(TAG_METHOD + "Entrée");
+        CharSequence textToShare = sharenextgen_text.getText();
+        if (textToShare==null||textToShare.length()==0){
+            showToastResult(false,"partage ! Le texte est vide");
+            return;
+        }
+        LOG.d(TAG_METHOD + "photosUrl:" + photosUrl + " / postRef:" + postRef);
+        if (postRef!=null && postRef.getId()>0){
+            //On écrit un commentaire.
+            commentPost(textToShare.toString());
+        }else if(photosUrl!=null && photosUrl.size()>1){
+            sendImagesAndComment(textToShare.toString());
+        }else{
+            //On démarre une conversation sans photos, sans post de référence
+            postConversation(textToShare.toString());
+        }
+
+
         LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @Background
+    public void commentPost(String text){
+        Post newPosted = diasporaService.comment(postRef.getId(), text);
+        showToastResult(newPosted!=null, "mise en ligne de votre commentaire");
+    }
+
+    @Background
+    public void postConversation(String text){
+        NewPost newPost = new NewPost();
+        StatusMessage statusMessage=new StatusMessage();
+        statusMessage.setText(text);
+        newPost.setStatus_message(statusMessage);
+        Post newPosted = diasporaService.sendPost(newPost);
+        //TODO, ajoutez la gestion de la progression
+        showToastResult(newPosted!=null, "mise en ligne de votre nouvelle conversation");
+    }
+
+    @Background
+    public void sendImagesAndComment(String text) {
+        String TAG_METHOD = TAG + ".getInfosUserForBar : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        NewPost newPost = new NewPost();
+        StatusMessage statusMessage = new StatusMessage();
+        statusMessage.setText(text);
+        newPost.setStatus_message(statusMessage);
+        StringBuilder listPhotoID = new StringBuilder("{");
+        boolean first = true;
+        for (String photoUrl : photosUrl) {
+            //On partage des photos, attention la dernière photo est le FAKE qui permet d'ajouter de nouvelles photos.
+            if (!FAKE_ADDPHOTO.equals(photoUrl)) {
+                UploadResult uploadFileResult = diasporaService.uploadFile(photoUrl);
+                if (!first) {
+                    listPhotoID.append("; ");
+                }
+                first = false;
+                boolean lastUploadSucceed = (uploadFileResult!=null && uploadFileResult.getData()!=null && uploadFileResult.getData().getPhoto()!=null && uploadFileResult.getData().getPhoto().getId()!=null);
+                showToastInfo(lastUploadSucceed, "partage d'une photo.");
+                if (lastUploadSucceed) {
+                    listPhotoID.append(uploadFileResult.getData().getPhoto().getId());
+                }
+            }
+        }
+        newPost.setPhotos(listPhotoID.toString());
+        Post newPosted = diasporaService.sendPost(newPost);
+        LOG.d(TAG_METHOD + "newPosted is null ? " + (newPosted == null));
+        showToastResult(newPosted != null, "mise en ligne de votre nouvelle conversation avec vos photos");
     }
 
 
@@ -138,6 +226,15 @@ public class ShareFragment extends Fragment {
                     LOG.d(TAG_METHOD + "call bind(imageLocalPath) for image "+imageLocalPath);
                     bind(imageLocalPath);
                 }
+                String postJson = this.getArguments().getString(Intent.EXTRA_TEXT);
+                if (postJson!=null && !postJson.isEmpty()){
+                    Gson gson = new Gson();
+                    Post postID = gson.fromJson(postJson, Post.class);
+                    if (postID!=null){
+                        LOG.d(TAG_METHOD + "call bind(postID) for postIDparent "+postID.getId());
+                        bind(postID);
+                    }
+                }
             }else {
                 LOG.d(TAG_METHOD + "call bind()");
                 bind();
@@ -171,6 +268,7 @@ public class ShareFragment extends Fragment {
         adapter.setPhotosUrls(photosUrl);
         adapter.notifyDataSetChanged();
         sharenextgen_gridphotos.setVisibility(View.GONE);
+        sharenextgen_text.setHint("Ecrivez votre commentaire ...");
         LOG.d(TAG_METHOD + "Sortie");
     }
 

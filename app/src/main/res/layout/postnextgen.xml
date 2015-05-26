@@ -2,7 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:padding="10dip"
     android:background="@drawable/borderbg">
 
@@ -60,6 +64,7 @@
         android:id="@+id/scrollpostnextgen_webvideo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="240dp"
         android:layout_marginTop="@dimen/padding_medium"
         android:layout_weight="1"/>
 
@@ -164,42 +169,143 @@
                   android:text="3"
             />
     </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="@dimen/margin_medium"-->
+        <!--style="?android:attr/buttonBarStyle"-->
+        <!--android:orientation="horizontal">-->
+        <!--&lt;!&ndash;<Button android:id="@+id/scrollpostnextgen_like"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:text="Aimer"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:padding="4dp"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_margin="4dp"&ndash;&gt;-->
+                <!--&lt;!&ndash;style="@style/LittleButtonText"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:background="@drawable/button_default_bg"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_weight="1"&ndash;&gt;-->
+            <!--&lt;!&ndash;/>&ndash;&gt;-->
+
+        <!--<Button android:id="@+id/scrollpostnextgen_like"-->
+            <!--android:text="Aimer"-->
+            <!--android:textSize="11dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:drawableLeft="@mipmap/diasp_like_padded"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="34dp" />-->
+        <!--<Button android:id="@+id/scrollpostnextgen_reshare"-->
+                <!--android:text="Repartager"-->
+            <!--android:textSize="10dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:drawableLeft="@mipmap/diasp_reshare_padded"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="34dp" />-->
+        <!--<Button android:id="@+id/scrollpostnextgen_comment"-->
+                <!--android:text="Commenter"-->
+                <!--android:textSize="10dp"-->
+                <!--android:layout_weight="1"-->
+            <!--android:drawableLeft="@mipmap/diasp_comment_padded"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:nestedScrollingEnabled="false"-->
+            <!--android:focusable="false"-->
+            <!--android:elegantTextHeight="false"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="34dp" />-->
+    <!--</LinearLayout>-->
+</LinearLayout>
+
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
-        style="?android:attr/buttonBarStyle"
-        android:orientation="horizontal">
-        <Button android:id="@+id/scrollpostnextgen_like"
-                android:text="Aimer"
+        android:layout_width="match_parent"
+        android:layout_height="30dip"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle">
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailLike"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:background="@drawable/borderbgbtns"
+            android:orientation="horizontal"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="15dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_like_padded" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
-                android:layout_margin="4dp"
-                style="@style/DefaultButtonText"
-                android:background="@drawable/button_default_bg"
-                android:layout_weight="1"
-            />
-        <Button android:id="@+id/scrollpostnextgen_reshare"
-                android:text="Repartager"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#141823"
+                android:textStyle="italic"
+                android:text="J'aime" />
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailRepublish"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:background="@drawable/borderbgbtns"
+            android:orientation="horizontal"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="15dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_reshare_padded" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_margin="4dp"
-                style="@style/DefaultButtonText"
-                android:layout_weight="1"
-                android:background="@drawable/button_default_bg"
-            />
-        <Button android:id="@+id/scrollpostnextgen_comment"
-                android:text="Commenter"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#141823"
+                android:textStyle="italic"
+                android:text="Repartager" />
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailComment"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:background="@drawable/borderbgbtns"
+            android:orientation="horizontal"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="15dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_comment_padded" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_margin="4dp"
-                style="@style/DefaultButtonText"
-                android:layout_weight="1"
-                android:background="@drawable/button_default_bg"
-            />
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#141823"
+                android:textStyle="italic"
+                android:text="Commenter" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

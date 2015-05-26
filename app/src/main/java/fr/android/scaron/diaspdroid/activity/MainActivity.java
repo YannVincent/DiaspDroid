@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -35,6 +37,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.fragment.ContactsFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxActivityFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
@@ -64,6 +67,8 @@ public class MainActivity extends ActionBarActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     @Extra
     Uri imageUri;
+
+    Post postParent;
 
     @ViewById(R.id.diaspora_main)
     DrawerLayout diasporaMain;
@@ -159,6 +164,14 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void listItemClicked(String itemClicked, Post postParent){
+        this.postParent = postParent;
+        listItemClicked(itemClicked);
+    }
+    public void listItemClicked(String itemClicked, Uri uri){
+        imageUri = uri;
+        listItemClicked(itemClicked);
+    }
 
     @ItemClick(R.id.diaspora_main_drawer)
     public void listItemClicked(String itemClicked) {
@@ -185,7 +198,11 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case 3 : //Partager
                 if (imageUri==null) {
-                    setShareFragment(itemClicked, itemPosition);
+                    if (postParent==null) {
+                        setShareFragment(itemClicked, itemPosition);
+                    }else {
+                        setShareFragment(itemClicked, itemPosition, postParent);
+                    }
                 }else{
                     setShareFragment(itemClicked, itemPosition, imageUri);
                 }
@@ -264,6 +281,26 @@ public class MainActivity extends ActionBarActivity {
         resetActionBarMain(title);
         LOG.d(TAG + TAG_METHOD + "Sortie");
     }
+    void setShareFragment(String title, int position, Post postParent){
+        String TAG_METHOD = TAG + ".setShareFragment : ";
+        LOG.d(TAG + TAG_METHOD + "Entrée");
+        // update the main content by replacing fragments
+        ShareFragment_ shareFragment = new ShareFragment_();
+        shareFragment.setActivityParent(this);
+        Bundle bundle = new Bundle();
+        LOG.d(TAG_METHOD + "On met l'EXTRA_UID '" + postParent.getId() + "' en argument au fragment de partage");
+        Gson gson = new Gson();
+        String postJson = gson.toJson(postParent);
+        bundle.putString(Intent.EXTRA_TEXT, postJson);
+        shareFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, shareFragment)
+                .commit();
+        resetActionBarMain(title);
+        LOG.d(TAG + TAG_METHOD + "Sortie");
+    }
+
     void setTagSuivisFragment(String title, int position){
         // update the main content by replacing fragments
         TagSuivisFragment_ tagSuivisFragment = new TagSuivisFragment_();
