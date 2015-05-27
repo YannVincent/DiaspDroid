@@ -82,6 +82,8 @@ public class MainActivity extends ActionBarActivity {
     @ViewById(R.id.progress_loading)
     RelativeLayout progressLoading;
 
+    Fragment fragementActif;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
@@ -227,6 +229,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         FluxFragment_ fluxFragment = new FluxFragment_();
         fluxFragment.setActivityParent(this);
+        fragementActif = fluxFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, fluxFragment)
@@ -238,6 +241,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         FluxActivityFragment_ fluxActivityFragment = new FluxActivityFragment_();
         fluxActivityFragment.setActivityParent(this);
+        fragementActif = fluxActivityFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, fluxActivityFragment)
@@ -248,6 +252,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ContactsFragment_ contactsFragment = new ContactsFragment_();
         contactsFragment.setActivityParent(this);
+        fragementActif = contactsFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, contactsFragment)
@@ -258,6 +263,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ShareFragment_ shareFragment = new ShareFragment_();
         shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, shareFragment)
@@ -270,6 +276,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ShareFragment_ shareFragment = new ShareFragment_();
         shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
         Bundle bundle = new Bundle();
         LOG.d(TAG_METHOD + "On met l'EXTRA_STREAM '"+imageUri+"' en argument au fragment de partage");
         bundle.putParcelable(Intent.EXTRA_STREAM, imageUri);
@@ -287,6 +294,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ShareFragment_ shareFragment = new ShareFragment_();
         shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
         Bundle bundle = new Bundle();
         LOG.d(TAG_METHOD + "On met l'EXTRA_UID '" + postParent.getId() + "' en argument au fragment de partage");
         Gson gson = new Gson();
@@ -305,6 +313,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         TagSuivisFragment_ tagSuivisFragment = new TagSuivisFragment_();
         tagSuivisFragment.setActivityParent(this);
+        fragementActif = tagSuivisFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, tagSuivisFragment)
@@ -315,6 +324,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ProfileFragment_ profileFragment = new ProfileFragment_();
         profileFragment.setActivityParent(this);
+        fragementActif = profileFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, profileFragment)
@@ -325,11 +335,16 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ParamsFragment_ paramsFragment = new ParamsFragment_();
         paramsFragment.setActivityParent(this);
+        fragementActif = paramsFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, paramsFragment)
                 .commit();
         resetActionBarMain(title);
+    }
+
+    public Fragment getFragementActif(){
+        return fragementActif;
     }
 
     void setUpDrawer(){

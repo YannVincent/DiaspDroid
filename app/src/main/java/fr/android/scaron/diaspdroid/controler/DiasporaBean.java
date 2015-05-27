@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.Comment;
 import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.NewPost;
@@ -332,6 +333,23 @@ public class DiasporaBean {
         List<Contact> emptyError =  new ArrayList<Contact>();
         Contact empty = Contact.createContactErreur("L'authentification sur votre POD a échouée.\nVeuillez vérifier vos paramètres ou que votre POD n'est pas en opération de maintenace !");
         emptyError.add(empty);
+        LOG.d(TAG_METHOD + "Sortie en erreur de login");
+        return emptyError;
+    }
+
+
+    public List<Comment> getComments(Integer postID){
+        String TAG_METHOD = TAG + ".getComments : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        boolean logged = seLogguer();
+        if (logged){
+            LOG.d(TAG_METHOD+ "appel de diasporaService.getComments");
+            diasporaService.setRootUrl(DiasporaConfig.POD_URL);
+            List<Comment> comments = diasporaService.getComments(postID);
+            LOG.d(TAG_METHOD+ "Sortie");
+            return comments;
+        }
+        List<Comment> emptyError =  new ArrayList<Comment>();
         LOG.d(TAG_METHOD + "Sortie en erreur de login");
         return emptyError;
     }

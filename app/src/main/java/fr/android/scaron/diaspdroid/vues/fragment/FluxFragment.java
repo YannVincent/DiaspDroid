@@ -44,6 +44,9 @@ public class FluxFragment extends Fragment implements AbsListView.OnScrollListen
     @Bean
     DiasporaBean diasporaBean;
 
+
+    CommentsFragment dialogFragment;
+
     @Bean
     PostsAdapter adapter;
 

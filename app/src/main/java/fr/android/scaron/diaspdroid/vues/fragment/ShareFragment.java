@@ -134,14 +134,13 @@ public class ShareFragment extends Fragment {
             //On démarre une conversation sans photos, sans post de référence
             postConversation(textToShare.toString());
         }
-
-
         LOG.d(TAG_METHOD + "Sortie");
     }
 
     @Background
     public void commentPost(String text){
         Post newPosted = diasporaService.comment(postRef.getId(), text);
+        postRef=null;
         showToastResult(newPosted!=null, "mise en ligne de votre commentaire");
     }
 
@@ -183,6 +182,7 @@ public class ShareFragment extends Fragment {
         }
         newPost.setPhotos(listPhotoID.toString());
         Post newPosted = diasporaService.sendPost(newPost);
+        photosUrl = new ArrayList<String>();
         LOG.d(TAG_METHOD + "newPosted is null ? " + (newPosted == null));
         showToastResult(newPosted != null, "mise en ligne de votre nouvelle conversation avec vos photos");
     }
@@ -217,6 +217,7 @@ public class ShareFragment extends Fragment {
         LOG.d(TAG_METHOD + "Entrée");
         try{
             super.onCreate(savedInstanceState);
+            postRef = null;
             LOG.d(TAG_METHOD + "this.getArguments() is null ? "+(this.getArguments()==null));
             if (this.getArguments()!=null){
                 Uri imageUri = this.getArguments().getParcelable(Intent.EXTRA_STREAM);
@@ -369,4 +370,6 @@ public class ShareFragment extends Fragment {
         cursor.close();
         return path;
     }
+
+
 }

@@ -17,6 +17,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 
 import java.util.List;
 
+import fr.android.scaron.diaspdroid.model.Comment;
 import fr.android.scaron.diaspdroid.model.Contact;
 import fr.android.scaron.diaspdroid.model.CustGsonHttpMessageConverter;
 import fr.android.scaron.diaspdroid.model.NewPost;
@@ -113,9 +114,14 @@ public interface DiasporaService extends RestClientErrorHandling {
     @Post("/posts/{postID}")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-//    @RequiresHeader("x-csrf-token")
     @Accept(MediaType.APPLICATION_JSON)
     fr.android.scaron.diaspdroid.model.Post getPost(Integer postID);
+
+    @Post("/posts/{postID}/comments")
+    @RequiresCookie({"_diaspora_session", "remember_user_token"})
+    @SetsCookie({"_diaspora_session", "remember_user_token"})
+//    @Accept(MediaType.APPLICATION_JSON)
+    List<Comment> getComments(Integer postID);
 
 
     @Post("/posts/{postID}/comments")

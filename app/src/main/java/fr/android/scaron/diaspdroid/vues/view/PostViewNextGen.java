@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import org.acra.ACRA;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,10 +42,12 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.MainActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.Comment;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.Photo;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.fragment.CommentsFragment_;
 
 /**
  * Created by Sébastien on 20/05/2015.
@@ -396,7 +401,7 @@ public class PostViewNextGen extends LinearLayout {
     @UiThread
     public void setImageLinkInViewUIT(byte[] imageLinkDatas){
         String TAG_METHOD = TAG + ".setImageLinkInViewUIT : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         if (imageLinkDatas!=null) {
             LOG.d(TAG_METHOD + "converting datas to bitmap");
             Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageLinkDatas, 0, imageLinkDatas.length);
@@ -410,10 +415,10 @@ public class PostViewNextGen extends LinearLayout {
         Map<String, String> videoData = getVideo(post);
         if (!videoData.isEmpty()){
             if (videoData.containsKey("web")) {
-                LOG.d(".setContact set web video");
+                LOG.d(".setComment set web video");
                 setWebVideo(videoData.get("web"));
             }else if (videoData.containsKey("youtube")){
-                LOG.d(".setContact set youtube video");
+                LOG.d(".setComment set youtube video");
                 scrollpostnextgen_webvideo.setVisibility(View.GONE);
             }else{
                 scrollpostnextgen_webvideo.setVisibility(View.GONE);
@@ -483,5 +488,30 @@ public class PostViewNextGen extends LinearLayout {
             throw thr;
         }
         LOG.d(".setWebVideo sortie");
+    }
+
+    @Click({R.id.scrollpostnextgen_detailIndicsCommentaire, R.id.scrollpostnextgen_detailIndicsCommentaireText})
+    public void getShowComments(){
+        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
+            //Nous avons des commentaires à afficher
+            getComments();
+        }
+    }
+
+    @Background
+    public void getComments(){
+        List<Comment> comments = diasporaService.getComments(post.getId());
+        showComments(comments);
+    }
+
+    @UiThread
+    public void showComments(List<Comment> comments){
+        if (comments!=null&&!comments.isEmpty()){
+            CommentsFragment_ commentFragment = new CommentsFragment_();
+            MainActivity mainActivity = (MainActivity)DiasporaConfig.APPLICATION_CONTEXT;
+            Fragment fragmentParent = mainActivity.getFragementActif();
+            commentFragment.setFragmentParent(fragmentParent);
+            commentFragment.show(fragmentParent.getFragmentManager(), "podSelection");
+        }
     }
 }
