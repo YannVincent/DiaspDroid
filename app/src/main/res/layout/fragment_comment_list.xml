@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/margin_small"
     android:paddingTop="@dimen/margin_small"
     android:paddingBottom="@dimen/margin_small"
-    android:background="#212121"
+    android:background="#eeeeee"
     tools:context="fr.android.scaron.diaspdroid.vues.fragment.CommentsFragment_">
 
     <ListView

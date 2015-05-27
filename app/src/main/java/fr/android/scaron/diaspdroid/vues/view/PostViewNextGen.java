@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -24,7 +25,6 @@ import android.widget.Toast;
 import org.acra.ACRA;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +41,6 @@ import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.activity.MainActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.Comment;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.Photo;
@@ -95,6 +93,12 @@ public class PostViewNextGen extends LinearLayout {
     TextView detailOpenGraphWebSite;
 
 
+    @ViewById(R.id.scrollpostnextgen_detailIndicsReshare)
+    LinearLayout detailIndicsReshare;
+    @ViewById(R.id.scrollpostnextgen_detailIndicsLike)
+    LinearLayout detailIndicsLike;
+    @ViewById(R.id.scrollpostnextgen_detailIndicsCommentaire)
+    LinearLayout detailIndicsCommentaire;
     @ViewById(R.id.scrollpostnextgen_detailIndicsReshareText)
     TextView detailIndicsReshareText;
     @ViewById(R.id.scrollpostnextgen_detailIndicsLikeText)
@@ -190,6 +194,17 @@ public class PostViewNextGen extends LinearLayout {
         };
         // On attache la fonction au bouton commenter
         detailComment.setOnClickListener(commentclickListener);
+
+        // On crée la fonction pour le bouton affichage des commentaires
+        View.OnClickListener commentsclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+//                getShowComments();
+                showComments();
+            }
+        };
+        // On attache la fonction au bouton commenter
+        detailIndicsCommentaire.setOnClickListener(commentsclickListener);
 
         LOG.d(TAG_METHOD + "Sortie");
     }
@@ -490,25 +505,43 @@ public class PostViewNextGen extends LinearLayout {
         LOG.d(".setWebVideo sortie");
     }
 
-    @Click({R.id.scrollpostnextgen_detailIndicsCommentaire, R.id.scrollpostnextgen_detailIndicsCommentaireText})
-    public void getShowComments(){
-        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
-            //Nous avons des commentaires à afficher
-            getComments();
-        }
-    }
-
-    @Background
-    public void getComments(){
-        List<Comment> comments = diasporaService.getComments(post.getId());
-        showComments(comments);
-    }
+////    @Click({R.id.scrollpostnextgen_detailIndicsCommentaire, R.id.scrollpostnextgen_detailIndicsCommentaireText})
+//    public void getShowComments(){
+//        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
+//            //Nous avons des commentaires à afficher
+//            getComments();
+//        }
+//    }
+//
+//    @Background
+//    public void getComments(){
+//        List<Comment> comments = diasporaService.getComments(post.getId());
+//        showComments(comments);
+//    }
+//
+//    @UiThread
+//    public void showComments(List<Comment> comments){
+//        if (comments!=null&&!comments.isEmpty()){
+//            CommentsFragment_ commentFragment = new CommentsFragment_();
+//            MainActivity mainActivity = (MainActivity)DiasporaConfig.APPLICATION_CONTEXT;
+//            Bundle bundle = new Bundle();
+//            bundle.putInt(Intent.EXTRA_UID, post.getId());
+//            commentFragment.setArguments(bundle);
+//            Fragment fragmentParent = mainActivity.getFragementActif();
+//            commentFragment.setFragmentParent(fragmentParent);
+//            commentFragment.show(fragmentParent.getFragmentManager(), "podSelection");
+//        }
+//    }
 
     @UiThread
-    public void showComments(List<Comment> comments){
-        if (comments!=null&&!comments.isEmpty()){
+    public void showComments(){
+        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
+            //Nous avons des commentaires à afficher
             CommentsFragment_ commentFragment = new CommentsFragment_();
             MainActivity mainActivity = (MainActivity)DiasporaConfig.APPLICATION_CONTEXT;
+            Bundle bundle = new Bundle();
+            bundle.putInt(Intent.EXTRA_UID, post.getId());
+            commentFragment.setArguments(bundle);
             Fragment fragmentParent = mainActivity.getFragementActif();
             commentFragment.setFragmentParent(fragmentParent);
             commentFragment.show(fragmentParent.getFragmentManager(), "podSelection");

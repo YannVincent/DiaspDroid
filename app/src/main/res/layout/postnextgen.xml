@@ -113,107 +113,154 @@
                   android:textSize="11sp" />
     </RelativeLayout>
 
-    <LinearLayout
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginTop="@dimen/margin_medium"
-                   android:layout_marginLeft="@dimen/margin_large"
-                   android:orientation="horizontal">
-        <ImageView android:id="@+id/scrollpostnextgen_detailIndicsReshare"
-                   android:layout_width="16sp"
-                   android:layout_height="16sp"
-                   android:layout_marginRight="@dimen/margin_small"
-                   android:contentDescription=""
-                   android:scaleType="fitCenter"
-                   android:src="@mipmap/diasp_reshare" />
-        <TextView android:id="@+id/scrollpostnextgen_detailIndicsReshareText"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/scrollpostnextgen_detailIndicsReshare"
-                  android:gravity="center_vertical"
-                  android:textColor="#141823"
-                  android:textSize="12sp"
-                  android:text="1"
-            />
-
-        <ImageView android:id="@+id/scrollpostnextgen_detailIndicsLike"
-                   android:layout_width="16sp"
-                   android:layout_height="16sp"
-                   android:scaleType="fitCenter"
-                   android:contentDescription=""
-                   android:layout_marginLeft="@dimen/margin_large"
-                   android:layout_marginRight="@dimen/margin_small"
-                   android:src="@mipmap/diasp_like" />
-        <TextView android:id="@+id/scrollpostnextgen_detailIndicsLikeText"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/detailIndicsLike"
-                  android:textColor="#141823"
-                  android:textSize="12sp"
-                  android:text="2"
-            />
-        <ImageView android:id="@+id/scrollpostnextgen_detailIndicsCommentaire"
-                   android:layout_width="16sp"
-                   android:layout_height="16sp"
-                   android:layout_marginRight="@dimen/margin_small"
-                   android:layout_marginLeft="@dimen/margin_large"
-                   android:contentDescription=""
-                   android:scaleType="fitCenter"
-                   android:src="@mipmap/diasp_comment" />
-        <TextView android:id="@+id/scrollpostnextgen_detailIndicsCommentaireText"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/scrollpostnextgen_detailIndicsCommentaire"
-                  android:textColor="#141823"
-                  android:textSize="12sp"
-                  android:text="3"
-            />
-    </LinearLayout>
     <!--<LinearLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="@dimen/margin_medium"-->
-        <!--style="?android:attr/buttonBarStyle"-->
-        <!--android:orientation="horizontal">-->
-        <!--&lt;!&ndash;<Button android:id="@+id/scrollpostnextgen_like"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:text="Aimer"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:padding="4dp"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_margin="4dp"&ndash;&gt;-->
-                <!--&lt;!&ndash;style="@style/LittleButtonText"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:background="@drawable/button_default_bg"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_weight="1"&ndash;&gt;-->
-            <!--&lt;!&ndash;/>&ndash;&gt;-->
+                   <!--android:layout_width="wrap_content"-->
+                   <!--android:layout_height="wrap_content"-->
+                   <!--android:layout_marginTop="@dimen/margin_medium"-->
+                   <!--android:layout_marginLeft="@dimen/margin_large"-->
+                   <!--android:orientation="horizontal">-->
 
-        <!--<Button android:id="@+id/scrollpostnextgen_like"-->
-            <!--android:text="Aimer"-->
-            <!--android:textSize="11dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:drawableLeft="@mipmap/diasp_like_padded"-->
-            <!--style="?android:attr/borderlessButtonStyle"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="34dp" />-->
-        <!--<Button android:id="@+id/scrollpostnextgen_reshare"-->
-                <!--android:text="Repartager"-->
-            <!--android:textSize="10dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:drawableLeft="@mipmap/diasp_reshare_padded"-->
-            <!--style="?android:attr/borderlessButtonStyle"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="34dp" />-->
-        <!--<Button android:id="@+id/scrollpostnextgen_comment"-->
-                <!--android:text="Commenter"-->
-                <!--android:textSize="10dp"-->
-                <!--android:layout_weight="1"-->
-            <!--android:drawableLeft="@mipmap/diasp_comment_padded"-->
-            <!--style="?android:attr/borderlessButtonStyle"-->
-            <!--android:nestedScrollingEnabled="false"-->
-            <!--android:focusable="false"-->
-            <!--android:elegantTextHeight="false"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="34dp" />-->
+
+        <!--<ImageView android:id="@+id/scrollpostnextgen_detailIndicsReshare"-->
+                   <!--android:layout_width="24sp"-->
+                   <!--android:layout_height="24sp"-->
+                   <!--android:layout_marginRight="@dimen/margin_small"-->
+                   <!--android:contentDescription=""-->
+                   <!--android:scaleType="fitCenter"-->
+                   <!--android:src="@mipmap/diasp_reshare" />-->
+        <!--<TextView android:id="@+id/scrollpostnextgen_detailIndicsReshareText"-->
+                  <!--android:layout_width="fill_parent"-->
+                  <!--android:layout_height="wrap_content"-->
+                  <!--android:layout_toRightOf="@id/scrollpostnextgen_detailIndicsReshare"-->
+                  <!--android:gravity="center_vertical"-->
+                  <!--android:textColor="#c3c3c3"-->
+                  <!--android:textSize="14sp"-->
+                  <!--android:text="1" />-->
+
+        <!--<ImageView android:id="@+id/scrollpostnextgen_detailIndicsLike"-->
+                   <!--android:layout_width="24sp"-->
+                   <!--android:layout_height="24sp"-->
+                   <!--android:scaleType="fitCenter"-->
+                   <!--android:contentDescription=""-->
+                   <!--android:layout_marginLeft="@dimen/margin_large"-->
+                   <!--android:layout_marginRight="@dimen/margin_small"-->
+                   <!--android:src="@mipmap/diasp_like" />-->
+        <!--<TextView android:id="@+id/scrollpostnextgen_detailIndicsLikeText"-->
+                  <!--android:layout_width="fill_parent"-->
+                  <!--android:layout_height="wrap_content"-->
+                  <!--android:layout_toRightOf="@id/detailIndicsLike"-->
+                  <!--android:textColor="#c3c3c3"-->
+            <!--android:textSize="14sp"-->
+                  <!--android:text="2"-->
+            <!--/>-->
+        <!--<ImageView android:id="@+id/scrollpostnextgen_detailIndicsCommentaire"-->
+                   <!--android:layout_width="24sp"-->
+                   <!--android:layout_height="24sp"-->
+                   <!--android:layout_marginRight="@dimen/margin_small"-->
+                   <!--android:layout_marginLeft="@dimen/margin_large"-->
+                   <!--android:contentDescription=""-->
+                   <!--android:scaleType="fitCenter"-->
+                   <!--android:src="@mipmap/diasp_comment" />-->
+        <!--<TextView android:id="@+id/scrollpostnextgen_detailIndicsCommentaireText"-->
+                  <!--android:layout_width="fill_parent"-->
+                  <!--android:layout_height="wrap_content"-->
+                  <!--android:layout_toRightOf="@id/scrollpostnextgen_detailIndicsCommentaire"-->
+                  <!--android:textColor="#c3c3c3"-->
+            <!--android:textSize="14sp"-->
+                  <!--android:text="3"-->
+            <!--/>-->
     <!--</LinearLayout>-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dip"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailIndicsReshare"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:orientation="horizontal"
+            android:layout_marginLeft="15dp"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="5dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_like_padded" />
+
+            <TextView android:id="@+id/scrollpostnextgen_detailIndicsReshareText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#c3c3c3"
+                android:textStyle="bold"
+                android:text="1" />
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailIndicsLike"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:orientation="horizontal"
+            android:layout_marginLeft="15dp"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="5dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_reshare_padded" />
+
+            <TextView android:id="@+id/scrollpostnextgen_detailIndicsLikeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#c3c3c3"
+                android:textStyle="bold"
+                android:text="2" />
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/scrollpostnextgen_detailIndicsCommentaire"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="30dip"
+            android:orientation="horizontal"
+            android:layout_marginLeft="15dp"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="22sp"
+                android:layout_height="22sp"
+                android:layout_marginRight="5dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/diasp_comment_padded" />
+
+            <TextView android:id="@+id/scrollpostnextgen_detailIndicsCommentaireText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="#c3c3c3"
+                android:textStyle="bold"
+                android:text="3" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 </LinearLayout>
 
     <LinearLayout

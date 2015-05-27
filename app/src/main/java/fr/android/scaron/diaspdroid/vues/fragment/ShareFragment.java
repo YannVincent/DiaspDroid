@@ -89,7 +89,7 @@ public class ShareFragment extends Fragment {
     ActionBarActivity activity;
 
 
-    Post postRef;
+    Post postRef=null;
 
     public void setActivityParent(ActionBarActivity activity){
         this.activity = activity;
@@ -258,8 +258,8 @@ public class ShareFragment extends Fragment {
     public void bind(Post postRef){
         String TAG_METHOD = TAG + ".getBitmap(postRef) >";
         LOG.d(TAG_METHOD + "Entrée");
-        photosUrl = new ArrayList<String>();
-        this.postRef = postRef;
+        postRef=null;
+        photosUrl=new ArrayList<String>();
         sharenextgen_post.setVisibility(View.VISIBLE);
         addPostAvatar();
         sharenextgen_post_user.setText(postRef.getAuthor().getName());
@@ -275,6 +275,7 @@ public class ShareFragment extends Fragment {
 
     @UiThread
     public void bind(String urlLocalImage){
+        postRef=null;
         sharenextgen_post.setVisibility(View.GONE);
         sharenextgen_gridphotos.setVisibility(View.VISIBLE);
         if (photosUrl.contains(urlLocalImage)){
@@ -293,6 +294,8 @@ public class ShareFragment extends Fragment {
 
     @UiThread
     public void bind(){
+        postRef=null;
+        photosUrl=new ArrayList<String>();
         sharenextgen_post.setVisibility(View.GONE);
         sharenextgen_gridphotos.setVisibility(View.VISIBLE);
         photosUrl = new ArrayList<String>();

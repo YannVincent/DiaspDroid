@@ -117,14 +117,14 @@ public interface DiasporaService extends RestClientErrorHandling {
     @Accept(MediaType.APPLICATION_JSON)
     fr.android.scaron.diaspdroid.model.Post getPost(Integer postID);
 
-    @Post("/posts/{postID}/comments")
+    @Get("/posts/{postID}/comments")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
-//    @Accept(MediaType.APPLICATION_JSON)
+    @Accept(MediaType.APPLICATION_JSON)
     List<Comment> getComments(Integer postID);
 
 
-    @Post("/posts/{postID}/comments")
+    @Post("/posts/{postID}/comment")
     @RequiresCookie({"_diaspora_session", "remember_user_token"})
     @SetsCookie({"_diaspora_session", "remember_user_token"})
     @RequiresHeader("x-csrf-token")
