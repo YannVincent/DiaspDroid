@@ -287,6 +287,8 @@ public class DiasporaBean {
             if (uploadResult!=null){
                 LOG.d(TAG_METHOD+ "uploadResult is success ? "+uploadResult.getSuccess());
                 LOG.d(TAG_METHOD+ "uploadResult is error ? "+uploadResult.getError());
+
+                LOG.d(TAG_METHOD+ "uploadResult url image ? "+uploadResult.getData().getPhoto().getUnprocessed_image());
             }
             LOG.d(TAG_METHOD+ "Sortie");
             return uploadResult;
@@ -343,7 +345,7 @@ public class DiasporaBean {
         LOG.d(TAG_METHOD + "Entrée");
         boolean logged = seLogguer();
         if (logged){
-            LOG.d(TAG_METHOD+ "appel de diasporaService.getComments");
+            LOG.d(TAG_METHOD + "appel de diasporaService.getComments");
             diasporaService.setRootUrl(DiasporaConfig.POD_URL);
             List<Comment> comments = diasporaService.getComments(postID);
             LOG.d(TAG_METHOD+ "Sortie");

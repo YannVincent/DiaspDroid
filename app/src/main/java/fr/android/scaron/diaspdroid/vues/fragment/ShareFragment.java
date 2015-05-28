@@ -168,19 +168,53 @@ public class ShareFragment extends Fragment {
         for (String photoUrl : photosUrl) {
             //On partage des photos, attention la dernière photo est le FAKE qui permet d'ajouter de nouvelles photos.
             if (!FAKE_ADDPHOTO.equals(photoUrl)) {
+                boolean lastUploadSucceed = false;
                 UploadResult uploadFileResult = diasporaService.uploadFile(photoUrl);
-                if (!first) {
-                    listPhotoID.append("; ");
+
+
+
+                if (uploadFileResult.getData()!=null && uploadFileResult.getData().getPhoto()!=null) {
+                    String urlSharedImg = null;
+                    if (uploadFileResult.getData().getPhoto().getUnprocessed_image() != null) {
+                        urlSharedImg = uploadFileResult.getData().getPhoto().getUnprocessed_image().getUrl();
+                    } else if (uploadFileResult.getData().getPhoto().getProcessed_image() != null) {
+                        urlSharedImg = uploadFileResult.getData().getPhoto().getProcessed_image().getUrl();
+                    }
+                    if (urlSharedImg != null) {
+                        String uploadedFilePath = urlSharedImg;
+                        String uploadedFileGuid = uploadFileResult.getData().getPhoto().getGuid();
+                        Integer uploadedFileId = uploadFileResult.getData().getPhoto().getId();
+
+                        if (!first) {
+                            listPhotoID.append("; ");
+                        }
+                        first = false;
+                        lastUploadSucceed = true;
+                        if (lastUploadSucceed) {
+                            listPhotoID.append(uploadFileResult.getData().getPhoto().getId());
+                        }
+                    }
                 }
-                first = false;
-                boolean lastUploadSucceed = (uploadFileResult!=null && uploadFileResult.getData()!=null && uploadFileResult.getData().getPhoto()!=null && uploadFileResult.getData().getPhoto().getId()!=null);
+
                 showToastInfo(lastUploadSucceed, "partage d'une photo.");
-                if (lastUploadSucceed) {
-                    listPhotoID.append(uploadFileResult.getData().getPhoto().getId());
-                }
+                
+                
+                
+                
+                
+//                if (!first) {
+//                    listPhotoID.append("; ");
+//                }
+//                first = false;
+//                boolean lastUploadSucceed = (uploadFileResult!=null && uploadFileResult.getData()!=null && uploadFileResult.getData().getPhoto()!=null && uploadFileResult.getData().getPhoto().getId()!=null);
+//                showToastInfo(lastUploadSucceed, "partage d'une photo.");
+//                if (lastUploadSucceed) {
+//                    listPhotoID.append(uploadFileResult.getData().getPhoto().getId());
+//                }
             }
         }
         newPost.setPhotos(listPhotoID.toString());
+        LOG.d(TAG_METHOD+ "Photos ID to share : "+listPhotoID.toString());
         Post newPosted = diasporaService.sendPost(newPost);
         photosUrl = new ArrayList<String>();
         LOG.d(TAG_METHOD + "newPosted is null ? " + (newPosted == null));
@@ -218,6 +252,7 @@ public class ShareFragment extends Fragment {
         try{
             super.onCreate(savedInstanceState);
             postRef = null;
+            photosUrl=new ArrayList<String>();
             LOG.d(TAG_METHOD + "this.getArguments() is null ? "+(this.getArguments()==null));
             if (this.getArguments()!=null){
                 Uri imageUri = this.getArguments().getParcelable(Intent.EXTRA_STREAM);
@@ -258,14 +293,11 @@ public class ShareFragment extends Fragment {
     public void bind(Post postRef){
         String TAG_METHOD = TAG + ".getBitmap(postRef) >";
         LOG.d(TAG_METHOD + "Entrée");
-        postRef=null;
-        photosUrl=new ArrayList<String>();
         sharenextgen_post.setVisibility(View.VISIBLE);
         addPostAvatar();
         sharenextgen_post_user.setText(postRef.getAuthor().getName());
         sharenextgen_post_datetime.setText(postRef.getCreated_at_str());
         sharenextgen_post_text.setText(postRef.getText());
-        photosUrl = new ArrayList<String>();
         adapter.setPhotosUrls(photosUrl);
         adapter.notifyDataSetChanged();
         sharenextgen_gridphotos.setVisibility(View.GONE);
@@ -275,7 +307,6 @@ public class ShareFragment extends Fragment {
 
     @UiThread
     public void bind(String urlLocalImage){
-        postRef=null;
         sharenextgen_post.setVisibility(View.GONE);
         sharenextgen_gridphotos.setVisibility(View.VISIBLE);
         if (photosUrl.contains(urlLocalImage)){
@@ -294,11 +325,8 @@ public class ShareFragment extends Fragment {
 
     @UiThread
     public void bind(){
-        postRef=null;
-        photosUrl=new ArrayList<String>();
         sharenextgen_post.setVisibility(View.GONE);
         sharenextgen_gridphotos.setVisibility(View.VISIBLE);
-        photosUrl = new ArrayList<String>();
         photosUrl.add(FAKE_ADDPHOTO);
         adapter.setPhotosUrls(photosUrl);
         adapter.notifyDataSetChanged();
