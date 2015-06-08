@@ -26,18 +26,10 @@
         <activity
             android:name=".activity.YoutubeActivity"
             android:label="@string/app_name" >
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
-        <!--<activity-->
-            <!--android:name=".activity.ShareActivity_"-->
-            <!--android:label="@string/action_share" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.SEND" />-->
-                <!--<data android:mimeType="image/*" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
     </application>
 
 </manifest>
