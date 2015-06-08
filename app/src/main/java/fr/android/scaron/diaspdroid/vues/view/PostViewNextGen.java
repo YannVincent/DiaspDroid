@@ -1,8 +1,12 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -16,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.androidannotations.annotations.Background;
@@ -33,11 +38,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fr.android.scaron.diaspdroid.R;
+import fr.android.scaron.diaspdroid.activity.MainActivity;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
+import fr.android.scaron.diaspdroid.model.DiasporaConfig;
 import fr.android.scaron.diaspdroid.model.OpenGraphCache;
 import fr.android.scaron.diaspdroid.model.Photo;
 import fr.android.scaron.diaspdroid.model.Post;
+import fr.android.scaron.diaspdroid.vues.fragment.CommentsFragment_;
 
 /**
  * Created by Sébastien on 20/05/2015.
@@ -49,6 +57,8 @@ public class PostViewNextGen extends LinearLayout {
     private static String TAG = PostViewNextGen.class.getSimpleName();
     final String mimeType = "text/html";
     final String encoding = "utf-8";
+
+    long TIME_TEMPO = 3000;
 
     @Bean
     DiasporaBean diasporaService;
@@ -83,12 +93,26 @@ public class PostViewNextGen extends LinearLayout {
     TextView detailOpenGraphWebSite;
 
 
+    @ViewById(R.id.scrollpostnextgen_detailIndicsReshare)
+    LinearLayout detailIndicsReshare;
+    @ViewById(R.id.scrollpostnextgen_detailIndicsLike)
+    LinearLayout detailIndicsLike;
+    @ViewById(R.id.scrollpostnextgen_detailIndicsCommentaire)
+    LinearLayout detailIndicsCommentaire;
     @ViewById(R.id.scrollpostnextgen_detailIndicsReshareText)
     TextView detailIndicsReshareText;
     @ViewById(R.id.scrollpostnextgen_detailIndicsLikeText)
     TextView detailIndicsLikeText;
     @ViewById(R.id.scrollpostnextgen_detailIndicsCommentaireText)
     TextView detailIndicsCommentaireText;
+
+
+    @ViewById(R.id.scrollpostnextgen_detailLike)
+    LinearLayout detailLike;
+    @ViewById(R.id.scrollpostnextgen_detailRepublish)
+    LinearLayout detailRepublish;
+    @ViewById(R.id.scrollpostnextgen_detailComment)
+    LinearLayout detailComment;
 
 
     Post post;
@@ -99,7 +123,7 @@ public class PostViewNextGen extends LinearLayout {
         this.context = context;
     }
 
-    public void bind(Post post){
+    public void bind(final Post post){
         String TAG_METHOD = TAG + ".getBitmap >";
         LOG.d(TAG_METHOD + "Entrée");
         this.post = post;
@@ -119,8 +143,136 @@ public class PostViewNextGen extends LinearLayout {
         detailIndicsReshareText.setText(""+post.getInteractions().getReshares_count());
         detailIndicsLikeText.setText(""+post.getInteractions().getLikes_count());
         detailIndicsCommentaireText.setText(""+post.getInteractions().getComments_count());
+
+        //Add buttons fonctions
+        View.OnClickListener urlclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post.asWebSiteUrl && post.webSiteUrl != null && !post.webSiteUrl.isEmpty()) {
+                    // Launching Browser Screen
+                    Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
+                    myWebLink.setData(Uri.parse(post.webSiteUrl));
+                    myWebLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(myWebLink);
+                }
+            }
+        };
+        detailOpenGraph.setOnClickListener(urlclickListener);
+
+        // On crée la fonction pour le bouton like
+        View.OnClickListener likeclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post != null && post.getGuid() != null) {
+                    aimer(post.getId());
+                }
+            }
+        };
+        // On attache la fonction au bouton like
+        detailLike.setOnClickListener(likeclickListener);
+
+        // On crée la fonction pour le bouton reshare
+        View.OnClickListener reshareclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post != null && post.getGuid() != null) {
+                    repartager(post.getGuid());
+                }
+            }
+        };
+        // On attache la fonction au bouton reshare
+        detailRepublish.setOnClickListener(reshareclickListener);
+
+        // On crée la fonction pour le bouton commenter
+        View.OnClickListener commentclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (post != null && post.getGuid() != null) {
+                    commenter(post);
+                }
+            }
+        };
+        // On attache la fonction au bouton commenter
+        detailComment.setOnClickListener(commentclickListener);
+
+        // On crée la fonction pour le bouton affichage des commentaires
+        View.OnClickListener commentsclickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+//                getShowComments();
+                showComments();
+            }
+        };
+        // On attache la fonction au bouton commenter
+        detailIndicsCommentaire.setOnClickListener(commentsclickListener);
+
         LOG.d(TAG_METHOD + "Sortie");
     }
+
+    public void aimer(Integer postID){
+        String TAG_METHOD = TAG + ".aimer : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        aimerTask(postID);
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    @Background
+    public void aimerTask(Integer postID){
+        String TAG_METHOD = TAG + ".aimerTask : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        Post result = diasporaService.like(postID);
+        showToastResult(result != null, "prise en compte de votre j'aime");
+        try {
+            Thread.sleep(TIME_TEMPO);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Post postUpdated = diasporaService.getPost(postID);
+        post = postUpdated;
+
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+
+    @UiThread
+    public void showToastResult(boolean resultOK, String message){
+        if (resultOK){
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context, "Erreur de "+message,Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void repartager(String rootGuid){
+        String TAG_METHOD = TAG + ".repartager : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        repartagerTask(rootGuid);
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+    @Background
+    public void repartagerTask(String rootGuid){
+        String TAG_METHOD = TAG + ".repartagerTask : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        Post result = diasporaService.reshare(rootGuid);
+        showToastResult(result != null, "prise en compte de votre repartage");
+
+        try {
+            Thread.sleep(TIME_TEMPO);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Post postUpdated = diasporaService.getPost(post.getId());
+        post = postUpdated;
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
+    public void commenter(Post postParent){
+        String TAG_METHOD = TAG + ".commenter : ";
+        LOG.d(TAG_METHOD + "Entrée");
+        ((MainActivity) DiasporaConfig.APPLICATION_CONTEXT).listItemClicked("Partagez", postParent);
+        LOG.d(TAG_METHOD + "Sortie");
+    }
+
     @Background
     public void addAvatar(){
         String TAG_METHOD = TAG + ".addAvatar > ";
@@ -264,7 +416,7 @@ public class PostViewNextGen extends LinearLayout {
     @UiThread
     public void setImageLinkInViewUIT(byte[] imageLinkDatas){
         String TAG_METHOD = TAG + ".setImageLinkInViewUIT : ";
-        LOG.d(TAG_METHOD+ "Entrée");
+        LOG.d(TAG_METHOD + "Entrée");
         if (imageLinkDatas!=null) {
             LOG.d(TAG_METHOD + "converting datas to bitmap");
             Bitmap imageAvatar = BitmapFactory.decodeByteArray(imageLinkDatas, 0, imageLinkDatas.length);
@@ -278,10 +430,10 @@ public class PostViewNextGen extends LinearLayout {
         Map<String, String> videoData = getVideo(post);
         if (!videoData.isEmpty()){
             if (videoData.containsKey("web")) {
-                LOG.d(".setContact set web video");
+                LOG.d(".setComment set web video");
                 setWebVideo(videoData.get("web"));
             }else if (videoData.containsKey("youtube")){
-                LOG.d(".setContact set youtube video");
+                LOG.d(".setComment set youtube video");
                 scrollpostnextgen_webvideo.setVisibility(View.GONE);
             }else{
                 scrollpostnextgen_webvideo.setVisibility(View.GONE);
@@ -351,5 +503,48 @@ public class PostViewNextGen extends LinearLayout {
             throw thr;
         }
         LOG.d(".setWebVideo sortie");
+    }
+
+////    @Click({R.id.scrollpostnextgen_detailIndicsCommentaire, R.id.scrollpostnextgen_detailIndicsCommentaireText})
+//    public void getShowComments(){
+//        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
+//            //Nous avons des commentaires à afficher
+//            getComments();
+//        }
+//    }
+//
+//    @Background
+//    public void getComments(){
+//        List<Comment> comments = diasporaService.getComments(post.getId());
+//        showComments(comments);
+//    }
+//
+//    @UiThread
+//    public void showComments(List<Comment> comments){
+//        if (comments!=null&&!comments.isEmpty()){
+//            CommentsFragment_ commentFragment = new CommentsFragment_();
+//            MainActivity mainActivity = (MainActivity)DiasporaConfig.APPLICATION_CONTEXT;
+//            Bundle bundle = new Bundle();
+//            bundle.putInt(Intent.EXTRA_UID, post.getId());
+//            commentFragment.setArguments(bundle);
+//            Fragment fragmentParent = mainActivity.getFragementActif();
+//            commentFragment.setFragmentParent(fragmentParent);
+//            commentFragment.show(fragmentParent.getFragmentManager(), "podSelection");
+//        }
+//    }
+
+    @UiThread
+    public void showComments(){
+        if (!"0".equals(detailIndicsCommentaireText.getText().toString())){
+            //Nous avons des commentaires à afficher
+            CommentsFragment_ commentFragment = new CommentsFragment_();
+            MainActivity mainActivity = (MainActivity)DiasporaConfig.APPLICATION_CONTEXT;
+            Bundle bundle = new Bundle();
+            bundle.putInt(Intent.EXTRA_UID, post.getId());
+            commentFragment.setArguments(bundle);
+            Fragment fragmentParent = mainActivity.getFragementActif();
+            commentFragment.setFragmentParent(fragmentParent);
+            commentFragment.show(fragmentParent.getFragmentManager(), "podSelection");
+        }
     }
 }

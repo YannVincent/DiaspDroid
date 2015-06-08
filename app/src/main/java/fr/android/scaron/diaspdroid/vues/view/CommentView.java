@@ -1,11 +1,8 @@
 package fr.android.scaron.diaspdroid.vues.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,31 +20,24 @@ import org.slf4j.LoggerFactory;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.DiasporaBean;
 import fr.android.scaron.diaspdroid.controler.LogControler;
-import fr.android.scaron.diaspdroid.model.Contact;
-import fr.android.scaron.diaspdroid.model.DiasporaConfig;
-//import fr.android.scaron.diaspdroid.vues.fragment.YoutubePlayerFragment;
+import fr.android.scaron.diaspdroid.model.Comment;
 
 /**
  * Created by Sébastien on 28/03/2015.
  */
 @EViewGroup(R.layout.fragment_contact)
-public class ContactView extends LinearLayout{
+public class CommentView extends LinearLayout{
 
 
-    private static Logger LOGGEUR = LoggerFactory.getLogger(ContactView.class);
+    private static Logger LOGGEUR = LoggerFactory.getLogger(CommentView.class);
     private static LogControler LOG = LogControler.getLoggeur(LOGGEUR);
-    private static String TAG = "ContactView";
+    private static String TAG = CommentView.class.getSimpleName();
 
     final String mimeType = "text/html";
     final String encoding = "utf-8";
 
     @Bean
     DiasporaBean diasporaService;
-
-    @ViewById(R.id.detailErreurContact)
-    LinearLayout detailErreurContact;
-    @ViewById(R.id.detailErreurContactText)
-    TextView detailErreurContactText;
 
     @ViewById(R.id.detailContact)
     RelativeLayout detailContact;
@@ -60,45 +50,20 @@ public class ContactView extends LinearLayout{
     @ViewById(R.id.detailContactWebSite)
     TextView detailContactWebSite;
 
-    public Integer contactId;
+    public Integer commentID;
 
-    Contact contact;
+    Comment comment;
     Context context;
     byte[] imageLinkDatas = null;
 
-    public ContactView(Context context) {
+    public CommentView(Context context) {
         super(context);
         this.context = context;
     }
 
-    public void bind(final Contact contact) {
-        this.contact = contact;
-        this.contactId = contact.getId();
-        if (this.contactId == 0){
-            // *** Detail de post en erreur
-            // Remplissage de la partie texte
-            detailErreurContactText.setText(contact.getName());
-            detailContact.setVisibility(GONE);
-            detailErreurContact.setVisibility(VISIBLE);
-            return;
-        }
-        LOG.d(".getView videos from post " + contact.getId() + "( instance id : " + this + ")");
-
-
-        OnClickListener urlclickListener = new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (contact.getUrl()!=null && !contact.getUrl().isEmpty()){
-                    // Launching Browser Screen
-                    Intent myWebLink = new Intent(Intent.ACTION_VIEW);
-                    myWebLink.setData(Uri.parse(DiasporaConfig.POD_URL+contact.getUrl()));
-                    myWebLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(myWebLink);
-                }
-            }
-        };
-        detailContact.setOnClickListener(urlclickListener);
-        setContact(contact);
+    public void bind(final Comment comment) {
+        this.comment = comment;
+        setComment(comment);
 
     }
 
@@ -126,14 +91,14 @@ public class ContactView extends LinearLayout{
     }
 
 
-    public void setContact(Contact contact) {
-        LOG.d(".setComment entree with post : "+contact);
+    public void setComment(Comment comment) {
+        LOG.d(".setComment entree with post : "+ comment);
         try {
             LOG.d(".setComment getSettings set params");
-            detailContactTitle.setText(contact.getName());
-            detailContactTxt.setText(contact.getHandle());
-            detailContactWebSite.setText(contact.getUrl());
-            setImageLinkInView(contact.getAvatar());
+            detailContactTitle.setText(comment.getAuthor().getName());
+            detailContactTxt.setText(comment.getText());
+            detailContactWebSite.setText(comment.getCreated_at().toString());
+            setImageLinkInView(comment.getAuthor().getAvatar().getLarge());
             LOG.d(".setComment sortie en succès");
         }catch(Throwable thr) {
             LOG.e(".setComment sortie en Erreur ("+thr.toString()+")", thr);

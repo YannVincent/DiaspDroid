@@ -122,7 +122,8 @@
                 android:src="@drawable/no_thumbnail"
                 android:layout_below="@id/webvideo"
                 android:id="@+id/ytb_thumbnail"
-                android:paddingTop="6dp"/>
+                android:paddingTop="6dp"
+                android:visibility="gone" />
             <ImageView
                 android:id="@+id/imgplay"
                 android:layout_width="100sp"

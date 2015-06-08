@@ -23,6 +23,7 @@
             android:padding="10dp"
             android:hint="NOM D'UTILISATEUR"
             android:textColorHint="#bbbbbb"
+            android:textColor="#141823"
             android:drawableLeft="@drawable/user"/>
         <EditText
             android:id="@+id/podpassword"
@@ -33,6 +34,7 @@
             android:padding="10dp"
             android:hint="MOT DE PASSE"
             android:textColorHint="#bbbbbb"
+            android:textColor="#141823"
             android:inputType="textPassword"
             android:drawableLeft="@drawable/password"/>
         <LinearLayout android:id="@+id/podSelectedLay"

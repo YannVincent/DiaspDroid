@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -35,6 +37,7 @@ import java.util.List;
 import fr.android.scaron.diaspdroid.R;
 import fr.android.scaron.diaspdroid.controler.LogControler;
 import fr.android.scaron.diaspdroid.model.DiasporaConfig;
+import fr.android.scaron.diaspdroid.model.Post;
 import fr.android.scaron.diaspdroid.vues.fragment.ContactsFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxActivityFragment_;
 import fr.android.scaron.diaspdroid.vues.fragment.FluxFragment_;
@@ -65,6 +68,8 @@ public class MainActivity extends ActionBarActivity {
     @Extra
     Uri imageUri;
 
+    Post postParent;
+
     @ViewById(R.id.diaspora_main)
     DrawerLayout diasporaMain;
 
@@ -76,6 +81,8 @@ public class MainActivity extends ActionBarActivity {
 
     @ViewById(R.id.progress_loading)
     RelativeLayout progressLoading;
+
+    Fragment fragementActif;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -159,6 +166,14 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void listItemClicked(String itemClicked, Post postParent){
+        this.postParent = postParent;
+        listItemClicked(itemClicked);
+    }
+    public void listItemClicked(String itemClicked, Uri uri){
+        imageUri = uri;
+        listItemClicked(itemClicked);
+    }
 
     @ItemClick(R.id.diaspora_main_drawer)
     public void listItemClicked(String itemClicked) {
@@ -185,7 +200,11 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case 3 : //Partager
                 if (imageUri==null) {
-                    setShareFragment(itemClicked, itemPosition);
+                    if (postParent==null) {
+                        setShareFragment(itemClicked, itemPosition);
+                    }else {
+                        setShareFragment(itemClicked, itemPosition, postParent);
+                    }
                 }else{
                     setShareFragment(itemClicked, itemPosition, imageUri);
                 }
@@ -210,6 +229,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         FluxFragment_ fluxFragment = new FluxFragment_();
         fluxFragment.setActivityParent(this);
+        fragementActif = fluxFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, fluxFragment)
@@ -221,6 +241,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         FluxActivityFragment_ fluxActivityFragment = new FluxActivityFragment_();
         fluxActivityFragment.setActivityParent(this);
+        fragementActif = fluxActivityFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, fluxActivityFragment)
@@ -231,6 +252,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ContactsFragment_ contactsFragment = new ContactsFragment_();
         contactsFragment.setActivityParent(this);
+        fragementActif = contactsFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, contactsFragment)
@@ -241,6 +263,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ShareFragment_ shareFragment = new ShareFragment_();
         shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, shareFragment)
@@ -253,6 +276,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ShareFragment_ shareFragment = new ShareFragment_();
         shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
         Bundle bundle = new Bundle();
         LOG.d(TAG_METHOD + "On met l'EXTRA_STREAM '"+imageUri+"' en argument au fragment de partage");
         bundle.putParcelable(Intent.EXTRA_STREAM, imageUri);
@@ -264,10 +288,32 @@ public class MainActivity extends ActionBarActivity {
         resetActionBarMain(title);
         LOG.d(TAG + TAG_METHOD + "Sortie");
     }
+    void setShareFragment(String title, int position, Post postParent){
+        String TAG_METHOD = TAG + ".setShareFragment : ";
+        LOG.d(TAG + TAG_METHOD + "Entrée");
+        // update the main content by replacing fragments
+        ShareFragment_ shareFragment = new ShareFragment_();
+        shareFragment.setActivityParent(this);
+        fragementActif = shareFragment;
+        Bundle bundle = new Bundle();
+        LOG.d(TAG_METHOD + "On met l'EXTRA_UID '" + postParent.getId() + "' en argument au fragment de partage");
+        Gson gson = new Gson();
+        String postJson = gson.toJson(postParent);
+        bundle.putString(Intent.EXTRA_TEXT, postJson);
+        shareFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.diaspora_main_content, shareFragment)
+                .commit();
+        resetActionBarMain(title);
+        LOG.d(TAG + TAG_METHOD + "Sortie");
+    }
+
     void setTagSuivisFragment(String title, int position){
         // update the main content by replacing fragments
         TagSuivisFragment_ tagSuivisFragment = new TagSuivisFragment_();
         tagSuivisFragment.setActivityParent(this);
+        fragementActif = tagSuivisFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, tagSuivisFragment)
@@ -278,6 +324,7 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ProfileFragment_ profileFragment = new ProfileFragment_();
         profileFragment.setActivityParent(this);
+        fragementActif = profileFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, profileFragment)
@@ -288,11 +335,16 @@ public class MainActivity extends ActionBarActivity {
         // update the main content by replacing fragments
         ParamsFragment_ paramsFragment = new ParamsFragment_();
         paramsFragment.setActivityParent(this);
+        fragementActif = paramsFragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.diaspora_main_content, paramsFragment)
                 .commit();
         resetActionBarMain(title);
+    }
+
+    public Fragment getFragementActif(){
+        return fragementActif;
     }
 
     void setUpDrawer(){

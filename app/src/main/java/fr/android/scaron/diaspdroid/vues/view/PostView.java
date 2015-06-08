@@ -471,9 +471,9 @@ public void hideLastImageInView(int sizePhotos){
 
 
     public void setPost(Post post) {
-        LOG.d(".setContact entree with post : "+post);
+        LOG.d(".setComment entree with post : "+post);
         try {
-            LOG.d(".setContact getSettings set params");
+            LOG.d(".setComment getSettings set params");
             // *** Entete
             // Remplissage de la partie auteur
             People author = post.getAuthor();
@@ -516,13 +516,13 @@ public void hideLastImageInView(int sizePhotos){
             Map<String, String> videoData = getVideo(post);
             if (!videoData.isEmpty()){
                 if (videoData.containsKey("web")) {
-                    LOG.d(".setContact set web video");
+                    LOG.d(".setComment set web video");
                     setWebVideo(videoData.get("web"));
                     thumbnail.setVisibility(View.GONE);
                     imgplay.setVisibility(View.GONE);
 //                    sbHtml.append(videoData.get("web"));
                 }else if (videoData.containsKey("youtube")){
-                    LOG.d(".setContact set youtube video");
+                    LOG.d(".setComment set youtube video");
                     webvideo.setVisibility(View.GONE);
                 }else{
                     thumbnail.setVisibility(View.GONE);
@@ -560,9 +560,9 @@ public void hideLastImageInView(int sizePhotos){
 
 
 //            texte.loadDataWithBaseURL("file:///android_asset/", sbHtml.toString(), mimeType, encoding, "");
-            LOG.d(".setContact sortie en succès");
+            LOG.d(".setComment sortie en succès");
         }catch(Throwable thr) {
-            LOG.e(".setContact sortie en Erreur ("+thr.toString()+")", thr);
+            LOG.e(".setComment sortie en Erreur ("+thr.toString()+")", thr);
             ACRA.getErrorReporter().handleException(thr);
             throw thr;
         }
