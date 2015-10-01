@@ -5,7 +5,7 @@ def AAVersion = '3.2'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    buildToolsVersion '22.0.1'
 //    systemProperty 'logback.configurationFile', 'assets/logback.xml'
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
@@ -18,15 +18,13 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
     }
-
     tracepotConfig {
         apiGroupKey "1234567890abcdef"
         enabledFor "develop"
     }
-
     defaultConfig {
         applicationId "fr.android.scaron.diaspdroid"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -37,37 +35,36 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-//    compile fileTree(dir: 'libs', include: ['*.properties'])
-
-    compile 'com.android.support:appcompat-v7:+'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //    compile fileTree(dir: 'libs', include: ['*.properties'])
+    compile 'com.android.support:appcompat-v7:22.+'
     compile 'com.android.support:support-v4:+'
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
     compile 'ch.acra:acra:4.+'
-//    compile 'com.koushikdutta.ion:ion:2.+'
-//    compile 'com.koushikdutta.async:androidasync:2.+'
+    //    compile 'com.koushikdutta.ion:ion:2.+'
+    //    compile 'com.koushikdutta.async:androidasync:2.+'
     compile 'com.google.code.gson:gson:2.3.1'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
-    compile "org.slf4j:jcl-over-slf4j:1.7.+"
+    compile 'org.slf4j:slf4j-api:1.7.+'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.+'
     compile('com.github.tony19:logback-android-classic:1.+') {
         exclude group: 'com.google.android', module: 'android'
     }
     compile 'com.google.apis:google-api-services-youtube:v3-rev125-1.19.1'
     compile 'org.apache.commons:commons-lang3:3.+'
-
     compile 'org.springframework.android:spring-android-core:1.0.1.RELEASE'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
-
     compile 'org.apache.httpcomponents:httpmime:4.3.3'
     compile 'org.apache.httpcomponents:httpcore:4.3.3'
     compile 'commons-io:commons-io:2.4'
-//    compile 'com.github.navasmdc:MaterialDesign:1.4@aar'
-//    compile 'com.android.support:cardview-v7:21.0.+'
-//    compile 'com.android.support:recyclerview-v7:21.0.+'
+    //    compile 'com.github.navasmdc:MaterialDesign:1.4@aar'
+    //    compile 'com.android.support:cardview-v7:22.0.+'
+    //    compile 'com.android.support:recyclerview-v7:22.0.+'
     androidTestCompile 'junit:junit:4.10'
 }
 
@@ -75,7 +72,7 @@ apt {
     arguments {
         androidManifestFile variant.outputs[0].processResources.manifestFile
         // if you have multiple outputs (when using splits), you may want to have other index than 0
-
+/*
         // If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
         // resourcePackageName android.defaultConfig.packageName
         resourcePackageName 'fr.android.scaron.diaspdroid'
@@ -84,6 +81,6 @@ apt {
         // logLevel 'INFO'
         // logFile '/var/log/aa.log'
        logLevel 'DEBUG'
-       logFile '/sdcard/Android/data/fr.scaron.diaspdroid/logs/mainapplication.log'
+       logFile '/sdcard/Android/data/fr.scaron.diaspdroid/logs/mainapplication.log'*/
     }
 }
